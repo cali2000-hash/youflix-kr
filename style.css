@@ -86,6 +86,11 @@
      margin-bottom: 20px;
      letter-spacing: -1px;
  }
+
+.category-header {
+    padding: 20px 4% 10px;
+}
+
 /* Dropdown System */
  .nav-links li { position: relative; list-style: none; display: inline-block; }
  .dropdown {
