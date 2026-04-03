@@ -17,16 +17,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
 <body class="category-page-bg">
-    <header class="navbar">
-        <div class="logo-container">
-            <a href="index.html" class="logo">YOUFLIX<span>.KR</span></a>
-        </div>
-        <nav class="nav-links">
-            <a href="index.html">← Back to Home</a>
+    <header id="main-header" class="navbar">
+        <a href="index.html" class="logo">YOUFLIX.KR</a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="category.html?c=kpop">K-Pop</a></li>
+                <li><a href="category.html?c=kdrama">Drama</a></li>
+                <li><a href="category.html?c=kclassic">Classic</a></li>
+                <li><a href="category.html?c=kvariety">Variety</a></li>
+                <li><a href="category.html?c=trending">Trending</a></li>
+            </ul>
         </nav>
-        <div class="header-actions">
-            <div class="auth-container">
-                <button id="login-btn" onclick="handleAuth()" class="btn btn-login">Google Login</button>
+        <div class="user-nav">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search archive...">
             </div>
         </div>
     </header>
@@ -46,33 +50,30 @@
             <button id="load-more-btn" class="btn-load-more">Load More Treasures</button>
         </div>
 
-        <!-- Footer for AdSense Approval -->
+    <!-- Global Video Modal -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="video-container" id="player-area">
+                <!-- Video will be injected here -->
+            </div>
+            <div class="modal-info">
+                <h2 id="modal-title">Video Title</h2>
+                <p id="modal-desc" style="margin-top: 15px; color: #ccc; font-size: 0.9rem; line-height: 1.6;">
+                    Special curation from Korea's National Movie & Music archive.
+                </p>
+            </div>
+        </div>
+    </div>
+    
     <footer>
         <div class="footer-links">
             <a href="about.html">About</a>
             <a href="privacy.html">Privacy Policy</a>
             <a href="contact.html">Contact Us</a>
+            <a href="admin.html" style="opacity: 0.3;">Admin</a>
         </div>
         <p>© 2024 YOUFLIX.KR / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
-    </footer>
-    </main>
-
-    <!-- Global Video Modal -->
-    <div id="video-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="video-container">
-                <div id="player"></div>
-            </div>
-            <div class="modal-info">
-                <h2 id="modal-title">Video Title</h2>
-                <p id="modal-desc">Loading description...</p>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <p>&copy; 2024 YOUFLIX.KR | The Global Premium YouTube Archive Platform</p>
     </footer>
 
     <script src="script.js"></script>

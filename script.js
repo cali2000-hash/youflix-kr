@@ -85,14 +85,34 @@ function closeModal() {
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
     
+    // Main Page Rows (이 ID가 존재할 때만 작동)
     load('kpop', { elementId: 'kpop-grid' });
     load('kdrama', { elementId: 'kdrama-grid' });
     load('kclassic', { elementId: 'kclassic-grid' });
     load('trending', { elementId: 'trending-grid' });
 
+    // Category Page Logic: URL 파라미터 감지
+    const params = new URLSearchParams(window.location.search);
+    const catKey = params.get('c') || params.get('id');
+    
+    if (catKey) {
+        const titleMap = {
+            'kpop': 'K-POP MV Archive',
+            'kdrama': 'K-Drama World',
+            'kclassic': 'K-Classic (KOFA)',
+            'kvariety': 'K-Variety Buzz',
+            'trending': 'Trending Now'
+        };
+        const titleEl = document.getElementById('category-title');
+        if (titleEl && titleMap[catKey]) titleEl.innerText = titleMap[catKey];
+        
+        load(catKey, { elementId: 'category-grid' });
+    }
+
     // Header Scroll Effect
     window.addEventListener('scroll', () => {
         const header = document.getElementById('main-header');
+        if (!header) return;
         if (window.scrollY > 50) header.classList.add('scrolled');
         else header.classList.remove('scrolled');
     });
