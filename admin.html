@@ -9,6 +9,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXX');
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --admin-primary: #e50914; --admin-bg: #0b0b0b; --card-bg: #1a1a1a; }
@@ -53,9 +61,10 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <span class="stat-label">오늘 보신 분들 (PV)</span>
-            <span class="stat-value" id="pv-count">0</span>
-            <div style="font-size:0.7rem; color:#00ff00;">▲ 실시간 업데이트 중</div>
+            <p class="stat-label">Google Analytics</p>
+            <p class="stat-value" id="ga-status">실시간 추적 중</p>
+            <p class="stat-change">Real-time Data Active</p>
+            <button onclick="window.open('https://analytics.google.com/')" class="btn-sm" style="margin-top:10px; background: #4285F4; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">GA 대시보드 열기</button>
         </div>
         <div class="stat-card">
             <span class="stat-label">보관된 영상 자산</span>
