@@ -24,14 +24,19 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Actions
+// 2. Auth Actions (v13.1 - Popup Restored for Chrome Privacy Sandbox)
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        await auth.signInWithRedirect(provider);
+        // 크롬 브라우저의 서드파티 쿠키 차단/파티셔닝 대응을 위해 팝업으로 복귀
+        await auth.signInWithPopup(provider);
     } catch (e) {
-        alert("Login process failed: " + e.message);
+        if (e.code === 'auth/popup-blocked' || e.message.includes('popup')) {
+            alert("🛑 팝업이 차단되었습니다!\n'Responsively App' 같은 가상 브라우저에서는 로그인이 제한됩니다.\n크롬(Chrome)이나 사파리(Safari) 일반 창에서 실행해 주세요!");
+        } else {
+            alert("Login System Error: " + e.message);
+        }
     }
 }
 
