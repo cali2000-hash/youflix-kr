@@ -85,11 +85,13 @@ function closeModal() {
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
     
-    // Main Page Rows (이 ID가 존재할 때만 작동)
-    load('kpop', { elementId: 'kpop-grid' });
-    load('kdrama', { elementId: 'kdrama-grid' });
-    load('kclassic', { elementId: 'kclassic-grid' });
-    load('trending', { elementId: 'trending-grid' });
+    // Main Page Rows Auto-Detection
+    const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+    rows.forEach(row => {
+        if (document.getElementById(row + '-grid')) {
+            load(row, { elementId: row + '-grid' });
+        }
+    });
 
     // Category Page Logic: URL 파라미터 감지
     const params = new URLSearchParams(window.location.search);
