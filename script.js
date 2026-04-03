@@ -271,7 +271,22 @@ function openVideo(videoId, title, channel) {
     document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
     const descEl = document.getElementById('modal-desc');
-    if (descEl) descEl.textContent = `Visual Essence from the ${channel} channel. Premium streaming archive.`;
+    if (descEl) descEl.textContent = `Official premium archve from the ${channel} channel. Digital restoration provided for your experience.`;
+
+    // Add direct YouTube link button for restricted videos
+    const modalInfo = document.querySelector('.modal-info');
+    let ytLinkBtn = document.getElementById('modal-yt-link');
+    if (!ytLinkBtn) {
+        ytLinkBtn = document.createElement('a');
+        ytLinkBtn.id = 'modal-yt-link';
+        ytLinkBtn.className = 'btn btn-primary';
+        ytLinkBtn.style.marginTop = '20px';
+        ytLinkBtn.style.display = 'inline-block';
+        ytLinkBtn.target = '_blank';
+        modalInfo.appendChild(ytLinkBtn);
+    }
+    ytLinkBtn.href = `https://www.youtube.com/watch?v=${videoId}`;
+    ytLinkBtn.textContent = 'Watch Directly on YouTube 🎬';
 
     if (player && typeof player.loadVideoById === 'function') {
         player.loadVideoById(videoId);
