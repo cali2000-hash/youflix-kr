@@ -75,16 +75,21 @@ function initHero() {
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
     try {
-        console.log(`Fetching videos for: ${query}`);
+        console.log(`[API Diagnostic] Fetching for: "${query}" using key ending in: ...${API_KEY.substring(API_KEY.length - 5)}`);
         const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
-            console.error('YouTube API Error:', data.error.message);
+            console.error('[API Error Detail]:', data.error.code, data.error.message, data.error.status);
             return [];
         }
 
-        if (!data.items || data.items.length === 0) return [];
+        if (!data.items || data.items.length === 0) {
+            console.warn(`[API Info]: No search results found for "${query}"`);
+            return [];
+        }
+
+        console.log(`[API Success]: Found ${data.items.length} videos for "${query}"`);
 
         return data.items.map(item => ({
             id: item.id.videoId,
@@ -95,7 +100,7 @@ async function fetchYouTubeVideos(query) {
             desc: item.snippet.description || ""
         }));
     } catch (error) {
-        console.error('Network error while fetching videos:', error);
+        console.error('[Network Error]:', error);
         return [];
     }
 }
