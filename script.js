@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v12.9 - CO-EXISTENCE Edition)
- * Features: Google Auth (Redirect), Cloud Sync, Real-time Profile Swap without deleting SearchBox
+ * YOUFLIX.KR Premium Archive Engine (v14.0 - Data Integrity Edition)
+ * Fixes: ID Synchronization for Video Grids, Category Loading Stability
  */
 
 const firebaseConfig = {
@@ -24,16 +24,15 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Actions (v13.1 - Popup Restored for Chrome Privacy Sandbox)
+// 2. Auth Actions (v13.1 - Popup Restored)
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     try {
-        // 크롬 브라우저의 서드파티 쿠키 차단/파티셔닝 대응을 위해 팝업으로 복귀
         await auth.signInWithPopup(provider);
     } catch (e) {
         if (e.code === 'auth/popup-blocked' || e.message.includes('popup')) {
-            alert("🛑 팝업이 차단되었습니다!\n'Responsively App' 같은 가상 브라우저에서는 로그인이 제한됩니다.\n크롬(Chrome)이나 사파리(Safari) 일반 창에서 실행해 주세요!");
+            alert("🛑 팝업이 차단되었습니다! 크롬이나 사파리 일반 창에서 실행해 주세요!");
         } else {
             alert("Login System Error: " + e.message);
         }
@@ -45,16 +44,15 @@ async function logout() {
     location.reload();
 }
 
-// 3. Smart UI Engine (v12.9 - Protects SearchBox)
+// 3. Smart UI Engine
 function updateAuthUI(user) {
     const targets = document.querySelectorAll('.user-nav');
     targets.forEach(nav => {
-        // 기존에 생성된 버튼이나 프로필이 있는지 확인
         let authZone = nav.querySelector('.auth-zone');
         if (!authZone) {
             authZone = document.createElement('div');
             authZone.className = 'auth-zone';
-            nav.appendChild(authZone); // 검색창 뒤에 추가
+            nav.appendChild(authZone);
         }
 
         if (user) {
@@ -65,7 +63,6 @@ function updateAuthUI(user) {
         }
     });
 
-    // Handle Admin Link Visibility (Admin Only)
     const adminLink = document.getElementById('admin-link');
     if (adminLink) {
         const isAdmin = user && user.email === 'cali20000@gmail.com';
@@ -117,13 +114,14 @@ async function toggleFav(v) {
     return result;
 }
 
-// 5. Component Loaders
+// 5. Component Loaders (v14.0 - Reliable IDs)
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
     try {
         const snap = await db.collection(key).orderBy('date', 'desc').limit(20).get();
         grid.innerHTML = '';
+        if (snap.empty) { grid.innerHTML = '<p class="loading-msg">현재 준비된 영상이 없습니다.</p>'; return; }
         snap.forEach(doc => {
             const v = doc.data(); v.category = key;
             const isFav = checkFav(v.id);
@@ -140,7 +138,10 @@ async function load(key, config) {
             card.querySelector('.thumbnail-container').onclick = () => openModal(v);
             grid.appendChild(card);
         });
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+        console.error("Load Error for " + key, e); 
+        grid.innerHTML = '<p class="loading-msg">데이터 소환 중 오류가 발생했습니다.</p>';
+    }
 }
 
 function openModal(v) {
@@ -177,7 +178,10 @@ function renderMyList(targetGridId = 'mylist-grid') {
     const favs = getFavs();
     const row = document.getElementById('mylist-row');
     if (targetGridId === 'mylist-grid' && row) row.style.display = favs.length > 0 ? 'block' : 'none';
-    if (favs.length === 0) { grid.innerHTML = '<p class="loading-msg" style="padding:4rem 0;">마이 리스트가 비어 있습니다.</p>'; return; }
+    if (favs.length === 0) { 
+        if (targetGridId === 'category-grid') grid.innerHTML = '<p class="loading-msg" style="padding:4rem 0;">마이 리스트가 비어 있습니다. 하트를 눌러보세요!</p>';
+        return; 
+    }
     grid.innerHTML = '';
     favs.forEach(v => {
         const card = document.createElement('div');
@@ -199,10 +203,26 @@ auth.onAuthStateChanged(async (user) => {
 // 7. Initialization
 document.addEventListener('DOMContentLoaded', async () => {
     trackPV();
-    auth.getRedirectResult().catch(e => { console.error(e); if (e.code !== 'auth/internal-error') alert("Redirect Login Result: " + e.message); });
-    
+    auth.getRedirectResult().catch(e => { console.error(e); });
+
+    // Multi-Row Support (Main Page)
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
-    rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
+    rows.forEach(row => { 
+        const gridId = row + '-grid';
+        if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
+    });
+
+    // Category Page Logic (Single Filter)
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('c');
+    if (cat && document.getElementById('category-grid')) {
+        const catTitle = document.getElementById('category-title');
+        const titles = { 'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 'kclassic': 'Eternal Cinema', 'fav': 'My Secret List' };
+        if (catTitle && titles[cat]) catTitle.innerText = titles[cat];
+        
+        if (cat === 'fav') renderMyList('category-grid');
+        else load(cat, { elementId: 'category-grid' });
+    }
     
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
     window.addEventListener('scroll', () => {
