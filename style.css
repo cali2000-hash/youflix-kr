@@ -86,6 +86,35 @@
      margin-bottom: 20px;
      letter-spacing: -1px;
  }
+/* Dropdown System */
+ .nav-links li { position: relative; list-style: none; display: inline-block; }
+ .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 200px;
+    background: #111;
+    border: 1px solid #222;
+    padding: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 1000;
+ }
+ .nav-links li:hover .dropdown { display: block; }
+ .dropdown li { display: block; width: 100%; }
+ .dropdown a {
+    display: block;
+    padding: 10px 20px;
+    color: #888;
+    font-size: 0.85rem;
+    transition: 0.2s;
+ }
+ .dropdown a:hover {
+    color: #fff;
+    background: rgba(229, 9, 20, 0.1);
+ }
+ 
  .search-box input {
      background: transparent;
      border: none;

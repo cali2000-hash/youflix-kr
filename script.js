@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const titleMap = {
             'kpop': 'K-POP MV Archive',
             'kdrama': 'K-Drama World: Official Clips',
+            'tvlit': 'TV Literature Hall (TV문학관)',
             'kclassic': 'Korean Classic Cinema (KOFA)',
             'kvariety': 'K-Variety: Entertainment Buzz',
             'kmovie': 'K-Cinema: Premium Masterpieces',
