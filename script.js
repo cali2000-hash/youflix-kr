@@ -78,8 +78,10 @@ async function load(key, config) {
 // 3. Modal Logic
 function openModal(v) {
     const modal = document.getElementById('video-modal');
-    const player = document.getElementById('player-area');
+    const player = document.getElementById('player'); // ID 수정: player-area -> player
     const title = document.getElementById('modal-title');
+    
+    if (!modal || !player) return;
     
     title.innerText = v.title;
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
@@ -89,8 +91,10 @@ function openModal(v) {
 }
 
 function closeModal() {
-    document.getElementById('video-modal').style.display = 'none';
-    document.getElementById('player-area').innerHTML = '';
+    const modal = document.getElementById('video-modal');
+    const player = document.getElementById('player'); // ID 수정: player-area -> player
+    if (modal) modal.style.display = 'none';
+    if (player) player.innerHTML = '';
     document.body.style.overflow = 'auto';
 }
 
@@ -127,6 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         load(catKey.toLowerCase(), { elementId: 'category-grid' });
     }
+
+    // v10.7 모달 닫기 이벤트 강화 (X버튼 및 외부 클릭)
+    document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('video-modal');
+        if (e.target === modal) closeModal();
+    });
 
     // Header Scroll Effect
     window.addEventListener('scroll', () => {
