@@ -51,6 +51,23 @@
         .thumb-mini { width: 60px; border-radius: 4px; }
         .btn-del { border: 1px solid #e50914; background: transparent; color: #e50914; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         .btn-del:hover { background: #e50914; color: #fff; }
+        
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            background: #444;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: 0.3s;
+            vertical-align: middle;
+        }
+        .info-icon:hover { background: var(--admin-primary); }
     </style>
 </head>
 <body>
@@ -72,7 +89,7 @@
             <div style="font-size:0.7rem; color:#aaa;">아카이브 총계</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">시스템 엔진 상태</span>
+            <span class="stat-label">시스템 엔진 상태 <span class="info-icon" onclick="showEngineInfo()">?</span></span>
             <div style="margin:20px 0;"><span class="status-dot"></span> <span id="sys-status">최상 (Excellent)</span></div>
             <div style="font-size:0.7rem; color:#aaa;">모든 서버 정상 작동</div>
         </div>

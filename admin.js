@@ -58,6 +58,15 @@ async function loadStats() {
     }
 }
 
+// v9.0 루미의 시스템 엔진 가이드함수
+function showEngineInfo() {
+    alert("🌌 [유플릭스 시스템 엔진 핵심 역할]\n\n" +
+          "1. 데이터베이스 감시: 파이어베이스 실시간 연결 무결성 확보\n" +
+          "2. 보안 가드: 아카이브 영상 및 데이터 불법 접근 원천 차단\n" +
+          "3. 과부하 가시화: API 사용량 및 트래픽 폭주 감지 모니터링\n\n" +
+          "루미는 오늘도 유플릭스의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨");
+}
+
 function updateResourceGauges(pv, videos) {
     const ytQuotaMax = 10000;
     const fbReadMax = 50000;
