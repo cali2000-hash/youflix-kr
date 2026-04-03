@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v14.7 - Layout Harmony) */
+/* YOUFLIX.KR Premium Style Sheet (v14.8 - Force Collision Fix) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -17,7 +17,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar (v14.7 Reinforced Density) */
+/* Navbar (v14.8 Solid Protection) */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -26,8 +26,9 @@ body {
     position: fixed;
     top: 0; width: 100%;
     z-index: 1000;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
-    transition: background 0.3s ease;
+    background: rgba(0, 0, 0, 0.98) !important; /* Force solid background to prevent see-through overlap */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 .navbar.scrolled { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 .logo {
@@ -38,65 +39,29 @@ body {
     letter-spacing: -1.5px;
 }
 
-/* Nav Links & Dropdown (v14.6 Remaster) */
+/* Nav Links & Dropdown */
 .nav-links { display: flex; list-style: none; gap: 25px; align-items: center; }
-.nav-links li { position: relative; }
-.nav-links a {
-    color: #e5e5e5;
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: color 0.3s;
-}
+.nav-links a { color: #e5e5e5; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.3s; }
 .nav-links a:hover { color: #fff; }
 
 /* Premium Dropdown Style */
 .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: rgba(10, 10, 10, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 180px;
-    padding: 10px 0;
-    border-radius: 4px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    margin-top: 15px;
+    display: none; position: absolute; top: 100%; left: 0;
+    background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 180px; padding: 10px 0; border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-top: 15px;
 }
-.nav-links li:hover .dropdown-menu { display: block; animation: fadeIn 0.25s ease; }
-.dropdown-menu a {
-    padding: 10px 20px;
-    font-size: 0.85rem;
-    color: #bbb;
-}
-.dropdown-menu a:hover {
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    padding-left: 25px;
-}
+.nav-links li:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
 
 .user-nav { display: flex; align-items: center; gap: 20px; }
 #search-input {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    padding: 6px 15px;
-    border-radius: 20px !important;
-    width: 220px;
-    height: 34px;
-    font-size: 0.85rem;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 6px 15px; border-radius: 20px !important; width: 220px; height: 34px;
 }
 .btn-login {
-    background: var(--netflix-red) !important;
-    padding: 0 20px !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    border-radius: 20px !important;
-    height: 34px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    background: var(--netflix-red) !important; padding: 0 20px !important;
+    font-size: 0.85rem !important; font-weight: 700 !important; border-radius: 20px !important; height: 34px !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
 }
 
 /* Hero */
@@ -107,9 +72,9 @@ body {
     display: flex; align-items: center; padding: 0 4%; margin-bottom: -100px;
 }
 
-/* Category Page (v14.7 Balanced Header) */
+/* Category Page (v14.8 Super-Spacer Fix) */
 .category-page {
-    padding: 160px 4% 80px; /* Increased top padding for fixed navbar */
+    padding: 220px 4% 80px !important; /* Force extreme top padding to push content below fixed navbar */
     min-height: 100vh;
 }
 .category-header {
@@ -117,7 +82,7 @@ body {
     max-width: 900px;
 }
 #category-title {
-    font-size: 3rem; /* Adjusted for better balance */
+    font-size: 2.8rem; /* Slightly smaller for better fit */
     font-weight: 900;
     letter-spacing: -2px;
     color: #fff;
@@ -125,18 +90,13 @@ body {
     text-transform: capitalize;
 }
 .category-header p {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     color: rgba(255,255,255,0.5);
     line-height: 1.5;
     font-weight: 400;
 }
 
-/* Row & Grid */
-.row { padding: 40px 0 10px 4%; position: relative; z-index: 2; overflow: hidden; }
-.view-all-link { 
-    color: #e5e5e5; text-decoration: none; font-size: 0.75rem; font-weight: 800; 
-    background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px;
-}
+/* Grid & Rows */
 #category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -145,7 +105,7 @@ body {
 }
 #category-grid .video-card { flex: none; width: 100%; }
 
-/* Video Cards Core (Restored and Optimized) */
+/* Video Cards Core */
 .video-card {
     background: var(--card-bg);
     border-radius: 4px;
@@ -157,10 +117,14 @@ body {
 .thumbnail-container { position: relative; aspect-ratio: 16/9; }
 .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
 .video-info { padding: 12px; }
-.video-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
+.video-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Modal & Footer Stylings */
+/* Footer */
 footer { padding: 80px 4% 40px; text-align: center; color: #808080; font-size: 0.8rem; }
+.footer-links { margin-bottom: 20px; display: flex; justify-content: center; gap: 30px; }
+.footer-links a { color: #808080; text-decoration: none; }
+
+/* Animations */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-in { animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
