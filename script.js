@@ -3,7 +3,7 @@
  */
 
 // 1. Configuration & Fallback Data
-const API_KEY = 'AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU';
+const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 
 const FALLBACK_DATA = {
     nature: [
@@ -136,18 +136,43 @@ function getOrCreateDebugEl() {
     return el;
 }
 
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
+
 async function fetchAllCategories() {
     let heroSetFromAPI = false;
 
     for (const [key, category] of Object.entries(CATEGORIES)) {
-        let videos = await fetchYouTubeVideos(category.query);
         const grid = document.getElementById(category.elementId);
-        
         if (!grid) continue;
 
-        // Fallback if API fails
+        // --- Caching Logic ---
+        const cacheKey = `youflix_cache_${key}`;
+        const cached = localStorage.getItem(cacheKey);
+        let videos = [];
+
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            const isFresh = (Date.now() - parsed.timestamp) < CACHE_DURATION;
+            if (isFresh) {
+                console.log(`[Cache Hit]: Using saved data for ${key}`);
+                videos = parsed.data;
+            }
+        }
+
+        // If no fresh cache, hit the API
+        if (videos.length === 0) {
+            videos = await fetchYouTubeVideos(category.query);
+            if (videos.length > 0) {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    timestamp: Date.now(),
+                    data: videos
+                }));
+            }
+        }
+
+        // Fallback if both API and Cache fail
         if (videos.length === 0 && FALLBACK_DATA[key]) {
-            console.warn(`No API results for ${key}, using fallback data.`);
+            console.warn(`[Fallback]: Using offline data for ${key}`);
             videos = FALLBACK_DATA[key];
         }
 
@@ -155,7 +180,6 @@ async function fetchAllCategories() {
             grid.innerHTML = ''; 
             videos.forEach(v => grid.appendChild(createVideoCard(v)));
 
-            // Dynamic Hero Update from the very first video fetched from API/Nature
             if (!heroSetFromAPI && (key === 'nature' || key === 'trending')) {
                 updateHeroContent(videos[0]);
                 heroSetFromAPI = true;
