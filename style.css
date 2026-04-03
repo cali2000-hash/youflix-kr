@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v14.1 - Horizon Scroll Revival) */
+/* YOUFLIX.KR Premium Style Sheet (v14.2 - The Detail Finale) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -86,10 +86,32 @@ body {
 }
 .hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -2px; }
 
-/* Horizon Scroll Row (Main Page Highlight) */
+/* Horizon Scroll Row */
 .row { padding: 40px 0 10px 4%; position: relative; z-index: 2; overflow: hidden; }
 .row-header { padding-right: 4%; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
+
+/* View All Link (v14.2 Premium Detailing) */
+.view-all-link { 
+    color: #808080; 
+    text-decoration: none; 
+    font-size: 0.8rem; 
+    font-weight: 700; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+.view-all-link:hover { 
+    color: #fff; 
+    transform: translateX(5px);
+}
+.view-all-link:after {
+    content: '›';
+    font-size: 1.2rem;
+    line-height: 0;
+    transition: transform 0.3s ease;
+}
 
 .video-grid {
     display: flex;
@@ -98,15 +120,16 @@ body {
     gap: 10px;
     padding-bottom: 20px;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Scrollbar Styling */
 .video-grid::-webkit-scrollbar { height: 4px; }
 .video-grid::-webkit-scrollbar-track { background: transparent; }
-.video-grid::-webkit-scrollbar-thumb { background: rgba(229, 9, 20, 0.4); border-radius: 2px; }
+.video-grid::-webkit-scrollbar-thumb { background: rgba(229, 9, 20, 0.3); border-radius: 2px; }
 .video-grid:hover::-webkit-scrollbar-thumb { background: var(--netflix-red); }
 
-/* Category Grid (Special Override for category.html) */
+/* Category Grid Override */
 #category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -116,14 +139,14 @@ body {
 
 /* Video Cards */
 .video-card {
-    flex: 0 0 280px; /* Fixed width for Horizon Scroll */
+    flex: 0 0 280px; 
     background: var(--card-bg);
     border-radius: 4px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s;
 }
-#category-grid .video-card { flex: none; } /* Reset flex for grid layout */
+#category-grid .video-card { flex: none; } 
 
 .video-card:hover { transform: scale(1.05); z-index: 10; }
 .thumbnail-container { position: relative; aspect-ratio: 16/9; }
