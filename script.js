@@ -1,13 +1,15 @@
 /**
- * YOUFLIX.IO - Ultimate Reliable Engine (v5.4)
- * MODAL REPAIR & AUTH SYNC
+ * YOUFLIX.IO - Key Sync Engine (v5.5)
+ * FIXED API KEY & AUTH
  */
 
-console.log("🎬 YOUFLIX Engine v5.4: Modal Fixed...");
+console.log("🎬 YOUFLIX Engine v5.5: Key Synchronized...");
 
-const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
+// Universal Key (Same as YouTube for maximum compatibility)
+const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
+
 const firebaseConfig = {
-    apiKey: "AIzaSyCjqOk6CidQvxXXFBVNa5liqshtpjQ3oQw",
+    apiKey: UNIVERSAL_KEY,
     authDomain: "gen-lang-client-0874410222.firebaseapp.com",
     projectId: "gen-lang-client-0874410222",
     storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
@@ -21,15 +23,19 @@ const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 window.handleAuth = async function() {
-    console.log("🔐 Auth Button Clicked!");
+    console.log("🔐 Auth Action Triggered...");
     try {
         if (auth.currentUser) {
             await auth.signOut();
             window.location.reload();
         } else {
+            console.log("🚀 Redirecting to Google...");
             await auth.signInWithRedirect(provider);
         }
-    } catch (e) { console.error("🔑 Auth Error:", e.message); alert("Auth failed: " + e.message); }
+    } catch (e) { 
+        console.error("🔑 API Key/Auth Error Details:", e.code, e.message); 
+        alert("Auth Error: " + e.message + "\n(Code: " + e.code + ")");
+    }
 };
 
 auth.onAuthStateChanged(user => {
@@ -55,12 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupUI();
 });
 
-const DEMO_DATA = {
-    kpop: [{ id: '900X9f_vWRE', title: 'Top K-POP MV', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800' }],
-    kdrama: [{ id: '900X9f_vWRE', title: 'Hot K-Drama', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800' }],
-    kclassic: [{ id: 'TUTP6D_X3Ww', title: 'Classic Film', channel: 'KOFA', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed0963c?auto=format&fit=crop&q=80&w=800' }]
-};
-
 const CATEGORIES = {
     kpop: { query: 'Official K-POP MV 4K', elementId: 'kpop-grid' },
     kdrama: { query: 'Official K-Drama Trailer 4K', elementId: 'kdrama-grid' },
@@ -70,7 +70,6 @@ const CATEGORIES = {
     trending: { query: 'Trending K-POP 2024 Today', elementId: 'trending-grid' }
 };
 
-function initMainPage() { initHero(); Object.entries(CATEGORIES).forEach(([k, c]) => load(k, c)); }
 async function load(key, config) {
     const grid = document.getElementById(config.elementId); if (!grid) return;
     grid.innerHTML = '<p class="loading-msg">Searching content...</p>';
@@ -84,13 +83,13 @@ async function load(key, config) {
             if (raw.length > 0) { vids = [...raw, ...vids].slice(0, 15); sync(key, raw); localStorage.setItem(`f_${key}`, Date.now()); }
         }
     } catch (e) {}
-    if (vids.length === 0) vids = DEMO_DATA[key] || DEMO_DATA.kpop;
+    if (vids.length === 0) vids = [{ id: '900X9f_vWRE', title: 'Loading...', channel: 'Archive', date: '2024', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800' }];
     grid.innerHTML = ''; vids.forEach(v => grid.appendChild(card(v)));
 }
 
 async function fetchYT(q) {
     try {
-        const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(q)}&type=video&key=${API_KEY}`);
+        const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(q)}&type=video&key=${UNIVERSAL_KEY}`);
         const d = await r.json();
         return (d.items || []).map(i => ({ id: i.id.videoId, title: i.snippet.title, channel: i.snippet.channelTitle, date: new Date(i.snippet.publishedAt).toLocaleDateString(), thumbnail: i.snippet.thumbnails.high ? i.snippet.thumbnails.high.url : i.snippet.thumbnails.medium.url, desc: i.snippet.description || "" }));
     } catch (e) { return []; }
@@ -107,17 +106,13 @@ function card(v) {
 function open(id, title, channel) {
     const m = document.getElementById('video-modal'); m.style.display = 'block'; document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
-    
     let ctrls = document.getElementById('modal-controls');
     if (!ctrls) { ctrls = document.createElement('div'); ctrls.id = 'modal-controls'; ctrls.className = 'modal-controls'; document.querySelector('.modal-info')?.prepend(ctrls); }
-    
-    ctrls.innerHTML = ''; // Clear and Re-build
+    ctrls.innerHTML = '';
     const yt = document.createElement('a'); yt.id = 'modal-yt-link'; yt.className = 'btn btn-primary'; yt.target = '_blank'; yt.href = `https://www.youtube.com/watch?v=${id}`; yt.textContent = 'Watch on YouTube 🎬';
     ctrls.appendChild(yt);
-    
     const lb = document.createElement('button'); lb.id = 'modal-login-btn'; lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px'; lb.onclick = window.handleAuth; lb.innerHTML = auth.currentUser ? `Logged in ✅` : `Login with Google 🔐`;
     ctrls.appendChild(lb);
-
     if (player && player.loadVideoById) player.loadVideoById(id);
     else { if (window.YT) create(id); else { const t = document.createElement('script'); t.src = "https://www.youtube.com/iframe_api"; document.body.appendChild(t); window.onYouTubeIframeAPIReady = () => create(id); } }
 }
@@ -126,4 +121,5 @@ function create(id) { player = new YT.Player('player', { height: '100%', width: 
 function close() { document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
 function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function setupUI() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
+function initMainPage() { initHero(); Object.entries(CATEGORIES).forEach(([k, c]) => load(k, c)); }
 function initHero() { const b = document.getElementById('hero-play-btn'); if (b) b.onclick = () => open('TUTP6D_X3Ww', 'Welcome', 'YOUFLIX'); }
