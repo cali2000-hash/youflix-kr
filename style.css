@@ -91,26 +91,34 @@ body {
 .row-header { padding-right: 4%; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
 
-/* View All Link (v14.2 Premium Detailing) */
+/* View All Button Re-master (v14.3 Premium Pill-Shape) */
 .view-all-link { 
-    color: #808080; 
+    color: #e5e5e5; 
     text-decoration: none; 
-    font-size: 0.8rem; 
-    font-weight: 700; 
+    font-size: 0.75rem; 
+    font-weight: 800; 
+    background: rgba(255,255,255,0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 .view-all-link:hover { 
-    color: #fff; 
-    transform: translateX(5px);
+    background: #fff;
+    color: #000;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 15px rgba(255,255,255,0.3);
 }
 .view-all-link:after {
     content: '›';
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     line-height: 0;
-    transition: transform 0.3s ease;
+    margin-top: -1px;
 }
 
 .video-grid {
