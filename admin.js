@@ -92,15 +92,9 @@ function updateResourceGauges(pv, videos) {
 function renderPulseChart(currentPV) {
     const ctx = document.getElementById('pulseChart').getContext('2d');
     const labels = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '오늘'];
-    const data = [
-        Math.floor(currentPV * 0.4), 
-        Math.floor(currentPV * 0.6), 
-        Math.floor(currentPV * 0.5), 
-        Math.floor(currentPV * 0.8), 
-        Math.floor(currentPV * 0.7), 
-        Math.floor(currentPV * 1.2), 
-        currentPV
-    ];
+    
+    // v9.1 루미의 데이터 정직 엔진: 가상 데이터 제거 후 오늘 데이터만 표시
+    const data = [0, 0, 0, 0, 0, 0, currentPV]; 
 
     new Chart(ctx, {
         type: 'line',
