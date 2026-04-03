@@ -21,6 +21,38 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// Login / Logout Logic
+async function handleAuth() {
+    const user = auth.currentUser;
+    if (user) {
+        await auth.signOut();
+        alert("Logged out from Premium Archive.");
+    } else {
+        try {
+            await auth.signInWithPopup(provider);
+            alert(`Welcome, ${auth.currentUser.displayName}! Enthusiast Mode enabled.`);
+        } catch (error) {
+            console.error("Auth Error:", error);
+        }
+    }
+}
+
+auth.onAuthStateChanged(user => {
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        if (user) {
+            loginBtn.textContent = 'Logout';
+            loginBtn.classList.add('logged-in');
+            // Optional: Show profile pic
+        } else {
+            loginBtn.textContent = 'Google Login';
+            loginBtn.classList.remove('logged-in');
+        }
+    }
+});
 
 // 2. Category Configuration (K-Content Focus)
 const CATEGORIES = {

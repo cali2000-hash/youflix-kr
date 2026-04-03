@@ -28,16 +28,20 @@
             <h1 class="logo">YOUFLIX<span>.KR</span></h1>
         </div>
         <nav class="nav-links">
-            <a href="#kpop">K-POP MV</a>
-            <a href="#kdrama">K-Drama</a>
-            <a href="#kmovie">K-Movie</a>
-            <a href="#kclassic">K-Classic</a>
-            <a href="#kvariety">K-Variety</a>
+            <a href="#kpop">K-POP</a>
+            <a href="#kdrama">Cinema</a>
+            <a href="#kclassic">Classic</a>
+            <a href="#kvariety">Variety</a>
             <a href="#trending">Trending</a>
         </nav>
-        <div class="search-bar">
-            <input type="text" id="video-search" placeholder="Explore K-Archive...">
-            <button id="search-btn">Search</button>
+        <div class="header-actions">
+            <div class="search-bar">
+                <input type="text" id="video-search" placeholder="Explore K-Archive...">
+                <button id="search-btn">Search</button>
+            </div>
+            <div class="auth-container">
+                <button id="login-btn" onclick="handleAuth()" class="btn btn-login">Google Login</button>
+            </div>
         </div>
     </header>
 
