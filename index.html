@@ -1,118 +1,122 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX - 프리미엄 유튜브 큐레이션</title>
-    <meta name="description" content="당신만의 유튜브 알고리즘, YOUFLIX.KR에서 넷플릭스 스타일로 감상하세요.">
-    <!-- Google Fonts: Inter & Outfit -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>YOUFLIX.KR - Premium YouTube Curation</title>
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="A premium Netflix-style YouTube curation blog for Nature, Tech, Knowledge, and Lofi.">
+    <meta name="keywords" content="YouTube Curation, Netflix Style, Wellness, Tech, Nature, Lofi">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <header id="main-header">
-        <div class="container header-content">
-            <div class="logo">
-                <h1 style="color: #E50914; font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.4)); letter-spacing: -2px; font-weight: 900;">YOUFLIX</h1>
-            </div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="#" class="active">홈</a></li>
-                    <li><a href="#">TV 프로그램</a></li>
-                    <li><a href="#">영화</a></li>
-                    <li><a href="#">최신 콘텐츠</a></li>
-                    <li><a href="#">내가 찜한 콘텐츠</a></li>
-                </ul>
-            </nav>
-            <div class="search-bar">
-                <input type="text" id="video-search" placeholder="제목, 사람, 장르">
+<body class="dark-mode">
+
+    <!-- 1. Navigation Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html" style="color: #E50914; font-size: 2.2rem; text-decoration: none; font-weight: 900;">YOUFLIX</a>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">TV Shows</a>
+            <a href="#">Movies</a>
+            <a href="#">New & Popular</a>
+            <a href="#">My List</a>
+        </nav>
+        <div class="header-tools">
+            <div class="search-box">
+                <input type="text" placeholder="Titles, channels, genres" id="search-input">
                 <button type="button" id="search-btn">🔍</button>
             </div>
         </div>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section id="hero" class="hero-section">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content">
-                <h2 id="hero-title">지금 가장 뜨거운 영상</h2>
-                <p id="hero-desc">유튜브에서 가장 인기 있는 동영상을 지금 바로 확인하세요. 하드 용량 걱정 없이 즐기는 고화질 스트리밍 블로그 앱.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" id="hero-play-btn">▶ 재생</button>
-                    <button class="btn btn-secondary">ⓘ 상세 정보</button>
-                </div>
+    <!-- 2. Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1 class="hero-title" id="hero-title">Experience the Best</h1>
+            <p class="hero-desc" id="hero-desc">
+                Escape the noise. Dive into your own world with premium-curated YouTube content tailored to your taste in Nature, Tech, and more.
+            </p>
+            <div class="hero-btns">
+                <button class="btn btn-play" id="hero-play-btn">▶ Play</button>
+                <button class="btn btn-info">ⓘ More Info</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Main Video Rows -->
+    <main class="main-content">
+        <!-- 1. Nature Row -->
+        <section class="video-row">
+            <h2>Visual Escape: Nature & Travel (8K)</h2>
+            <div class="video-grid" id="nature-grid">
+                <!-- script.js will populate this -->
             </div>
         </section>
 
-        <!-- Rows of videos -->
-        <div class="rows-container">
-            <section class="video-row container">
-                <h3 class="row-title">시각적 압도: 8K 자연 & 여행</h3>
-                <div class="video-grid" id="nature-grid">
-                    <!-- Loaded via JS -->
-                </div>
-            </section>
+        <!-- 2. Tech Row -->
+        <section class="video-row">
+            <h2>Minimalist Tech: Premium Reviews</h2>
+            <div class="video-grid" id="tech-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
 
-            <section class="video-row container">
-                <h3 class="row-title">미니멀 & 테크: 프리미엄 리뷰</h3>
-                <div class="video-grid" id="tech-grid">
-                    <!-- Loaded via JS -->
-                </div>
-            </section>
+        <!-- 3. Knowledge Row -->
+        <section class="video-row">
+            <h2>Infinite Knowledge: Visual Essays & Insight</h2>
+            <div class="video-grid" id="knowledge-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
 
-            <!-- 3. Knowledge Row -->
-            <section class="video-row">
-                <h2>학습의 재발견: 깊이 있는 지식 & 비디오 에세이</h2>
-                <div class="video-grid" id="knowledge-grid">
-                    <!-- script.js will populate this -->
-                </div>
-            </section>
+        <!-- 4. Lofi Row -->
+        <section class="video-row">
+            <h2>Deep Focus: Lo-fi Beats & Ambiance</h2>
+            <div class="video-grid" id="lofi-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
 
-            <!-- 4. Lofi Row -->
-            <section class="video-row">
-                <h2>몰입형 휴식: Lo-fi 음악 & 앰비언트 사운드</h2>
-                <div class="video-grid" id="lofi-grid">
-                    <!-- script.js will populate this -->
-                </div>
-            </section>
+        <!-- 5. Trending Row -->
+        <section class="video-row">
+            <h2>Trending Now: Global Viral Picks</h2>
+            <div class="video-grid" id="trending-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
 
-            <!-- 5. Trending Row (NEW) -->
-            <section class="video-row">
-                <h2>지금 뜨는 콘텐츠: 글로벌 인기 프로젝트</h2>
-                <div class="video-grid" id="trending-grid">
-                    <!-- script.js will populate this -->
-                </div>
-            </section>
+        <!-- 6. Movie/Animation Row -->
+        <section class="video-row">
+            <h2>Cinematic Moments: Film Essays & Trailers</h2>
+            <div class="video-grid" id="movie-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
 
-            <!-- 6. Movie/Animation Row (NEW) -->
-            <section class="video-row">
-                <h2>시네마틱 모먼트: 영화 에세이 & 공식 예고편</h2>
-                <div class="video-grid" id="movie-grid">
-                    <!-- script.js will populate this -->
-                </div>
-            </section>
-
-            <!-- 7. Healing Row (NEW) -->
-            <section class="video-row">
-                <h2>마음의 안식: 힐링 영상 & 4K 명상 사운드</h2>
-                <div class="video-grid" id="healing-grid">
-                    <!-- script.js will populate this -->
-                </div>
-            </section>
-        </div>
+        <!-- 7. Healing Row -->
+        <section class="video-row">
+            <h2>Inner Peace: Healing & Meditation (4K)</h2>
+            <div class="video-grid" id="healing-grid">
+                <!-- script.js will populate this -->
+            </div>
+        </section>
     </main>
 
-    <footer id="main-footer">
+    <!-- 4. Footer -->
+    <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 YOUFLIX.KR - No limits, Just watch.</p>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">유튜브 API를 정식으로 사용하며, 어떠한 데이터도 기기에 저장하지 않습니다.</p>
+            <p>© 2026 YOUFLIX.KR - No limits, Just watch.</p>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">Curated with passion for quality content. We use the official YouTube API.</p>
         </div>
     </footer>
 
-    <!-- Video Modal Player -->
+    <!-- Video Modal -->
     <div id="video-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>

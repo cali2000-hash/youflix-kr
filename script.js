@@ -3,12 +3,12 @@
  */
 
 // 1. Configuration
-const API_KEY = 'AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU'; // 사용자가 발급한 API 키
+const API_KEY = 'AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU'; // YouTube Data API Key
 
 const CATEGORIES = {
     nature: { query: 'Nature 4K 8K Travel Documentary 8K', elementId: 'nature-grid' },
     tech: { query: 'Minimalist Tech Review Desk Setup 2024', elementId: 'tech-grid' },
-    knowledge: { query: 'Insightful Knowledge Documentary KR', elementId: 'knowledge-grid' },
+    knowledge: { query: 'Insightful Knowledge Documentary Video Essay', elementId: 'knowledge-grid' },
     lofi: { query: 'Lofi hip hop beats long mix 2024', elementId: 'lofi-grid' },
     trending: { query: 'YouTube Trending Official Music Movie 2024', elementId: 'trending-grid' },
     movie: { query: 'Official Movie Trailer Cinema Essay Analysis', elementId: 'movie-grid' },
@@ -17,8 +17,8 @@ const CATEGORIES = {
 
 const HERO_VIDEO = {
     id: 'f7_7vA_r_vM',
-    title: 'YOUFLIX: 당신만의 새로운 시각',
-    desc: '유튜브의 소음에서 벗어나, 당신이 선택한 카테고리로 구성된 프리미엄 스트리밍 경험을 YOUFLIX.KR에서 시작하세요.',
+    title: 'YOUFLIX: Your New Perspective',
+    desc: 'Escape the noise of the algorithm. Experience premium streaming with curated YouTube content in Nature, Tech, and beyond at YOUFLIX.KR.',
     bg: 'https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1500' 
 };
 
@@ -54,7 +54,7 @@ function initHero() {
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
     try {
-        // videoEmbeddable=true 옵션을 추가하여 퍼가기 금지된 영상은 아예 목록에서 제외
+        // Fetch up to 10 videos per row to provide a rich horizontal scroll
         const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`);
         const data = await response.json();
         
@@ -77,13 +77,12 @@ async function fetchYouTubeVideos(query) {
 }
 
 async function fetchAllCategories() {
-    // 모든 섹션 작업
     for (const [key, category] of Object.entries(CATEGORIES)) {
         const videos = await fetchYouTubeVideos(category.query);
         const grid = document.getElementById(category.elementId);
         
         if (grid && videos.length > 0) {
-            grid.innerHTML = ''; // 기존 목데이터 제거
+            grid.innerHTML = ''; // Remove loading/placeholder
             videos.forEach(v => grid.appendChild(createVideoCard(v)));
         }
     }
@@ -116,12 +115,11 @@ function openVideo(videoId, title, channel) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-desc').textContent = `${channel} 채널의 엄선된 콘텐츠입니다.`;
+    document.getElementById('modal-desc').textContent = `Curated content from the ${channel} channel. Enjoy high-quality streaming.`;
 
     if (player && typeof player.loadVideoById === 'function') {
         player.loadVideoById(videoId);
     } else {
-        // IFrame Player API already loaded?
         if (window.YT && window.YT.Player) {
             createPlayer(videoId);
         } else {
