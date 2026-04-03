@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v13.5 - Emergency Fix) */
+/* YOUFLIX.KR Premium Style Sheet (v13.7 - Specificity Fix) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -62,7 +62,7 @@ body {
 .dropdown li a { padding: 8px 20px; display: block; }
 .has-dropdown:hover .dropdown { display: block; }
 
-/* Search & Auth Zone (v13.5 Fine Tuning) */
+/* Search & Auth Zone (v13.7 - Pill-Shape Integration) */
 .user-nav {
     display: flex;
     align-items: center;
@@ -72,18 +72,12 @@ body {
     display: flex;
     align-items: center;
 }
-.search-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-/* Fixed Selector from .search-input to #search-input */
 #search-input {
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
     padding: 6px 15px;
-    border-radius: 20px;
+    border-radius: 20px !important; /* Force Pill-Shape */
     width: 200px;
     transition: all 0.3s ease;
     height: 32px;
@@ -97,24 +91,24 @@ body {
     outline: none;
 }
 .btn-login {
-    background: var(--netflix-red);
-    color: #fff;
-    padding: 0 18px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    border-radius: 20px;
-    letter-spacing: 1px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    background: var(--netflix-red) !important;
+    color: #fff !important;
+    padding: 0 18px !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    border-radius: 20px !important; /* Force Pill-Shape to match search box (20px) */
+    letter-spacing: 1px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
 }
 .btn-login:hover {
-    background: #ff0f1a;
-    transform: scale(1.05);
+    background: #ff0f1a !important;
+    transform: scale(1.05) !important;
 }
 .profile-img {
     width: 32px;
@@ -151,7 +145,7 @@ body {
 .hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; line-height: 1; }
 .hero p { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; }
 
-/* Global Row Styles */
+/* Row Styles */
 .row { padding: 40px 4% 10px; position: relative; z-index: 2; }
 .row-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
