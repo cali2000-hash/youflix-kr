@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v12.6 - IRON-CLAD UI Edition)
- * Features: Google Auth (Redirect), Cloud Sync, Multi-Target UI Syncing
+ * YOUFLIX.KR Premium Archive Engine (v12.7 - AUTH-INVESTIGATION Edition)
+ * Features: Google Auth (Redirect), Cloud Sync, Robust UI Syncing, Forced Persistence
  */
 
 const firebaseConfig = {
@@ -24,11 +24,16 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Actions
+// 2. Auth Actions (v12.7 - Forced Persistence)
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    try { await auth.signInWithRedirect(provider); } 
-    catch (e) { alert("Login failed: " + e.message); }
+    try {
+        // 세션 영구 유지 설정 (Local)
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        await auth.signInWithRedirect(provider);
+    } catch (e) {
+        alert("인증 시작 실패: " + e.message);
+    }
 }
 
 async function logout() {
@@ -36,15 +41,15 @@ async function logout() {
     location.reload();
 }
 
-// 3. Iron-Clad UI Update Engine (v12.6)
+// 3. Robust UI Update Engine
 function updateAuthUI(user) {
-    const userNavTargets = document.querySelectorAll('.user-nav');
-    console.log(`[AuthUI] Found ${userNavTargets.length} nav targets. User: ${user ? user.displayName : 'Guest'}`);
+    const targets = document.querySelectorAll('.user-nav');
+    if (targets.length === 0) return;
     
-    userNavTargets.forEach(nav => {
+    targets.forEach(nav => {
         if (user) {
             const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
-            nav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout from ${user.displayName}">`;
+            nav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Click to Logout (${user.displayName})">`;
         } else {
             nav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
         }
@@ -100,7 +105,6 @@ async function toggleFav(v) {
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
-    grid.innerHTML = '<p class="loading-msg">Searching treasures...</p>';
     try {
         const snap = await db.collection(key).orderBy('date', 'desc').limit(20).get();
         grid.innerHTML = '';
@@ -126,7 +130,7 @@ async function load(key, config) {
             };
             grid.appendChild(card);
         });
-    } catch (e) { console.error(e); grid.innerHTML = '<p class="loading-msg">System temporary offline.</p>'; }
+    } catch (e) { console.error(e); }
 }
 
 function openModal(v) {
@@ -177,26 +181,33 @@ function renderMyList(targetGridId = 'mylist-grid') {
     });
 }
 
-// 6. Global Auth Listener
+// 6. Global Auth Listener (v12.7 Investigating)
 auth.onAuthStateChanged(async (user) => {
-    console.log("[Auth] State changed:", user ? user.email : "Logged Out");
+    console.log("[Auth] State changed. User found:", !!user);
     currentUser = user;
-    if (user) await syncFavorites();
-    updateAuthUI(user);
+    if (user) {
+        await syncFavorites();
+        updateAuthUI(user);
+    } else {
+        updateAuthUI(null);
+    }
     renderMyList('mylist-grid');
 });
 
 // 7. Initialization
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     trackPV();
     
-    // Initial UI Setup with delay for robust rendering
-    setTimeout(() => updateAuthUI(auth.currentUser), 500);
-    
-    auth.getRedirectResult().then((result) => {
-        if (result.user) console.log("[Auth] Redirect successful");
-    }).catch(e => console.error("[Auth] Redirect Error", e));
-    
+    // 리다이렉트 결과 정밀 수사
+    try {
+        const result = await auth.getRedirectResult();
+        if (result.user) console.log("[Auth] New Login via Redirect detected.");
+    } catch (e) {
+        // 인증 도메인 문제나 브라우저 쿠키 문제 시 경고 출력
+        console.error("[Auth] Redirect Result Failure", e);
+        if (e.code !== 'auth/internal-error') alert("인증 데이터 처리 중 오류: " + e.message);
+    }
+
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
 
@@ -204,18 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cat = (params.get('c') || params.get('id'))?.toLowerCase();
     if (cat === 'fav') { 
         const el = document.getElementById('category-title'); if (el) el.innerText = '❤ My Favorite List';
-        setTimeout(() => renderMyList('category-grid'), 1500); 
+        setTimeout(() => renderMyList('category-grid'), 1000); 
     } else if (cat) {
-        const titleMap = { 'kpop': 'K-POP MV Archive', 'kdrama': 'K-Drama World: Official Clips', 'tvlit': 'TV Literature Hall (TV문학관)', 'kclassic': 'Korean Classic Cinema (KOFA)', 'kvariety': 'K-Variety: Entertainment Buzz', 'kmovie': 'K-Cinema: Premium Masterpieces', 'trending': 'Trending Now in Seoul' };
         const el = document.getElementById('category-title');
-        if (el && titleMap[cat]) el.innerText = titleMap[cat];
+        if (el) el.innerText = cat.toUpperCase() + ' Archive';
         load(cat, { elementId: 'category-grid' });
     }
 
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('video-modal')) closeModal(); });
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('main-header');
-        if (header) window.scrollY > 50 ? header.classList.add('scrolled') : header.classList.remove('scrolled');
-    });
 });
