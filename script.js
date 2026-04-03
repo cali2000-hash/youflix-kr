@@ -16,8 +16,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. Visit Counter (PV Tracker)
+// 1. Visit Counter (PV Tracker - v9.2 Admin Filter Included)
 function trackPV() {
+    // 관리자 기기인지 확인
+    if (localStorage.getItem('youflix_admin') === 'true') {
+        console.log("🛡️ [루미] 관리자 접속 확인: PV 카운팅에서 제외됩니다.");
+        return;
+    }
+
     db.collection('statistics').doc('daily_pv').set({
         count: firebase.firestore.FieldValue.increment(1),
         lastUpdate: new Date().toLocaleDateString()

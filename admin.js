@@ -18,6 +18,9 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
+// v9.2 루미의 관리자 표식 부착
+localStorage.setItem('youflix_admin', 'true');
+
 let cachedVideo = null;
 
 // 통계 데이터 로드 (v8.8 루미 텐션 엔진)
