@@ -67,7 +67,38 @@
      border-radius: 20px;
      padding: 6px 15px;
  }
- /* Category & Grid Layouts */
+ /* v12.0 Auth & Profile UI */
+.profile-img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--netflix-red);
+    transition: transform 0.2s ease;
+    object-fit: cover;
+}
+.profile-img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.4);
+}
+.btn-login {
+    background: var(--netflix-red);
+    color: white;
+    padding: 7px 18px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.btn-login:hover {
+    background: #b20710;
+}
+
+/* Category & Grid Layouts */
  .category-grid {
      display: grid;
      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -1,11 +1,10 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v11.1 - LOVE Explorer)
- * Core Logic: Database Fetching, YouTube Integration, Favorites, and Dedicated My List Page
+ * YOUFLIX.KR Premium Archive Engine (v12.0 - CLOUD SYNC Edition)
+ * Features: Google Auth, Firestore Cloud Sync, Local-to-Cloud Merge
  */
 
-const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
-    apiKey: UNIVERSAL_KEY,
+    apiKey: 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14',
     authDomain: "gen-lang-client-0874410222.firebaseapp.com",
     projectId: "gen-lang-client-0874410222",
     storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
@@ -13,40 +12,127 @@ const firebaseConfig = {
     appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
+let currentUser = null;
+let cloudFavs = [];
 
 // 1. Visit Counter
 function trackPV() {
     if (localStorage.getItem('youflix_admin') === 'true') return;
-    if (/bot|spider|crawl|slurp|ia_archiver/i.test(navigator.userAgent)) return;
     db.collection('statistics').doc('daily_pv').set({
         count: firebase.firestore.FieldValue.increment(1),
         lastUpdate: new Date().toLocaleDateString()
     }, { merge: true });
 }
 
-// 2. High-Speed Category Loader
+// 2. Auth Logic (v12.0)
+async function login() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+        await auth.signInWithPopup(provider);
+    } catch (e) {
+        console.error("Login Failed", e);
+        alert("로그인에 실패했습니다.");
+    }
+}
+
+async function logout() {
+    await auth.signOut();
+    location.reload();
+}
+
+auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+    const userNav = document.querySelector('.user-nav');
+    if (userNav) {
+        if (user) {
+            userNav.innerHTML = `
+                <img src="${user.photoURL}" alt="Profile" class="profile-img" onclick="logout()" title="Click to Logout">
+            `;
+            // 클라우드 데이터 동기화
+            await syncFavorites();
+        } else {
+            userNav.innerHTML = `
+                <button class="btn btn-login" onclick="login()">Sign In</button>
+            `;
+        }
+    }
+    renderMyList('mylist-grid');
+});
+
+// 3. Cloud Sync Favorite Engine
+async function syncFavorites() {
+    if (!currentUser) return;
+    const userRef = db.collection('users').doc(currentUser.uid);
+    const doc = await userRef.get();
+    let localFavs = getLocalFavs();
+    
+    if (doc.exists) {
+        cloudFavs = doc.data().favs || [];
+        // 병합 로직 (로컬에만 있는 것을 클라우드로 전송)
+        const newOnes = localFavs.filter(l => !cloudFavs.some(c => c.id === l.id));
+        if (newOnes.length > 0) {
+            cloudFavs = [...newOnes, ...cloudFavs];
+            await userRef.set({ favs: cloudFavs }, { merge: true });
+            localStorage.removeItem('youflix_favs'); // 병합 후 로컬 비우기
+        }
+    } else {
+        // 첫 로그인: 로컬 데이터를 클라우드로 초기화
+        cloudFavs = localFavs;
+        await userRef.set({ favs: cloudFavs });
+        localStorage.removeItem('youflix_favs');
+    }
+}
+
+function getLocalFavs() { return JSON.parse(localStorage.getItem('youflix_favs') || '[]'); }
+function getFavs() { return currentUser ? cloudFavs : getLocalFavs(); }
+function checkFav(id) { return getFavs().some(f => f.id === id); }
+
+async function toggleFav(v) {
+    let favs = [...getFavs()];
+    const idx = favs.findIndex(f => f.id === v.id);
+    let result = false;
+    
+    if (idx > -1) {
+        favs.splice(idx, 1);
+        result = false;
+    } else {
+        favs.unshift(v);
+        result = true;
+    }
+    
+    if (currentUser) {
+        cloudFavs = favs;
+        await db.collection('users').doc(currentUser.uid).set({ favs: cloudFavs }, { merge: true });
+    } else {
+        localStorage.setItem('youflix_favs', JSON.stringify(favs));
+    }
+    
+    renderMyList('mylist-grid');
+    if (new URLSearchParams(window.location.search).get('c') === 'fav') renderMyList('category-grid');
+    return result;
+}
+
+// 4. Modal & Loader (Main Logic Linked with Cloud)
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
     grid.innerHTML = '<p class="loading-msg">Searching treasures...</p>';
+    
     try {
         const snap = await db.collection(key).orderBy('date', 'desc').limit(20).get();
         grid.innerHTML = '';
-        if (snap.empty) {
-            grid.innerHTML = '<p class="loading-msg">Archive empty in this section.</p>';
-            return;
-        }
         snap.forEach(doc => {
             const v = doc.data(); v.category = key;
-            const isFavorite = checkFav(v.id);
+            const isFav = checkFav(v.id);
             const card = document.createElement('div');
             card.className = 'video-card animate-in';
             card.innerHTML = `
                 <div class="thumbnail-container">
                     <img src="${v.thumbnail}" alt="${v.title}">
-                    <div class="fav-icon ${isFavorite ? 'active' : ''}" data-id="${v.id}">❤</div>
+                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${v.id}">❤</div>
                     <div class="play-overlay"><span class="play-icon">▶</span></div>
                 </div>
                 <div class="video-info">
@@ -58,37 +144,17 @@ async function load(key, config) {
             card.querySelector('.video-info').onclick = () => openModal(v);
             card.querySelector('.fav-icon').onclick = (e) => {
                 e.stopPropagation();
-                const result = toggleFav(v);
-                e.target.classList.toggle('active', result);
-                e.target.classList.add('beat');
-                setTimeout(() => e.target.classList.remove('beat'), 500);
+                toggleFav(v).then(res => {
+                    e.target.classList.toggle('active', res);
+                    e.target.classList.add('beat');
+                    setTimeout(() => e.target.classList.remove('beat'), 500);
+                });
             };
             grid.appendChild(card);
         });
     } catch (e) { console.error(e); grid.innerHTML = '<p class="loading-msg">System temporary offline.</p>'; }
 }
 
-// 3. Favorite Engine
-function getFavs() { return JSON.parse(localStorage.getItem('youflix_favs') || '[]'); }
-function checkFav(id) { return getFavs().some(f => f.id === id); }
-
-function toggleFav(v) {
-    let favs = getFavs();
-    const idx = favs.findIndex(f => f.id === v.id);
-    let result = false;
-    if (idx > -1) { favs.splice(idx, 1); result = false; }
-    else { favs.unshift(v); result = true; }
-    localStorage.setItem('youflix_favs', JSON.stringify(favs));
-    
-    // 실시간 렌더링 갱신
-    renderMyList('mylist-grid');
-    if (new URLSearchParams(window.location.search).get('c') === 'fav') {
-        renderMyList('category-grid');
-    }
-    return result;
-}
-
-// 4. Modal Logic
 function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
@@ -96,21 +162,20 @@ function openModal(v) {
     const controls = document.getElementById('modal-controls');
     if (!modal || !player) return;
     
-    const isFavorite = checkFav(v.id);
+    const isFav = checkFav(v.id);
     title.innerText = v.title;
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
     if (controls) {
-        controls.innerHTML = `<button class="btn btn-fav ${isFavorite ? 'active' : ''}" id="modal-fav-btn">${isFavorite ? '❤ In My List' : '🤍 Add to My List'}</button>`;
-        document.getElementById('modal-fav-btn').onclick = (e) => {
+        controls.innerHTML = `<button class="btn btn-fav ${isFav ? 'active' : ''}" id="modal-fav-btn">${isFav ? '❤ In My List' : '🤍 Add to My List'}</button>`;
+        document.getElementById('modal-fav-btn').onclick = async (e) => {
             const btn = e.currentTarget;
-            const res = toggleFav(v);
+            const res = await toggleFav(v);
             btn.classList.toggle('active', res);
             btn.innerText = res ? '❤ In My List' : '🤍 Add to My List';
         };
     }
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    modal.style.display = 'block'; document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
@@ -122,18 +187,12 @@ function closeModal() {
     renderMyList('mylist-grid');
 }
 
-// 5. My List Renderer (v11.1 Enhanced Multi-Target)
 function renderMyList(targetGridId = 'mylist-grid') {
     const grid = document.getElementById(targetGridId);
     if (!grid) return;
-    
     const favs = getFavs();
     const row = document.getElementById('mylist-row');
-    
-    // 메인 페이지 전용 행 가시성 제어
-    if (targetGridId === 'mylist-grid' && row) {
-        row.style.display = favs.length > 0 ? 'block' : 'none';
-    }
+    if (targetGridId === 'mylist-grid' && row) row.style.display = favs.length > 0 ? 'block' : 'none';
     
     if (favs.length === 0) {
         grid.innerHTML = '<p class="loading-msg" style="padding:4rem 0;">마이 리스트가 비어 있습니다.</p>';
@@ -157,36 +216,28 @@ function renderMyList(targetGridId = 'mylist-grid') {
         `;
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
         card.querySelector('.video-info').onclick = () => openModal(v);
-        card.querySelector('.fav-icon').onclick = (e) => {
-            e.stopPropagation();
-            toggleFav(v);
-        };
+        card.querySelector('.fav-icon').onclick = (e) => { e.stopPropagation(); toggleFav(v); };
         grid.appendChild(card);
     });
 }
 
-// 6. Initialization
+// 5. Initialization
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
-    renderMyList('mylist-grid');
-    
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
 
-    // Category Page Logic (v11.1 Dedicated FAV Page Support)
     const params = new URLSearchParams(window.location.search);
-    const cat = params.get('c') || params.get('id');
-    
-    if (cat) {
-        const catKey = cat.toLowerCase();
+    const catKey = (params.get('c') || params.get('id'))?.toLowerCase();
+    if (catKey) {
         if (catKey === 'fav') {
-            const titleEl = document.getElementById('category-title');
-            if (titleEl) titleEl.innerText = '❤ My Favorite List';
-            renderMyList('category-grid');
+            const el = document.getElementById('category-title');
+            if (el) el.innerText = '❤ My Favorite List';
+            setTimeout(() => renderMyList('category-grid'), 1000); // 클라우드 동기화 대기
         } else {
             const titleMap = { 'kpop': 'K-POP MV Archive', 'kdrama': 'K-Drama World: Official Clips', 'tvlit': 'TV Literature Hall (TV문학관)', 'kclassic': 'Korean Classic Cinema (KOFA)', 'kvariety': 'K-Variety: Entertainment Buzz', 'kmovie': 'K-Cinema: Premium Masterpieces', 'trending': 'Trending Now in Seoul' };
-            const titleEl = document.getElementById('category-title');
-            if (titleEl && titleMap[catKey]) titleEl.innerText = titleMap[catKey];
+            const el = document.getElementById('category-title');
+            if (el && titleMap[catKey]) el.innerText = titleMap[catKey];
             load(catKey, { elementId: 'category-grid' });
         }
     }
@@ -195,8 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('video-modal')) closeModal(); });
     window.addEventListener('scroll', () => {
         const header = document.getElementById('main-header');
-        if (!header) return;
-        if (window.scrollY > 50) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
+        if (header) window.scrollY > 50 ? header.classList.add('scrolled') : header.classList.remove('scrolled');
     });
 });
