@@ -69,6 +69,17 @@
         }
         .info-icon:hover { background: var(--admin-primary); }
 
+        /* v9.7 모바일 최적화 레이아웃 */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; text-align: center; }
+            .stat-grid { grid-template-columns: 1fr; gap: 15px; }
+            .admin-controls { grid-template-columns: 1fr; }
+            .stat-card { min-height: auto; padding: 20px; }
+            .stat-value { font-size: 2rem; }
+            .modal-content { width: 95%; padding: 20px; }
+            h1 { font-size: 1.5rem !important; }
+        }
+
         /* v9.6 커스텀 모달 스타일 */
         .modal-overlay {
             display: none;
