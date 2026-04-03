@@ -86,7 +86,7 @@ async function fetchYouTubeVideos(query) {
             console.error('[API Error Detail]:', data.error.code, data.error.message, data.error.status);
             if (debugEl) {
                 debugEl.style.color = '#ff4b4b';
-                debugEl.textContent = `API Error ${data.error.code}: ${data.error.message.substring(0, 40)}...`;
+                debugEl.textContent = `API Error ${data.error.code}: ${data.error.message} (${data.error.status})`;
             }
             return [];
         }
@@ -121,12 +121,15 @@ function getOrCreateDebugEl() {
         el.style.position = 'fixed';
         el.style.bottom = '10px';
         el.style.right = '10px';
-        el.style.backgroundColor = 'rgba(0,0,0,0.8)';
-        el.style.color = '#666';
-        el.style.fontSize = '10px';
-        el.style.padding = '5px 10px';
+        el.style.width = '350px';
+        el.style.backgroundColor = 'rgba(0,0,0,0.9)';
+        el.style.color = '#fff';
+        el.style.fontSize = '11px';
+        el.style.padding = '10px';
         el.style.borderRadius = '5px';
         el.style.zIndex = '9999';
+        el.style.wordBreak = 'break-word';
+        el.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
         el.style.pointerEvents = 'none';
         document.body.appendChild(el);
     }
