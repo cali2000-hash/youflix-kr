@@ -1,11 +1,11 @@
-/* YOUFLIX.KR Premium Style Sheet (v13.7 - Specificity Fix) */
+/* YOUFLIX.KR Premium Style Sheet (v13.8 - Global Font Reboot) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
     --card-bg: #141414;
     --text-color: #fff;
     --accent-color: #0080ff;
-    --font-main: 'Outfit', 'Inter', sans-serif;
+    --font-main: 'Noto Sans KR', 'Outfit', 'Inter', sans-serif; /* Priority: Noto Sans KR */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,6 +14,8 @@ body {
     color: var(--text-color);
     font-family: var(--font-main);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Navbar */
@@ -34,14 +36,14 @@ body {
     font-size: 1.8rem;
     font-weight: 900;
     text-decoration: none;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
 }
 .nav-links { display: flex; list-style: none; gap: 20px; }
 .nav-links a {
     color: #e5e5e5;
     text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     transition: color 0.3s;
 }
 .nav-links a:hover { color: #fff; }
@@ -62,7 +64,7 @@ body {
 .dropdown li a { padding: 8px 20px; display: block; }
 .has-dropdown:hover .dropdown { display: block; }
 
-/* Search & Auth Zone (v13.7 - Pill-Shape Integration) */
+/* Search & Auth Zone (v13.8) */
 .user-nav {
     display: flex;
     align-items: center;
@@ -72,12 +74,17 @@ body {
     display: flex;
     align-items: center;
 }
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 #search-input {
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
     padding: 6px 15px;
-    border-radius: 20px !important; /* Force Pill-Shape */
+    border-radius: 20px !important;
     width: 200px;
     transition: all 0.3s ease;
     height: 32px;
@@ -96,8 +103,8 @@ body {
     padding: 0 18px !important;
     font-size: 0.8rem !important;
     font-weight: 700 !important;
-    border-radius: 20px !important; /* Force Pill-Shape to match search box (20px) */
-    letter-spacing: 1px !important;
+    border-radius: 20px !important;
+    letter-spacing: 0.5px !important;
     height: 32px !important;
     display: flex !important;
     align-items: center !important;
@@ -105,6 +112,7 @@ body {
     border: none !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
+    font-family: var(--font-main) !important;
 }
 .btn-login:hover {
     background: #ff0f1a !important;
@@ -142,10 +150,10 @@ body {
     margin-bottom: 20px;
     display: inline-block;
 }
-.hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; line-height: 1; }
-.hero p { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; }
+.hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; line-height: 1.1; letter-spacing: -2px; }
+.hero p { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; font-weight: 400; line-height: 1.6; }
 
-/* Row Styles */
+/* Global Row Styles */
 .row { padding: 40px 4% 10px; position: relative; z-index: 2; }
 .row-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
@@ -182,8 +190,8 @@ body {
 .fav-icon.active { color: var(--netflix-red); }
 .fav-icon:hover { transform: scale(1.2); }
 .video-info { padding: 12px; }
-.video-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.video-meta { font-size: 0.75rem; color: #808080; }
+.video-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.video-meta { font-size: 0.75rem; color: #808080; font-weight: 400; }
 
 /* Modal Styles */
 .modal {
@@ -203,11 +211,11 @@ body {
 }
 .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
 .modal-info { padding: 30px; }
-.modal-info h2 { font-size: 2rem; margin-bottom: 10px; }
+.modal-info h2 { font-size: 2rem; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px; }
 
 /* Buttons */
 .btn {
-    padding: 10px 25px; border: none; border-radius: 4px; font-weight: 800;
+    padding: 10px 25px; border: none; border-radius: 4px; font-weight: 700;
     cursor: pointer; transition: opacity 0.2s; font-family: var(--font-main);
 }
 .btn-primary { background-color: #fff; color: #000; }
@@ -224,10 +232,10 @@ body {
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Footer */
-footer { padding: 60px 4% 40px; text-align: center; color: #808080; font-size: 0.8rem; }
+footer { padding: 60px 4% 40px; text-align: center; color: #808080; font-size: 0.8rem; font-weight: 400; }
 .footer-links { margin-bottom: 20px; display: flex; justify-content: center; gap: 30px; }
-.footer-links a { color: #808080; text-decoration: none; }
-.footer-links a:hover { text-decoration: underline; }
+.footer-links a { color: #808080; text-decoration: none; transition: color 0.3s; }
+.footer-links a:hover { color: #fff; text-decoration: underline; }
 
 /* Loading State */
-.loading-msg { text-align: center; color: #808080; padding: 20px; font-style: italic; }
+.loading-msg { text-align: center; color: #808080; padding: 20px; font-style: italic; font-weight: 300; }
