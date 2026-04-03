@@ -22,26 +22,25 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
-// 2. Category Configuration
+// 2. Category Configuration (K-Content Focus)
 const CATEGORIES = {
-    nature: { query: 'Nature 8K Relaxing Visuals', title: 'Visual Escape: Nature & Travel (8K)', elementId: 'nature-grid' },
-    tech: { query: 'Minimalist Tech Setup Reviews', title: 'Minimalist Tech & Setups', elementId: 'tech-grid' },
-    knowledge: { query: 'Informative Video Essay Science History', title: 'Deep Insights: Knowledge & Essays', elementId: 'knowledge-grid' },
-    lofi: { query: 'Lofi Hip Hop Radio Study Beats', title: 'Deep Ocean Wonders: Lofi Healing', elementId: 'lofi-grid' },
-    trending: { query: 'Global Trending YouTube 2024 Video', title: 'Top Trending: New & Popular', elementId: 'trending-grid' },
-    movie: { query: 'Cinematic Movie Review Essay Theory', title: 'Cinema World: Movies & Analysis', elementId: 'movie-grid' },
-    healing: { query: 'Deep Sea Underwater 8K Relaxing', title: 'Visual Escape: Ocean Healing', elementId: 'healing-grid' }
+    kpop: { query: 'Official K-POP Music Video 2024 New 4K', title: 'K-POP MV: The Official Archive', elementId: 'kpop-grid' },
+    kdrama: { query: 'K-Drama Official Highlights Playlist 4K', title: 'K-Drama World: Teasers & Clips', elementId: 'kdrama-grid' },
+    kvariety: { query: 'Korean Variety Show Highlight Funny 2024', title: 'K-Variety Buzz: Viral Moments', elementId: 'kvariety-grid' },
+    kstage: { query: 'K-POP Live Performance Stage 4K Focus', title: 'K-Stage Live: Absolute Performance', elementId: 'kstage-grid' },
+    trending: { query: 'K-POP Trending Video South Korea 2024', title: 'NOW: Trending in Korea', elementId: 'trending-grid' },
+    kfood: { query: 'Korean Street Food Mukbang 4K UHD High Quality', title: 'K-Food & Mukbang Essentials', elementId: 'kfood-grid' }
 };
 
 const FALLBACK_DATA = {
-    nature: [{ id: '_fL9vO1U1B8', title: 'Majestic Swiss Alps 4K', channel: 'Nature Relax', date: '2024-03-25', thumbnail: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800', desc: "Visual escape to the Swiss Alps." }]
+    kpop: [{ id: '900X9f_vWRE', title: 'Global K-POP Standard', channel: 'Official Channel', date: '2024-03-25', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800', desc: "Experience the pinnacle of K-POP performance." }]
 };
 
 const HERO_DEFAULT = {
-    id: 'f7_7vA_r_vM',
-    title: 'Experience the Best',
-    desc: 'Dive into your own world with premium-curated YouTube content tailored to your taste at YOUFLIX.KR.',
-    bg: 'https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1500' 
+    id: 'TUTP6D_X3Ww', // New K-POP Related or Trending Video ID if needed
+    title: 'K-IDENTITY: THE ARCHIVE',
+    desc: 'The complete digital archive of South Korea’s most viral cultural exports. From official K-POP MV to Cinema gems.',
+    bg: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1500' 
 };
 
 const API_FETCH_COOLDOWN = 12 * 60 * 60 * 1000; // Build Archive every 12h
