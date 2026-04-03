@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Ultimate Popup Auth Engine (v5.9)
- * REVERTED TO POPUP FOR BETTER UX
+ * YOUFLIX.IO - Ultimate Hybrid Auth Master (v6.0)
+ * POPUP -> REDIRECT FALLBACK (UNSTOPPABLE)
  */
 
-console.log("🎬 YOUFLIX Engine v5.9: Popup Auth Active...");
+console.log("🎬 YOUFLIX Engine v6.0: Unstoppable Hybrid Auth Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -44,23 +44,34 @@ function updateAuthUI(user) {
 }
 
 window.handleAuth = async function() {
-    console.log("🔐 Popup Auth Triggered...");
+    console.log("🔐 Unstoppable Auth Initiated...");
     try {
         if (auth.currentUser) {
             await auth.signOut();
             window.location.reload();
         } else {
-            const result = await auth.signInWithPopup(provider);
-            console.log("🌟 Login Success:", result.user.displayName);
-            updateAuthUI(result.user);
+            // Save state just in case we need to redirect
+            const state = { url: window.location.href, video: currentVideo };
+            sessionStorage.setItem('uf_recovery', JSON.stringify(state));
+
+            try {
+                // Try Popup First
+                const result = await auth.signInWithPopup(provider);
+                console.log("🌟 Popup Login Success:", result.user.displayName);
+                updateAuthUI(result.user);
+                sessionStorage.removeItem('uf_recovery'); // Not needed if popup worked
+            } catch (pError) {
+                if (pError.code === 'auth/popup-blocked') {
+                    console.log("🛰️ Popup blocked! Switching to Redirect mode automatically...");
+                    await auth.signInWithRedirect(provider);
+                } else {
+                    throw pError;
+                }
+            }
         }
     } catch (e) {
-        console.error("🔑 Popup Auth Error:", e.message);
-        if (e.code === 'auth/popup-blocked') {
-            alert("팝업이 차단되었습니다! 브라우저 설정에서 팝업을 허용해주세요. 🔓");
-        } else {
-            alert(`인증 에러: ${e.message}`);
-        }
+        console.error("🔑 Auth Fatal Error:", e.message);
+        alert(`로그인 지원 모드 가동 중: ${e.message}`);
     }
 };
 
@@ -71,6 +82,21 @@ auth.onAuthStateChanged(user => { updateAuthUI(user); });
 setInterval(() => { if (auth.currentUser) updateAuthUI(auth.currentUser); }, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Handle Redirect Result & Recovery
+    auth.getRedirectResult().then(result => {
+        if (result.user) updateAuthUI(result.user);
+        
+        const rec = sessionStorage.getItem('uf_recovery');
+        if (rec) {
+            const state = JSON.parse(rec);
+            sessionStorage.removeItem('uf_recovery');
+            if (state.video) {
+                console.log("♻️ Post-Redirect Recovery:", state.video.title);
+                setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1500);
+            }
+        }
+    }).catch(e => console.error("Redirect Final Check Error:", e));
+
     const iCat = !!document.getElementById('category-grid');
     if (iCat) initCategoryPage(); else initMainPage();
     setupUI();
