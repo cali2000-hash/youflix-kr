@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Ultimate Visual Auth Engine (v5.7)
- * SHOWS USER PROFILE & SYNC FIX
+ * YOUFLIX.IO - Ultimate Auth Sync & Persistence (v5.8)
+ * FIXES LOCAL UI LAG & RECOVERY
  */
 
-console.log("🎬 YOUFLIX Engine v5.7: Visual Auth & Profile Active...");
+console.log("🎬 YOUFLIX Engine v5.8: Auth Watchdog Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -21,21 +21,15 @@ const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 let currentVideo = null;
+let player = null;
 
-// Unified UI Update function
+// UI Update with Watchdog
 function updateAuthUI(user) {
-    console.log("🛠️ Updating UI for:", user ? user.displayName : "Guest");
-    
-    // 1. Header Btn
+    console.log("🛠️ Sync UI for:", user ? user.displayName : "Guest");
     const hBtn = document.getElementById('login-btn');
     if (hBtn) {
         if (user) {
-            hBtn.innerHTML = `
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <img src="${user.photoURL || ''}" style="width:24px; height:24px; border-radius:50%; border:1px solid #fff;">
-                    <span>Logout</span>
-                </div>
-            `;
+            hBtn.innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><img src="${user.photoURL || ''}" style="width:24px;height:24px;border-radius:50%;border:1px solid #fff;"><span>Logout</span></div>`;
             hBtn.classList.add('logged-in');
         } else {
             hBtn.innerHTML = 'Google Login';
@@ -43,8 +37,6 @@ function updateAuthUI(user) {
         }
         hBtn.onclick = window.handleAuth;
     }
-
-    // 2. Modal Btn
     const mBtn = document.getElementById('modal-login-btn');
     if (mBtn) {
         mBtn.innerHTML = user ? `Welcome, ${user.displayName.split(' ')[0]} ✅` : `Login with Google 🔐`;
@@ -53,40 +45,33 @@ function updateAuthUI(user) {
 }
 
 window.handleAuth = async function() {
-    console.log("🔐 Auth Button Triggered...");
     try {
-        if (auth.currentUser) {
-            await auth.signOut();
-            window.location.reload();
-        } else {
+        if (auth.currentUser) { await auth.signOut(); window.location.reload(); }
+        else {
             const state = { url: window.location.href, video: currentVideo };
             sessionStorage.setItem('uf_recovery', JSON.stringify(state));
             await auth.signInWithRedirect(provider);
         }
-    } catch (e) { console.error("🔑 Auth Error:", e.message); }
+    } catch (e) { console.error("Auth Fail:", e.message); }
 };
 
-auth.onAuthStateChanged(user => {
-    updateAuthUI(user);
-});
+// Periodic Check for Login State (Watchdog)
+setInterval(() => {
+    if (auth.currentUser) updateAuthUI(auth.currentUser);
+}, 2000);
+
+auth.onAuthStateChanged(user => { updateAuthUI(user); });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle Redirect & Recovery
     auth.getRedirectResult().then(result => {
-        if (result.user) {
-            console.log("🌟 Redirect Success:", result.user.displayName);
-            updateAuthUI(result.user);
-        }
-        
-        const recoveryData = sessionStorage.getItem('uf_recovery');
-        if (recoveryData) {
-            const state = JSON.parse(recoveryData);
+        if (result.user) { updateAuthUI(result.user); }
+        const rec = sessionStorage.getItem('uf_recovery');
+        if (rec) {
+            const state = JSON.parse(rec);
             sessionStorage.removeItem('uf_recovery');
-            if (state.video) {
-                setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1000);
-            }
+            if (state.video) setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1500);
         }
-    }).catch(e => console.error("Redirect Error:", e));
+    }).catch(e => console.error("Result Error:", e));
 
     const iCat = !!document.getElementById('category-grid');
     if (iCat) initCategoryPage(); else initMainPage();
@@ -147,11 +132,27 @@ function open(id, title, channel) {
     const lb = document.createElement('button'); lb.id = 'modal-login-btn'; lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px'; lb.onclick = window.handleAuth;
     lb.innerHTML = auth.currentUser ? `Welcome, ${auth.currentUser.displayName.split(' ')[0]} ✅` : `Login with Google 🔐`;
     ctrls.appendChild(lb);
-    if (player && player.loadVideoById) player.loadVideoById(id);
-    else { if (window.YT) create(id); else { const t = document.createElement('script'); t.src = "https://www.youtube.com/iframe_api"; document.body.appendChild(t); window.onYouTubeIframeAPIReady = () => create(id); } }
+
+    if (player && player.loadVideoById) {
+        player.loadVideoById(id);
+    } else {
+        const pContainer = document.getElementById('player');
+        if (pContainer) pContainer.innerHTML = '';
+        if (window.YT && window.YT.Player) create(id);
+        else {
+            const t = document.createElement('script'); t.src = "https://www.youtube.com/iframe_api"; document.body.appendChild(t);
+            window.onYouTubeIframeAPIReady = () => create(id);
+        }
+    }
 }
 
-function create(id) { player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }}); }
+function create(id) { 
+    player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }, 
+        events: { 'onStateChange': (e) => { 
+            if (e.data === -1) { console.log("Video restricted or loading..."); }
+        }}
+    }); 
+}
 function close() { currentVideo = null; document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
 function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function setupUI() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
