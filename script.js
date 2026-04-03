@@ -214,6 +214,39 @@ function setupEventListeners() {
     window.onclick = (event) => {
         if (event.target == modal) closeVideoModal();
     };
+
+    // --- Real-time Search Implementation ---
+    const searchInput = document.getElementById('video-search');
+    const searchBtn = document.getElementById('search-btn');
+
+    if (searchBtn && searchInput) {
+        searchBtn.onclick = () => performSearch(searchInput.value);
+        searchInput.onkeypress = (e) => {
+            if (e.key === 'Enter') performSearch(searchInput.value);
+        };
+    }
+}
+
+async function performSearch(query) {
+    if (!query || query.trim() === "") return;
+    
+    console.log(`Performing live search for: ${query}`);
+    const natureRowTitle = document.querySelector('#nature-grid').previousElementSibling;
+    if (natureRowTitle) natureRowTitle.textContent = `Search Results: "${query}"`;
+
+    const videos = await fetchYouTubeVideos(query);
+    const grid = document.getElementById('nature-grid');
+    
+    if (grid) {
+        grid.innerHTML = '';
+        if (videos.length > 0) {
+            videos.forEach(v => grid.appendChild(createVideoCard(v)));
+            // Optionally update hero with the top search result
+            updateHeroContent(videos[0]);
+        } else {
+            grid.innerHTML = '<p style="padding: 2rem; color: #666;">No results found for your search.</p>';
+        }
+    }
 }
 
 
