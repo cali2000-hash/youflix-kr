@@ -1,13 +1,11 @@
 /**
- * YOUFLIX.IO - Key Sync Engine (v5.5)
- * FIXED API KEY & AUTH
+ * YOUFLIX.IO - Intelligent State Recovery Engine (v5.6)
+ * REMEMBERS WHERE YOU WERE
  */
 
-console.log("🎬 YOUFLIX Engine v5.5: Key Synchronized...");
+console.log("🎬 YOUFLIX Engine v5.6: State Recovery Active...");
 
-// Universal Key (Same as YouTube for maximum compatibility)
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
-
 const firebaseConfig = {
     apiKey: UNIVERSAL_KEY,
     authDomain: "gen-lang-client-0874410222.firebaseapp.com",
@@ -22,28 +20,34 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
+// Current Video Tracking
+let currentVideo = null;
+
 window.handleAuth = async function() {
-    console.log("🔐 Auth Action Triggered...");
+    console.log("🔐 Saving state and handles Auth...");
     try {
         if (auth.currentUser) {
             await auth.signOut();
             window.location.reload();
         } else {
-            console.log("🚀 Redirecting to Google...");
+            // Save current context for recovery
+            const state = {
+                url: window.location.href,
+                video: currentVideo
+            };
+            sessionStorage.setItem('uf_recovery', JSON.stringify(state));
+            console.log("🚀 Redirecting with status saved:", state);
             await auth.signInWithRedirect(provider);
         }
-    } catch (e) { 
-        console.error("🔑 API Key/Auth Error Details:", e.code, e.message); 
-        alert("Auth Error: " + e.message + "\n(Code: " + e.code + ")");
-    }
+    } catch (e) { console.error("🔑 Auth Error:", e.message); }
 };
 
 auth.onAuthStateChanged(user => {
-    const hBtn = document.getElementById('login-btn');
-    if (hBtn) {
-        hBtn.textContent = user ? 'Logout' : 'Google Login';
-        hBtn.classList.toggle('logged-in', !!user);
-        hBtn.onclick = window.handleAuth;
+    const headerBtn = document.getElementById('login-btn');
+    if (headerBtn) {
+        headerBtn.textContent = user ? 'Logout' : 'Google Login';
+        headerBtn.classList.toggle('logged-in', !!user);
+        headerBtn.onclick = window.handleAuth;
     }
     const mBtn = document.getElementById('modal-login-btn');
     if (mBtn) {
@@ -53,7 +57,20 @@ auth.onAuthStateChanged(user => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    auth.getRedirectResult().catch(() => {});
+    // 1. Handle Auth Redirect & Recovery
+    auth.getRedirectResult().then(() => {
+        const recoveryData = sessionStorage.getItem('uf_recovery');
+        if (recoveryData) {
+            const state = JSON.parse(recoveryData);
+            sessionStorage.removeItem('uf_recovery'); // Use once
+            console.log("♻️ Recovery Check:", state);
+            if (state.video) {
+                // Wait for player to be ready or open directly
+                setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1000);
+            }
+        }
+    }).catch(e => console.error("Redirect Result Error:", e));
+
     const iCat = !!document.getElementById('category-grid');
     if (iCat) initCategoryPage(); else initMainPage();
     const hBtn = document.getElementById('login-btn');
@@ -104,6 +121,7 @@ function card(v) {
 }
 
 function open(id, title, channel) {
+    currentVideo = { id, title, channel };
     const m = document.getElementById('video-modal'); m.style.display = 'block'; document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
     let ctrls = document.getElementById('modal-controls');
@@ -118,7 +136,7 @@ function open(id, title, channel) {
 }
 
 function create(id) { player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }}); }
-function close() { document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
+function close() { currentVideo = null; document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
 function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function setupUI() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
 function initMainPage() { initHero(); Object.entries(CATEGORIES).forEach(([k, c]) => load(k, c)); }
