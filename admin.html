@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX | MONITORING CENTER</title>
+    <title>YOUFLIX | 운영 관리 센터</title>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
@@ -12,132 +12,131 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --admin-primary: #e50914; --admin-bg: #0b0b0b; --card-bg: #1a1a1a; }
-        body { background-color: var(--admin-bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        .admin-header { padding: 40px 4%; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); border-bottom: 2px solid var(--admin-primary); }
-        .admin-header h1 { margin: 0; font-size: 2rem; font-weight: 900; color: var(--admin-primary); }
+        body { background-color: var(--admin-bg); color: #fff; font-family: 'Noto Sans KR', 'Inter', sans-serif; margin: 0; padding: 0; }
+        .admin-header { padding: 40px 4%; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); border-bottom: 2px solid var(--admin-primary); display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { margin: 0; font-size: 1.8rem; font-weight: 900; color: var(--admin-primary); }
+        .btn-home { background: #fff; color: #000; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 0.8rem; transition: 0.3s; }
         
-        /* Stats Dashboard Styling */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
-        .stat-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; transition: 0.3s; }
-        .stat-card:hover { border-color: var(--admin-primary); transform: translateY(-5px); }
-        .stat-value { font-size: 2.5rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
-        .stat-label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .stat-value { font-size: 2.2rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
+        .stat-label { color: #888; font-size: 0.8rem; letter-spacing: 1px; }
         
         .main-dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 20px 4%; }
-        .chart-section { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
-        .resource-section { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
+        .chart-section, .resource-section { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
 
-        .usage-bar { height: 10px; background: #333; border-radius: 5px; margin-top: 10px; overflow: hidden; }
-        .usage-fill { height: 100%; background: var(--admin-primary); width: 0%; transition: width 1s ease-out; }
-        .usage-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px; color: #aaa; }
+        .usage-bar { height: 8px; background: #333; border-radius: 5px; margin-top: 10px; overflow: hidden; }
+        .usage-fill { height: 100%; background: var(--admin-primary); width: 0%; transition: width 1s; }
+        .usage-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; color: #aaa; }
 
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; background: #00ff00; box-shadow: 0 0 10px rgba(0,255,0,0.5); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; background: #00ff00; }
         
         .admin-controls { display: grid; grid-template-columns: 350px 1fr; gap: 40px; padding: 40px 4%; }
-        .add-card { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
+        .add-card { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
         .form-group { margin-bottom: 20px; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; background: #262626; border: 1px solid #444; border-radius: 6px; color: #fff; }
-        .btn-add { background: var(--admin-primary); color: #fff; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: #262626; border: 1px solid #444; border-radius: 6px; color: #fff; font-family: 'Noto Sans KR'; }
+        .btn-add { background: var(--admin-primary); color: #fff; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         
-        .admin-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; }
-        .admin-table th { text-align: left; background: #262626; padding: 15px; color: #888; }
-        .admin-table td { padding: 15px; border-bottom: 1px solid #333; }
+        .admin-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; }
+        .admin-table th { text-align: left; background: #262626; padding: 15px; color: #888; font-size: 0.8rem; }
+        .admin-table td { padding: 15px; border-bottom: 1px solid #333; font-size: 0.9rem; }
         .thumb-mini { width: 60px; border-radius: 4px; }
+        .btn-del { border: 1px solid #e50914; background: transparent; color: #e50914; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .btn-del:hover { background: #e50914; color: #fff; }
     </style>
 </head>
 <body>
     <header class="admin-header">
-        <h1>YOUFLIX DASHBOARD <span style="font-size:0.9rem; color:#888; font-weight:normal;">/ SYSTEM_ID: v2.0-STATS</span></h1>
+        <h1>YOUFLIX 관리 센터 <span style="font-size:0.8rem; color:#666; font-weight:normal; margin-left:10px;">KR v2.1-HQ</span></h1>
+        <a href="index.html" class="btn-home">🏠 홈으로 가기</a>
     </header>
 
-    <!-- Key Metrics -->
     <div class="stats-grid">
         <div class="stat-card">
-            <span class="stat-label">Total Visits</span>
+            <span class="stat-label">오늘 보신 분들 (PV)</span>
             <span class="stat-value" id="pv-count">0</span>
-            <div style="font-size:0.7rem; color:#00ff00;">▲ 12.5% vs Last Week</div>
+            <div style="font-size:0.7rem; color:#00ff00;">▲ 실시간 업데이트 중</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">Archive Assets</span>
+            <span class="stat-label">보관된 영상 자산</span>
             <span class="stat-value" id="asset-count">0</span>
-            <div style="font-size:0.7rem; color:#aaa;">Videos Managed</div>
+            <div style="font-size:0.7rem; color:#aaa;">아카이브 총계</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">System Health</span>
-            <div style="margin:20px 0;"><span class="status-dot"></span> <span id="sys-status">EXCELLENT</span></div>
-            <div style="font-size:0.7rem; color:#aaa;">All Services Online</div>
+            <span class="stat-label">시스템 엔진 상태</span>
+            <div style="margin:20px 0;"><span class="status-dot"></span> <span id="sys-status">최상 (Excellent)</span></div>
+            <div style="font-size:0.7rem; color:#aaa;">모든 서버 정상 작동</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">Estimated Traffic</span>
+            <span class="stat-label">예상 데이터 트래픽</span>
             <span class="stat-value" id="traffic-est">0GB</span>
-            <div style="font-size:0.7rem; color:#aaa;">Monthly Consumption</div>
+            <div style="font-size:0.7rem; color:#aaa;">이번 달 사용량 추산</div>
         </div>
     </div>
 
-    <!-- Charts & Resources -->
     <div class="main-dashboard">
         <div class="chart-section">
-            <h3 style="margin-bottom:20px;">Daily Visitor Pulse</h3>
+            <h3 style="margin-bottom:20px; font-size:1.1rem;">방문자 활동 지수 (최근 7일)</h3>
             <canvas id="pulseChart" height="150"></canvas>
         </div>
         <div class="resource-section">
-            <h3 style="margin-bottom:20px;">Resource Efficiency</h3>
-            
+            <h3 style="margin-bottom:20px; font-size:1.1rem;">리소스 사용 효율</h3>
             <div class="form-group">
-                <div class="usage-label"><span>YouTube v3 Quota (Daily)</span><span id="yt-quota-text">0.5%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="yt-quota-bar" style="width: 5.5%;"></div></div>
+                <div class="usage-label"><span>유튜브 API 사용량 (일일)</span><span id="yt-quota-text">0%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="yt-quota-bar"></div></div>
             </div>
-            
             <div class="form-group">
-                <div class="usage-label"><span>Firebase Firestore (Reads)</span><span id="fb-read-text">1.2%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="fb-read-bar" style="width: 12%;"></div></div>
+                <div class="usage-label"><span>파이어베이스 DB 읽기</span><span id="fb-read-text">0%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="fb-read-bar"></div></div>
             </div>
-
             <div class="form-group">
-                <div class="usage-label"><span>Vercel Bandwidth (Monthly)</span><span id="vcl-usage-text">0.1%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="vcl-usage-bar" style="width: 2%;"></div></div>
+                <div class="usage-label"><span>호스팅 대역폭 (Vercel)</span><span id="vcl-usage-text">0%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="vcl-usage-bar"></div></div>
             </div>
-            
-            <p style="font-size:0.7rem; color:#555; margin-top:20px;">* Data based on approximate hit counting and API weight analytics. Update real-time every 5 minutes.</p>
+            <p style="font-size:0.7rem; color:#555; margin-top:20px;">* 방문자 수와 API 가중치를 기반으로 추산된 수치입니다.</p>
         </div>
     </div>
 
-    <!-- Admin Controls -->
     <div class="admin-controls">
         <aside class="add-card">
-            <h2>Release New Video</h2>
+            <h2 style="font-size:1.2rem; margin-bottom:20px;">🎬 새 영상 등록</h2>
             <div class="form-group">
-                <input type="text" id="yt-input" placeholder="Paste YouTube Link..." oninput="parseVideo()">
+                <label style="font-size:0.8rem; color:#888;">유튜브 링크 (URL)</label>
+                <input type="text" id="yt-input" placeholder="여기에 주소를 붙여넣으세요" oninput="parseVideo()">
             </div>
             <div id="preview-box" style="display:none; background:#000; border-radius:8px; overflow:hidden; margin-bottom:20px;">
                 <img id="preview-img" src="" style="width:100%;">
-                <div id="preview-info" style="padding:10px; font-size:0.8rem; color:#aaa;"></div>
+                <div id="preview-info" style="padding:10px; font-size:0.8rem; color:#aaa; line-height:1.4;"></div>
             </div>
             <div class="form-group">
+                <label style="font-size:0.8rem; color:#888;">카테고리 선택</label>
                 <select id="category-select">
-                    <option value="trending">Trending Now</option>
-                    <option value="kpop">K-Pop Hits</option>
-                    <option value="kdrama">K-Drama Originals</option>
-                    <option value="kclassic">Legacy Cinema</option>
-                    <option value="kmovie">Latest Films</option>
-                    <option value="kvariety">Variety Specials</option>
+                    <option value="trending">실시간 트렌딩</option>
+                    <option value="kpop">K-Pop 히트곡</option>
+                    <option value="kdrama">K-드라마 오리지널</option>
+                    <option value="kclassic">레전드 클래식</option>
+                    <option value="kmovie">최신 한국 영화</option>
+                    <option value="kvariety">예능 스페셜</option>
                 </select>
             </div>
-            <button class="btn-add" onclick="pushToArchive()">🚀 PUSH TO ARCHIVE</button>
+            <button class="btn-add" onclick="pushToArchive()">🚀 아카이브에 등록하기</button>
         </aside>
 
         <section class="list-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Archive Logs</h2>
+                <h2 style="font-size:1.2rem;">📦 아카이브 보관 목록</h2>
                 <select id="filter-select" onchange="loadList()" style="padding:8px; background:#262626; border:1px solid #444; color:#fff; border-radius:4px;">
                     <option value="kpop">K-Pop</option>
                     <option value="kdrama">K-Drama</option>
-                    <option value="trending">Trending</option>
+                    <option value="trending">트렌딩</option>
+                    <option value="kclassic">클래식</option>
+                    <option value="kmovie">영화</option>
+                    <option value="kvariety">예능</option>
                 </select>
             </div>
             <table class="admin-table">
                 <thead>
-                    <tr><th>Video</th><th>Title</th><th>Category</th><th>Manage</th></tr>
+                    <tr><th>영상</th><th>제목</th><th>분류</th><th>관리</th></tr>
                 </thead>
                 <tbody id="archive-list"></tbody>
             </table>
