@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v12.4 - INSTANT UI Edition)
- * Features: Google Auth (Redirect), Cloud Sync, Robust UI Syncing
+ * YOUFLIX.KR Premium Archive Engine (v12.6 - IRON-CLAD UI Edition)
+ * Features: Google Auth (Redirect), Cloud Sync, Multi-Target UI Syncing
  */
 
 const firebaseConfig = {
@@ -36,39 +36,43 @@ async function logout() {
     location.reload();
 }
 
-// 3. UI Update Engine (v12.4)
+// 3. Iron-Clad UI Update Engine (v12.6)
 function updateAuthUI(user) {
-    const userNav = document.querySelector('.user-nav');
-    if (!userNav) return;
-
-    if (user) {
-        const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
-        userNav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout from ${user.displayName}">`;
-    } else {
-        userNav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
-    }
+    const userNavTargets = document.querySelectorAll('.user-nav');
+    console.log(`[AuthUI] Found ${userNavTargets.length} nav targets. User: ${user ? user.displayName : 'Guest'}`);
+    
+    userNavTargets.forEach(nav => {
+        if (user) {
+            const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
+            nav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout from ${user.displayName}">`;
+        } else {
+            nav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
+        }
+    });
 }
 
 // 4. Cloud Sync Engine
 async function syncFavorites() {
     if (!currentUser) return;
     const userRef = db.collection('users').doc(currentUser.uid);
-    const doc = await userRef.get();
-    let localFavs = JSON.parse(localStorage.getItem('youflix_favs') || '[]');
-    
-    if (doc.exists) {
-        cloudFavs = doc.data().favs || [];
-        const newOnes = localFavs.filter(l => !cloudFavs.some(c => c.id === l.id));
-        if (newOnes.length > 0) {
-            cloudFavs = [...newOnes, ...cloudFavs];
-            await userRef.set({ favs: cloudFavs }, { merge: true });
+    try {
+        const doc = await userRef.get();
+        let localFavs = JSON.parse(localStorage.getItem('youflix_favs') || '[]');
+        
+        if (doc.exists) {
+            cloudFavs = doc.data().favs || [];
+            const newOnes = localFavs.filter(l => !cloudFavs.some(c => c.id === l.id));
+            if (newOnes.length > 0) {
+                cloudFavs = [...newOnes, ...cloudFavs];
+                await userRef.set({ favs: cloudFavs }, { merge: true });
+                localStorage.removeItem('youflix_favs');
+            }
+        } else {
+            cloudFavs = localFavs;
+            await userRef.set({ favs: cloudFavs });
             localStorage.removeItem('youflix_favs');
         }
-    } else {
-        cloudFavs = localFavs;
-        await userRef.set({ favs: cloudFavs });
-        localStorage.removeItem('youflix_favs');
-    }
+    } catch (e) { console.error("Sync Error", e); }
 }
 
 function getFavs() { return currentUser ? cloudFavs : JSON.parse(localStorage.getItem('youflix_favs') || '[]'); }
@@ -122,7 +126,7 @@ async function load(key, config) {
             };
             grid.appendChild(card);
         });
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); grid.innerHTML = '<p class="loading-msg">System temporary offline.</p>'; }
 }
 
 function openModal(v) {
@@ -173,19 +177,25 @@ function renderMyList(targetGridId = 'mylist-grid') {
     });
 }
 
-// 6. Global Initialization
+// 6. Global Auth Listener
 auth.onAuthStateChanged(async (user) => {
+    console.log("[Auth] State changed:", user ? user.email : "Logged Out");
     currentUser = user;
     if (user) await syncFavorites();
     updateAuthUI(user);
     renderMyList('mylist-grid');
 });
 
+// 7. Initialization
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
-    updateAuthUI(auth.currentUser); // 초기 UI 로드 시도
     
-    auth.getRedirectResult().catch(e => console.error(e));
+    // Initial UI Setup with delay for robust rendering
+    setTimeout(() => updateAuthUI(auth.currentUser), 500);
+    
+    auth.getRedirectResult().then((result) => {
+        if (result.user) console.log("[Auth] Redirect successful");
+    }).catch(e => console.error("[Auth] Redirect Error", e));
     
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
