@@ -188,41 +188,11 @@ async function loadList() {
     snap.forEach(doc => {
         const v = doc.data();
         const tr = document.createElement('tr');
-        const isMobile = window.innerWidth <= 768;
-        
-        if (isMobile) {
-            // v10.5 모바일 와이드 컨테이너 스와이프 레이아웃
-            tr.innerHTML = `
-                <td colspan="4">
-                    <div class="swipe-container">
-                        <div class="swipe-wrapper">
-                            <img src="${v.thumbnail}" class="thumb-mini" style="width:50px; border-radius:4px; margin-right:15px;">
-                            <div style="flex:1;">
-                                <b style="font-size:0.8rem; display:block; color:#fff; word-break:break-all; line-height:1.4;">${v.title}</b>
-                                <span style="color:#e50914; font-size:0.7rem; font-weight:bold;">${cat.toUpperCase()}</span>
-                            </div>
-                        </div>
-                        <div class="swipe-delete-area" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</div>
-                    </div>
-                </td>`;
-            
-            const container = tr.querySelector('.swipe-container');
-            let startX = 0;
-            container.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
-            container.addEventListener('touchend', (e) => {
-                const endX = e.changedTouches[0].clientX;
-                const diff = startX - endX;
-                if (diff > 50) container.style.transform = 'translateX(-100px)';
-                else if (diff < -50) container.style.transform = 'translateX(0)';
-            });
-        } else {
-            // PC용 기존 테이블 레이아웃
-            tr.innerHTML = `
-                <td><img src="${v.thumbnail}" class="thumb-mini"></td>
-                <td><b>${v.title}</b></td>
-                <td><span style="color:#e50914;">${cat.toUpperCase()}</span></td>
-                <td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>`;
-        }
+        tr.innerHTML = `
+            <td><img src="${v.thumbnail}" class="thumb-mini"></td>
+            <td><b>${v.title}</b></td>
+            <td><span style="color:#e50914;">${cat.toUpperCase()}</span></td>
+            <td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>`;
         tbody.appendChild(tr);
     });
 }
