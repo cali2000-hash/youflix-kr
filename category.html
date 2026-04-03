@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category | YOUFLIX.KR Archive</title>
+    <meta name="description" content="Explore your favorite category in depth on YOUFLIX.KR. The ultimate premium YouTube archive.">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+</head>
+<body class="category-page-bg">
+    <header class="navbar">
+        <div class="logo-container">
+            <a href="index.html" class="logo">YOUFLIX<span>.KR</span></a>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+        <div class="search-bar" style="display: none;">
+            <input type="text" id="video-search" placeholder="Search...">
+            <button id="search-btn">Search</button>
+        </div>
+    </header>
+
+    <main class="category-main container">
+        <div class="category-header">
+            <h1 id="category-title" class="row-title" style="font-size: 3rem; margin-bottom: 0.5rem;">Archive Explorer</h1>
+            <p id="category-subtitle" style="color: #999; margin-bottom: 2rem;">Discover the curated collection of timeless YouTube moments.</p>
+        </div>
+
+        <div id="category-grid" class="category-grid">
+            <!-- Videos will be dynamically loaded here by script.js -->
+            <p style="padding: 4rem 0; color: #666; text-align: center;">Opening the vault...</p>
+        </div>
+        
+        <div class="load-more-container" id="load-more-area" style="display: none;">
+            <button id="load-more-btn" class="btn-load-more">Load More Treasures</button>
+        </div>
+    </main>
+
+    <!-- Global Video Modal -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="video-container">
+                <div id="player"></div>
+            </div>
+            <div class="modal-info">
+                <h2 id="modal-title">Video Title</h2>
+                <p id="modal-desc">Loading description...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 YOUFLIX.KR | The Global Premium YouTube Archive Platform</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

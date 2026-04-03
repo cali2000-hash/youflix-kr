@@ -1,34 +1,40 @@
 /**
- * YOUFLIX.IO - Premium YouTube Curation (Stable Version)
+ * YOUFLIX.IO - Global Premium YouTube Archive (Ultimate Version)
+ * Features: YouTube API v3, Firebase Firestore Archive, 24h Smart Caching, Live Search, Pagination
  */
 
-// 1. Configuration & Fallback Data
+// 1. Configuration (YouTube & Firebase)
 const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 
-const FALLBACK_DATA = {
-    nature: [
-        { id: '_fL9vO1U1B8', title: 'Majestic Swiss Alps 4K', channel: 'Nature Relax', date: '2024-03-25', thumbnail: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800' },
-        { id: 'vGZ2709U8S8', title: 'Deep Ocean Wonders', channel: 'Traveler TV', date: '2024-01-15', thumbnail: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&q=80&w=800' }
-    ],
-    tech: [
-        { id: '3JZ_D3ELwOQ', title: 'Minimal Desk Setup 2024', channel: 'Tech Insider', date: '2024-02-28', thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800' }
-    ],
-    knowledge: [
-        { id: 'cZ6_xK7_D_Q', title: 'How Big is the Universe?', channel: 'Kurzgesagt', date: '2023-12-15', thumbnail: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=800' }
-    ],
-    lofi: [
-        { id: 'jfKfPfyJRdk', title: 'Lofi Girl - Study Radio', channel: 'Lofi Girl', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&q=80&w=800' }
-    ]
+const firebaseConfig = {
+    apiKey: "AIzaSyCjqOk6CidQvxXXFBVNa5liqshtpjQ3oQw",
+    authDomain: "gen-lang-client-0874410222.firebaseapp.com", // Corrected Auth Domain
+    projectId: "gen-lang-client-0874410222",
+    storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
+    messagingSenderId: "970801923265",
+    appId: "1:970801923265:web:e2ee1f82d2c567808d0040",
+    measurementId: "G-W46PH03XQE"
 };
 
+// Initialize Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
+// 2. Category Configuration
 const CATEGORIES = {
-    nature: { query: 'Nature 4K 8K Travel Documentary', elementId: 'nature-grid' },
-    tech: { query: 'Minimalist Tech Desk Setup review', elementId: 'tech-grid' },
-    knowledge: { query: 'Video Essay Insight Discovery', elementId: 'knowledge-grid' },
-    lofi: { query: 'Lofi hip hop beats long mix', elementId: 'lofi-grid' },
-    trending: { query: 'Trending Trailer Viral Hot 2024', elementId: 'trending-grid' },
-    movie: { query: 'Movie Trailer Review analysis', elementId: 'movie-grid' },
-    healing: { query: 'Healing Relaxation 4K Nature Sound', elementId: 'healing-grid' }
+    nature: { query: 'Nature 8K Relaxing Visuals', title: 'Visual Escape: Nature & Travel (8K)', elementId: 'nature-grid' },
+    tech: { query: 'Minimalist Tech Setup Reviews', title: 'Minimalist Tech & Setups', elementId: 'tech-grid' },
+    knowledge: { query: 'Informative Video Essay Science History', title: 'Deep Insights: Knowledge & Essays', elementId: 'knowledge-grid' },
+    lofi: { query: 'Lofi Hip Hop Radio Study Beats', title: 'Deep Ocean Wonders: Lofi Healing', elementId: 'lofi-grid' },
+    trending: { query: 'Global Trending YouTube 2024 Video', title: 'Top Trending: New & Popular', elementId: 'trending-grid' },
+    movie: { query: 'Cinematic Movie Review Essay Theory', title: 'Cinema World: Movies & Analysis', elementId: 'movie-grid' },
+    healing: { query: 'Deep Sea Underwater 8K Relaxing', title: 'Visual Escape: Ocean Healing', elementId: 'healing-grid' }
+};
+
+const FALLBACK_DATA = {
+    nature: [{ id: '_fL9vO1U1B8', title: 'Majestic Swiss Alps 4K', channel: 'Nature Relax', date: '2024-03-25', thumbnail: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800', desc: "Visual escape to the Swiss Alps." }]
 };
 
 const HERO_DEFAULT = {
@@ -38,30 +44,37 @@ const HERO_DEFAULT = {
     bg: 'https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1500' 
 };
 
-// 2. DOM Elements
-const grids = {
-    nature: document.getElementById('nature-grid'),
-    tech: document.getElementById('tech-grid'),
-    knowledge: document.getElementById('knowledge-grid'),
-    lofi: document.getElementById('lofi-grid'),
-    trending: document.getElementById('trending-grid'),
-    movie: document.getElementById('movie-grid'),
-    healing: document.getElementById('healing-grid')
-};
+const API_FETCH_COOLDOWN = 12 * 60 * 60 * 1000; // Build Archive every 12h
+
+// 3. App State & Logic
+const grids = {};
 const modal = document.getElementById('video-modal');
 const closeModal = document.querySelector('.close-modal');
 const heroTitle = document.getElementById('hero-title');
 const heroDesc = document.getElementById('hero-desc');
 const heroSection = document.getElementById('hero');
 
-// 3. Initialize App
+let lastDoc = null; // For Archive Pagination
+let currentCategoryId = null;
+
+// 4. Initialization Logic
 document.addEventListener('DOMContentLoaded', () => {
+    const categoryGrid = document.getElementById('category-grid');
+    if (categoryGrid) {
+        initCategoryPage();
+    } else {
+        initMainPage();
+    }
+});
+
+function initMainPage() {
+    Object.keys(CATEGORIES).forEach(key => grids[key] = document.getElementById(CATEGORIES[key].elementId));
     initHero();
     fetchAllCategories();
     setupEventListeners();
-});
+}
 
-function initHero() {
+async function initHero() {
     if (heroTitle) heroTitle.textContent = HERO_DEFAULT.title;
     if (heroDesc) heroDesc.textContent = HERO_DEFAULT.desc;
     if (heroSection) heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${HERO_DEFAULT.bg}')`;
@@ -72,32 +85,144 @@ function initHero() {
     }
 }
 
-// 4. YouTube API Logic
+// 5. Category Details Logic (category.html)
+async function initCategoryPage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    currentCategoryId = urlParams.get('id');
+    
+    if (!currentCategoryId || !CATEGORIES[currentCategoryId]) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const titleEl = document.getElementById('category-title');
+    if (titleEl) titleEl.textContent = CATEGORIES[currentCategoryId].title;
+    
+    setupEventListeners();
+    loadCategoryVideos(true); // Load initial batch from Archive
+
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.onclick = () => loadCategoryVideos(false);
+    }
+}
+
+async function loadCategoryVideos(isInitial = false) {
+    const grid = document.getElementById('category-grid');
+    const loadMoreArea = document.getElementById('load-more-area');
+    if (!grid) return;
+
+    if (isInitial) {
+        grid.innerHTML = '<p style="padding: 4rem 0; color: #666; text-align: center;">Opening the vault...</p>';
+        lastDoc = null;
+    }
+
+    try {
+        let query = db.collection(currentCategoryId).orderBy('date', 'desc').limit(20);
+        if (lastDoc) {
+            query = query.startAfter(lastDoc);
+        }
+
+        const snapshot = await query.get();
+        if (isInitial) grid.innerHTML = '';
+
+        if (snapshot.empty) {
+            if (loadMoreArea) loadMoreArea.style.display = 'none';
+            if (isInitial) grid.innerHTML = '<p style="padding: 4rem 0; color: #666; text-align: center;">No items found in this archive yet.</p>';
+            return;
+        }
+
+        lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        snapshot.docs.forEach(doc => {
+            grid.appendChild(createVideoCard(doc.data()));
+        });
+
+        // Use 'flex' to match CSS and show it correctly
+        if (loadMoreArea) loadMoreArea.style.display = 'flex';
+        
+        // If we fetched less than the limit, we might want to hide it or keep it for future sync
+        if (snapshot.docs.length < 20) {
+           console.log("End of current archive reached.");
+           // Optional: You can hide it or keep it visible. Let's keep it visible for now as requested.
+        }
+    } catch (e) {
+        console.error("Pagination Error:", e);
+        if (isInitial) grid.innerHTML = '<p>Error connecting to archive.</p>';
+    }
+}
+
+// 6. Main Data Core (index.html)
+async function fetchAllCategories() {
+    let heroSet = false;
+
+    for (const [key, category] of Object.entries(CATEGORIES)) {
+        if (!grids[key]) continue;
+
+        let videos = [];
+        try {
+            const snapshot = await db.collection(key).orderBy('date', 'desc').limit(20).get();
+            videos = snapshot.docs.map(doc => doc.data());
+
+            const lastFetch = localStorage.getItem(`last_fetch_${key}`);
+            const needsRefresh = !lastFetch || (Date.now() - parseInt(lastFetch) > API_FETCH_COOLDOWN);
+            
+            if (needsRefresh) {
+                const newDiscovery = await fetchYouTubeVideos(category.query);
+                if (newDiscovery.length > 0) {
+                    const batch = db.batch();
+                    newDiscovery.forEach(v => {
+                        const docRef = db.collection(key).doc(v.id);
+                        batch.set(docRef, v);
+                    });
+                    await batch.commit();
+                    
+                    const existingIds = new Set(videos.map(v => v.id));
+                    newDiscovery.forEach(v => {
+                        if (!existingIds.has(v.id)) videos.unshift(v);
+                    });
+                    localStorage.setItem(`last_fetch_${key}`, Date.now().toString());
+                }
+            }
+        } catch (error) {
+            console.error(`[Data System Error]:`, error);
+        }
+
+        if (videos.length === 0 && FALLBACK_DATA[key]) videos = FALLBACK_DATA[key];
+
+        if (videos.length > 0) {
+            grids[key].innerHTML = ''; 
+            videos.forEach(v => grids[key].appendChild(createVideoCard(v)));
+            
+            if (!heroSet && (key === 'nature' || key === 'trending' || key === 'movie')) {
+                updateHeroContent(videos[0]);
+                heroSet = true;
+            }
+        }
+    }
+}
+
 async function fetchYouTubeVideos(query) {
     const debugEl = getOrCreateDebugEl();
     try {
-        console.log(`[API Diagnostic] Fetching for: "${query}" using key ending in: ...${API_KEY.substring(API_KEY.length - 5)}`);
-        if (debugEl) debugEl.textContent = `API Status: Fetching "${query.substring(0,10)}..."`;
-        
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
+        if (debugEl) debugEl.textContent = `Searching: "${query.substring(0,10)}..."`;
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
-            console.error('[API Error Detail]:', data.error.code, data.error.message, data.error.status);
             if (debugEl) {
                 debugEl.style.color = '#ff4b4b';
-                debugEl.textContent = `API Error ${data.error.code}: ${data.error.message} (${data.error.status})`;
+                debugEl.textContent = `API Error ${data.error.code}: ${data.error.message}`;
             }
             return [];
         }
 
         if (debugEl) {
             debugEl.style.color = '#4CAF50';
-            debugEl.textContent = `API Status: OK (Fetched ${data.items ? data.items.length : 0} items)`;
+            debugEl.textContent = `Search OK: Found ${data.items ? data.items.length : 0} items`;
+            setTimeout(() => { debugEl.style.display = 'none'; }, 5000);
         }
 
-        if (!data.items || data.items.length === 0) return [];
-
+        if (!data.items) return [];
         return data.items.map(item => ({
             id: item.id.videoId,
             title: item.snippet.title,
@@ -107,131 +232,47 @@ async function fetchYouTubeVideos(query) {
             desc: item.snippet.description || ""
         }));
     } catch (error) {
-        console.error('[Network Error]:', error);
-        if (debugEl) debugEl.textContent = `Network Error: ${error.message}`;
         return [];
     }
 }
 
-function getOrCreateDebugEl() {
-    let el = document.getElementById('api-debug');
-    if (!el) {
-        el = document.createElement('div');
-        el.id = 'api-debug';
-        el.style.position = 'fixed';
-        el.style.bottom = '10px';
-        el.style.right = '10px';
-        el.style.width = '350px';
-        el.style.backgroundColor = 'rgba(0,0,0,0.9)';
-        el.style.color = '#fff';
-        el.style.fontSize = '11px';
-        el.style.padding = '10px';
-        el.style.borderRadius = '5px';
-        el.style.zIndex = '9999';
-        el.style.wordBreak = 'break-word';
-        el.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        el.style.pointerEvents = 'none';
-        document.body.appendChild(el);
-    }
-    return el;
-}
-
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
-
-async function fetchAllCategories() {
-    let heroSetFromAPI = false;
-
-    for (const [key, category] of Object.entries(CATEGORIES)) {
-        const grid = document.getElementById(category.elementId);
-        if (!grid) continue;
-
-        // --- Caching Logic ---
-        const cacheKey = `youflix_cache_${key}`;
-        const cached = localStorage.getItem(cacheKey);
-        let videos = [];
-
-        if (cached) {
-            const parsed = JSON.parse(cached);
-            const isFresh = (Date.now() - parsed.timestamp) < CACHE_DURATION;
-            if (isFresh) {
-                console.log(`[Cache Hit]: Using saved data for ${key}`);
-                videos = parsed.data;
-            }
-        }
-
-        // If no fresh cache, hit the API
-        if (videos.length === 0) {
-            videos = await fetchYouTubeVideos(category.query);
-            if (videos.length > 0) {
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    timestamp: Date.now(),
-                    data: videos
-                }));
-            }
-        }
-
-        // Fallback if both API and Cache fail
-        if (videos.length === 0 && FALLBACK_DATA[key]) {
-            console.warn(`[Fallback]: Using offline data for ${key}`);
-            videos = FALLBACK_DATA[key];
-        }
-
-        if (videos.length > 0) {
-            grid.innerHTML = ''; 
-            videos.forEach(v => grid.appendChild(createVideoCard(v)));
-
-            if (!heroSetFromAPI && (key === 'nature' || key === 'trending')) {
-                updateHeroContent(videos[0]);
-                heroSetFromAPI = true;
-            }
-        }
-    }
-}
-
-function updateHeroContent(video) {
-    if (!video) return;
-    if (heroTitle) heroTitle.textContent = video.title;
-    if (heroDesc) heroDesc.textContent = video.desc.substring(0, 150) + "...";
-    if (heroSection) {
-        heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${video.thumbnail}')`;
-    }
-    
-    const heroPlayBtn = document.getElementById('hero-play-btn');
-    if (heroPlayBtn) {
-        heroPlayBtn.onclick = () => openVideo(video.id, video.title, video.channel);
-    }
-}
-
+// 7. UI Rendering Logic
 function createVideoCard(video) {
     const card = document.createElement('div');
     card.className = 'video-card';
     card.innerHTML = `
         <div class="thumbnail-container">
             <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
-            <div class="play-overlay">
-                <div class="play-icon">▶</div>
-            </div>
+            <div class="play-overlay"><div class="play-icon">▶</div></div>
         </div>
         <div class="video-info">
             <h4>${video.title}</h4>
-            <div class="video-meta">
-                <span>${video.channel}</span> • <span>${video.date}</span>
-            </div>
+            <div class="video-meta"><span>${video.channel}</span> • <span>${video.date}</span></div>
         </div>
     `;
     card.addEventListener('click', () => openVideo(video.id, video.title, video.channel));
     return card;
 }
 
-// 5. Modal & Player Logic
+function updateHeroContent(video) {
+    if (!video) return;
+    if (heroTitle) heroTitle.textContent = video.title;
+    if (heroDesc) heroDesc.textContent = video.desc.substring(0, 160) + "...";
+    if (heroSection) {
+        heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${video.thumbnail}')`;
+    }
+    const heroPlayBtn = document.getElementById('hero-play-btn');
+    if (heroPlayBtn) heroPlayBtn.onclick = () => openVideo(video.id, video.title, video.channel);
+}
+
+// 8. Player & Modal Systems
 let player;
 function openVideo(videoId, title, channel) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
-    
     const descEl = document.getElementById('modal-desc');
-    if (descEl) descEl.textContent = `Curated content from the ${channel} channel. Enjoy high-quality streaming.`;
+    if (descEl) descEl.textContent = `Visual Essence from the ${channel} channel. Premium streaming archive.`;
 
     if (player && typeof player.loadVideoById === 'function') {
         player.loadVideoById(videoId);
@@ -241,9 +282,7 @@ function openVideo(videoId, title, channel) {
         } else {
             const tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
+            document.body.appendChild(tag);
             window.onYouTubeIframeAPIReady = () => createPlayer(videoId);
         }
     }
@@ -251,15 +290,9 @@ function openVideo(videoId, title, channel) {
 
 function createPlayer(videoId) {
     player = new YT.Player('player', {
-        height: '100%',
-        width: '100%',
+        height: '100%', width: '100%',
         videoId: videoId,
-        playerVars: {
-            'autoplay': 1,
-            'controls': 1,
-            'modestbranding': 1,
-            'rel': 0
-        }
+        playerVars: { 'autoplay': 1, 'controls': 1, 'modestbranding': 1, 'rel': 0 }
     });
 }
 
@@ -271,42 +304,41 @@ function closeVideoModal() {
 
 function setupEventListeners() {
     if (closeModal) closeModal.onclick = closeVideoModal;
-    window.onclick = (event) => {
-        if (event.target == modal) closeVideoModal();
-    };
+    window.onclick = (e) => { if (e.target == modal) closeVideoModal(); };
 
-    // --- Real-time Search Implementation ---
     const searchInput = document.getElementById('video-search');
     const searchBtn = document.getElementById('search-btn');
-
     if (searchBtn && searchInput) {
         searchBtn.onclick = () => performSearch(searchInput.value);
-        searchInput.onkeypress = (e) => {
-            if (e.key === 'Enter') performSearch(searchInput.value);
-        };
+        searchInput.onkeypress = (e) => { if (e.key === 'Enter') performSearch(searchInput.value); };
     }
 }
 
 async function performSearch(query) {
     if (!query || query.trim() === "") return;
-    
-    console.log(`Performing live search for: ${query}`);
     const natureRowTitle = document.querySelector('#nature-grid').previousElementSibling;
     if (natureRowTitle) natureRowTitle.textContent = `Search Results: "${query}"`;
-
     const videos = await fetchYouTubeVideos(query);
     const grid = document.getElementById('nature-grid');
-    
     if (grid) {
         grid.innerHTML = '';
         if (videos.length > 0) {
             videos.forEach(v => grid.appendChild(createVideoCard(v)));
-            // Optionally update hero with the top search result
             updateHeroContent(videos[0]);
-        } else {
-            grid.innerHTML = '<p style="padding: 2rem; color: #666;">No results found for your search.</p>';
         }
     }
 }
 
-
+function getOrCreateDebugEl() {
+    let el = document.getElementById('api-debug');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'api-debug';
+        el.style.position = 'fixed'; el.style.bottom = '10px'; el.style.right = '10px';
+        el.style.width = '350px'; el.style.backgroundColor = 'rgba(0,0,0,0.9)'; el.style.color = '#fff';
+        el.style.fontSize = '11px'; el.style.padding = '10px'; el.style.borderRadius = '5px';
+        el.style.zIndex = '9999'; el.style.wordBreak = 'break-word'; el.style.pointerEvents = 'none';
+        document.body.appendChild(el);
+    }
+    return el;
+}

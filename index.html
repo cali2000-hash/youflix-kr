@@ -3,157 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX.KR - Premium YouTube Curation & 8K Visual Escape</title>
+    <title>YOUFLIX.KR | Global Premium YouTube Archive</title>
+    <meta name="description" content="Discover curated 8K Nature, Minimalist Tech, and Premium Visual Essays on YOUFLIX.KR. The ultimate YouTube archive.">
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Discover premium curated YouTube content on YOUFLIX.KR. Experience Nature 8K, Minimalist Tech, Knowledge Essays, and Lofi beats in a sleek Netflix-style interface.">
-    <meta name="keywords" content="YouTube Curation, 8K Nature, Tech Reviews, Lofi Beats, Documentary, Video Essays, YOUFLIX">
-    <link rel="canonical" href="https://youflix.kr" />
-    
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://youflix.kr">
-    <meta property="og:title" content="YOUFLIX.KR - Your Premium YouTube Curation">
-    <meta property="og:description" content="Escape the noise. Experience the world's best YouTube content curated just for you. Nature, Tech, Knowledge and more.">
+    <meta property="og:url" content="https://youflix.kr/">
+    <meta property="og:title" content="YOUFLIX.KR | Premium YouTube Curation">
+    <meta property="og:description" content="Dive into 8K Nature and Minimalist Tech. Premium curated YouTube streaming at your fingertips.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1200">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://youflix.kr">
-    <meta property="twitter:title" content="YOUFLIX.KR - Premium YouTube Curation">
+    <meta property="twitter:url" content="https://youflix.kr/">
+    <meta property="twitter:title" content="YOUFLIX.KR | Premium YouTube Curation">
     <meta property="twitter:description" content="Dive into 8K Nature and Minimalist Tech. Premium curated YouTube streaming at your fingertips.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1200">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <link rel="stylesheet" href="style.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
-<body class="dark-mode">
-
-    <!-- 1. Navigation Header -->
-    <header id="main-header">
-        <div class="container header-content">
-            <div class="logo">
-                <a href="index.html" style="color: #E50914; font-size: 1.8rem; text-decoration: none; font-weight: 900;">YOUFLIX</a>
-            </div>
-            <nav aria-label="Main Navigation">
-                <ul class="nav-links">
-                    <li><a href="#hero" class="active">Home</a></li>
-                    <li><a href="#nature-grid">Visual Escape</a></li>
-                    <li><a href="#knowledge-grid">Insights</a></li>
-                    <li><a href="#movie-grid">Movies</a></li>
-                    <li><a href="#trending-grid">New & Popular</a></li>
-                    <li><a href="#healing-grid">Wellness</a></li>
-                </ul>
-            </nav>
-            <div class="header-tools">
-                <div class="search-bar">
-                    <input type="text" id="video-search" placeholder="Titles, channels, genres" aria-label="Search videos">
-                    <button type="button" id="search-btn" aria-label="Submit Search">🔍</button>
-                </div>
-            </div>
+<body>
+    <header class="navbar">
+        <div class="logo-container">
+            <h1 class="logo">YOUFLIX<span>.KR</span></h1>
+        </div>
+        <nav class="nav-links">
+            <a href="#nature">Nature</a>
+            <a href="#tech">Tech</a>
+            <a href="#knowledge">Knowledge</a>
+            <a href="#lofi">Lofi</a>
+            <a href="#trending">Trending</a>
+            <a href="#movie">Cinema</a>
+        </nav>
+        <div class="search-bar">
+            <input type="text" id="video-search" placeholder="Search premium videos...">
+            <button id="search-btn">Search</button>
         </div>
     </header>
 
-    <!-- 2. Hero Section -->
-    <section class="hero-section" id="hero">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <div class="badge">Trending Now</div>
-            <h1 id="hero-title">Experience the Best</h1>
-            <p id="hero-desc">
-                Escape the noise. Dive into your own world with premium-curated YouTube content tailored to your taste in Nature, Tech, and more.
-            </p>
-            <div class="hero-actions">
-                <button class="btn btn-primary" id="hero-play-btn">▶ Play</button>
-                <button class="btn btn-secondary">ⓘ More Info</button>
+    <main>
+        <!-- Dynamic Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-content">
+                <span class="hero-tag">NEW ARCHIVE ACTIVE</span>
+                <h1 id="hero-title">Experience the Best</h1>
+                <p id="hero-desc">Dive into your own world with premium-curated YouTube content tailored to your taste at YOUFLIX.KR.</p>
+                <div class="hero-btns">
+                    <button id="hero-play-btn" class="btn btn-primary">Play Now</button>
+                    <button class="btn btn-secondary">Add Archive</button>
+                </div>
             </div>
+        </section>
+
+        <div class="rows-container">
+            <!-- 1. Nature Row -->
+            <section id="nature" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Visual Escape: Nature & Travel (8K)</h3>
+                    <a href="category.html?id=nature" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="nature-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=nature" class="btn">Browse More Nature Classics</a>
+                </div>
+            </section>
+
+            <!-- 2. Tech Row -->
+            <section id="tech" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Minimalist Tech: Premium Reviews</h3>
+                    <a href="category.html?id=tech" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="tech-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=tech" class="btn">Browse More Tech Treasures</a>
+                </div>
+            </section>
+
+            <!-- 3. Knowledge Row -->
+            <section id="knowledge" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Infinite Knowledge: Visual Essays</h3>
+                    <a href="category.html?id=knowledge" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="knowledge-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=knowledge" class="btn">Explore All Visual Essays</a>
+                </div>
+            </section>
+
+            <!-- 4. Lofi Row -->
+            <section id="lofi" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Deep Focus: Lo-fi Beats & Ambiance</h3>
+                    <a href="category.html?id=lofi" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="lofi-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=lofi" class="btn">Discover More Healing Beats</a>
+                </div>
+            </section>
+
+            <!-- 5. Trending Row -->
+            <section id="trending" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Trending Now: Global Viral Picks</h3>
+                    <a href="category.html?id=trending" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="trending-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=trending" class="btn">See Full Trending List</a>
+                </div>
+            </section>
+
+            <!-- 6. Cinema Row -->
+            <section id="movie" class="video-row container">
+                <div class="row-header">
+                    <h3 class="row-title">Cinematic World: Stories & Film Essays</h3>
+                    <a href="category.html?id=movie" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="movie-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=movie" class="btn">Browse All Cinema Treasures</a>
+                </div>
+            </section>
         </div>
-    </section>
+    </main>
 
-    <!-- 3. Main Video Rows -->
-    <div class="rows-container">
-        <!-- 1. Nature Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Visual Escape: Nature & Travel (8K)</h3>
-            <div class="video-grid" id="nature-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 2. Tech Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Minimalist Tech: Premium Reviews</h3>
-            <div class="video-grid" id="tech-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 3. Knowledge Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Infinite Knowledge: Visual Essays & Insight</h3>
-            <div class="video-grid" id="knowledge-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 4. Lofi Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Deep Focus: Lo-fi Beats & Ambiance</h3>
-            <div class="video-grid" id="lofi-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 5. Trending Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Trending Now: Global Viral Picks</h3>
-            <div class="video-grid" id="trending-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 6. Movie/Animation Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Cinematic Moments: Film Essays & Trailers</h3>
-            <div class="video-grid" id="movie-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-
-        <!-- 7. Healing Row -->
-        <section class="video-row container">
-            <h3 class="row-title">Inner Peace: Healing & Meditation (4K)</h3>
-            <div class="video-grid" id="healing-grid">
-                <!-- script.js will populate this -->
-            </div>
-        </section>
-    </div>
-
-    <!-- 4. Footer -->
-    <footer id="main-footer">
-        <div class="container" style="padding: 3rem 0; border-top: 1px solid var(--glass-border); margin-top: 5rem;">
-            <p>© 2024 YOUFLIX.KR - No limits, Just watch.</p>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">Curated with passion for quality content. We use the official YouTube API.</p>
-        </div>
-    </footer>
-
-    <!-- Video Modal -->
+    <!-- Global Video Modal -->
     <div id="video-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <div class="player-container">
+            <div class="video-container">
                 <div id="player"></div>
             </div>
-            <div class="video-details">
+            <div class="modal-info">
                 <h2 id="modal-title">Video Title</h2>
-                <p id="modal-desc">Detailed information about this video will be displayed here.</p>
+                <p id="modal-desc">Loading metadata and curated description...</p>
             </div>
         </div>
     </div>
 
-    <!-- YouTube IFrame API & Script -->
+    <footer class="footer">
+        <p>&copy; 2024 YOUFLIX.KR | The Global Premium YouTube Archive Platform</p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
