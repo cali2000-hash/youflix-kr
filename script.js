@@ -1,24 +1,40 @@
 /**
- * YOUFLIX.IO - Premium YouTube Curation (Real-time Version)
+ * YOUFLIX.IO - Premium YouTube Curation (Stable Version)
  */
 
-// 1. Configuration
-const API_KEY = 'AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU'; // YouTube Data API Key
+// 1. Configuration & Fallback Data
+const API_KEY = 'AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU';
 
-const CATEGORIES = {
-    nature: { query: 'Nature 4K 8K Travel Documentary 8K', elementId: 'nature-grid' },
-    tech: { query: 'Minimalist Tech Review Desk Setup 2024', elementId: 'tech-grid' },
-    knowledge: { query: 'Insightful Knowledge Documentary Video Essay', elementId: 'knowledge-grid' },
-    lofi: { query: 'Lofi hip hop beats long mix 2024', elementId: 'lofi-grid' },
-    trending: { query: 'YouTube Trending Official Music Movie 2024', elementId: 'trending-grid' },
-    movie: { query: 'Official Movie Trailer Cinema Essay Analysis', elementId: 'movie-grid' },
-    healing: { query: 'Healing Nature 4K Meditation Relaxation Sound', elementId: 'healing-grid' }
+const FALLBACK_DATA = {
+    nature: [
+        { id: '_fL9vO1U1B8', title: 'Majestic Swiss Alps 4K', channel: 'Nature Relax', date: '2024-03-25', thumbnail: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800' },
+        { id: 'vGZ2709U8S8', title: 'Deep Ocean Wonders', channel: 'Traveler TV', date: '2024-01-15', thumbnail: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&q=80&w=800' }
+    ],
+    tech: [
+        { id: '3JZ_D3ELwOQ', title: 'Minimal Desk Setup 2024', channel: 'Tech Insider', date: '2024-02-28', thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800' }
+    ],
+    knowledge: [
+        { id: 'cZ6_xK7_D_Q', title: 'How Big is the Universe?', channel: 'Kurzgesagt', date: '2023-12-15', thumbnail: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=800' }
+    ],
+    lofi: [
+        { id: 'jfKfPfyJRdk', title: 'Lofi Girl - Study Radio', channel: 'Lofi Girl', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&q=80&w=800' }
+    ]
 };
 
-const HERO_VIDEO = {
+const CATEGORIES = {
+    nature: { query: 'Nature 4K 8K Travel Documentary', elementId: 'nature-grid' },
+    tech: { query: 'Minimalist Tech Desk Setup review', elementId: 'tech-grid' },
+    knowledge: { query: 'Video Essay Insight Discovery', elementId: 'knowledge-grid' },
+    lofi: { query: 'Lofi hip hop beats long mix', elementId: 'lofi-grid' },
+    trending: { query: 'Trending Trailer Viral Hot 2024', elementId: 'trending-grid' },
+    movie: { query: 'Movie Trailer Review analysis', elementId: 'movie-grid' },
+    healing: { query: 'Healing Relaxation 4K Nature Sound', elementId: 'healing-grid' }
+};
+
+const HERO_DEFAULT = {
     id: 'f7_7vA_r_vM',
-    title: 'YOUFLIX: Your New Perspective',
-    desc: 'Escape the noise of the algorithm. Experience premium streaming with curated YouTube content in Nature, Tech, and beyond at YOUFLIX.KR.',
+    title: 'Experience the Best',
+    desc: 'Dive into your own world with premium-curated YouTube content tailored to your taste at YOUFLIX.KR.',
     bg: 'https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1500' 
 };
 
@@ -46,15 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initHero() {
-    if (heroTitle) heroTitle.textContent = HERO_VIDEO.title;
-    if (heroDesc) heroDesc.textContent = HERO_VIDEO.desc;
-    if (heroSection) heroSection.style.backgroundImage = `url('${HERO_VIDEO.bg}')`;
+    if (heroTitle) heroTitle.textContent = HERO_DEFAULT.title;
+    if (heroDesc) heroDesc.textContent = HERO_DEFAULT.desc;
+    if (heroSection) heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${HERO_DEFAULT.bg}')`;
+    
+    const heroPlayBtn = document.getElementById('hero-play-btn');
+    if (heroPlayBtn) {
+        heroPlayBtn.onclick = () => openVideo(HERO_DEFAULT.id, HERO_DEFAULT.title, 'YOUFLIX');
+    }
 }
 
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
     try {
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`);
+        console.log(`Fetching videos for: ${query}`);
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
@@ -62,45 +84,55 @@ async function fetchYouTubeVideos(query) {
             return [];
         }
 
+        if (!data.items || data.items.length === 0) return [];
+
         return data.items.map(item => ({
             id: item.id.videoId,
             title: item.snippet.title,
             channel: item.snippet.channelTitle,
             date: new Date(item.snippet.publishedAt).toLocaleDateString(),
-            thumbnail: item.snippet.thumbnails.high.url || item.snippet.thumbnails.medium.url,
+            thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.medium.url,
             desc: item.snippet.description || ""
         }));
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Network error while fetching videos:', error);
         return [];
     }
 }
 
 async function fetchAllCategories() {
-    let heroInitialized = false;
+    let heroSetFromAPI = false;
 
     for (const [key, category] of Object.entries(CATEGORIES)) {
-        const videos = await fetchYouTubeVideos(category.query);
+        let videos = await fetchYouTubeVideos(category.query);
         const grid = document.getElementById(category.elementId);
         
-        if (grid && videos.length > 0) {
-            grid.innerHTML = '';
+        if (!grid) continue;
+
+        // Fallback if API fails
+        if (videos.length === 0 && FALLBACK_DATA[key]) {
+            console.warn(`No API results for ${key}, using fallback data.`);
+            videos = FALLBACK_DATA[key];
+        }
+
+        if (videos.length > 0) {
+            grid.innerHTML = ''; 
             videos.forEach(v => grid.appendChild(createVideoCard(v)));
 
-            // Update Hero dynamically with the first video from the 'nature' or first category
-            if (!heroInitialized && key === 'nature') {
+            // Dynamic Hero Update from the very first video fetched from API/Nature
+            if (!heroSetFromAPI && (key === 'nature' || key === 'trending')) {
                 updateHeroContent(videos[0]);
-                heroInitialized = true;
+                heroSetFromAPI = true;
             }
         }
     }
 }
 
 function updateHeroContent(video) {
+    if (!video) return;
     if (heroTitle) heroTitle.textContent = video.title;
     if (heroDesc) heroDesc.textContent = video.desc.substring(0, 150) + "...";
     if (heroSection) {
-        // High quality thumbnail as background
         heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${video.thumbnail}')`;
     }
     
@@ -137,7 +169,9 @@ function openVideo(videoId, title, channel) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-desc').textContent = `Curated content from the ${channel} channel. Enjoy high-quality streaming.`;
+    
+    const descEl = document.getElementById('modal-desc');
+    if (descEl) descEl.textContent = `Curated content from the ${channel} channel. Enjoy high-quality streaming.`;
 
     if (player && typeof player.loadVideoById === 'function') {
         player.loadVideoById(videoId);
@@ -180,6 +214,6 @@ function setupEventListeners() {
     window.onclick = (event) => {
         if (event.target == modal) closeVideoModal();
     };
-    // hero-play-btn listener is now handled dynamically in updateHeroContent()
 }
+
 
