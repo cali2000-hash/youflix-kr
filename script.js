@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v6.6 - Minimalist Version)
- * Core Logic: Database Fetching, YouTube Integration, and PV Tracking
+ * YOUFLIX.KR Premium Archive Engine (v11.0 - LOVE Edition)
+ * Core Logic: Database Fetching, YouTube Integration, Favorites, and PV Tracking
  */
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
@@ -16,20 +16,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. Visit Counter (PV Tracker - v9.3 Bot & Admin Filter Included)
+// 1. Visit Counter (PV Tracker)
 function trackPV() {
-    // 관리자 기기인지 확인
-    if (localStorage.getItem('youflix_admin') === 'true') {
-        console.log("🛡️ [루미] 관리자 접속 확인: PV 카운팅에서 제외됩니다.");
-        return;
-    }
-
-    // 검색 엔진 봇인지 확인 (Googlebot, Bingbot, etc)
+    if (localStorage.getItem('youflix_admin') === 'true') return;
     const botPattern = /bot|spider|crawl|slurp|ia_archiver/i;
-    if (botPattern.test(navigator.userAgent)) {
-        console.log("🤖 [루미] 검색 엔진 봇 감지: PV 카운팅에서 제외됩니다.");
-        return;
-    }
+    if (botPattern.test(navigator.userAgent)) return;
 
     db.collection('statistics').doc('daily_pv').set({
         count: firebase.firestore.FieldValue.increment(1),
@@ -37,7 +28,7 @@ function trackPV() {
     }, { merge: true });
 }
 
-// 2. High-Speed Category Loader
+// 2. High-Speed Category Loader (Enhanced with Favorites)
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
@@ -54,11 +45,14 @@ async function load(key, config) {
 
         snap.forEach(doc => {
             const v = doc.data();
+            v.category = key;
+            const isFavorite = checkFav(v.id);
             const card = document.createElement('div');
             card.className = 'video-card animate-in';
             card.innerHTML = `
                 <div class="thumbnail-container">
                     <img src="${v.thumbnail}" alt="${v.title}">
+                    <div class="fav-icon ${isFavorite ? 'active' : ''}" data-id="${v.id}">❤</div>
                     <div class="play-overlay"><span class="play-icon">▶</span></div>
                 </div>
                 <div class="video-info">
@@ -66,7 +60,19 @@ async function load(key, config) {
                     <p class="video-meta">${v.channel} • ${v.date}</p>
                 </div>
             `;
-            card.onclick = () => openModal(v);
+            
+            card.querySelector('.thumbnail-container').onclick = () => openModal(v);
+            card.querySelector('.video-info').onclick = () => openModal(v);
+            
+            card.querySelector('.fav-icon').onclick = (e) => {
+                e.stopPropagation();
+                const icon = e.target;
+                const result = toggleFav(v);
+                icon.classList.toggle('active', result);
+                icon.classList.add('beat');
+                setTimeout(() => icon.classList.remove('beat'), 500);
+            };
+            
             grid.appendChild(card);
         });
     } catch (e) {
@@ -75,16 +81,54 @@ async function load(key, config) {
     }
 }
 
-// 3. Modal Logic
+// 3. Favorite Engine
+function getFavs() { return JSON.parse(localStorage.getItem('youflix_favs') || '[]'); }
+function checkFav(id) { return getFavs().some(f => f.id === id); }
+
+function toggleFav(v) {
+    let favs = getFavs();
+    const idx = favs.findIndex(f => f.id === v.id);
+    let result = false;
+    
+    if (idx > -1) {
+        favs.splice(idx, 1);
+        result = false;
+    } else {
+        favs.unshift(v);
+        result = true;
+    }
+    
+    localStorage.setItem('youflix_favs', JSON.stringify(favs));
+    renderMyList();
+    return result;
+}
+
+// 4. Modal Logic
 function openModal(v) {
     const modal = document.getElementById('video-modal');
-    const player = document.getElementById('player'); // ID 수정: player-area -> player
+    const player = document.getElementById('player');
     const title = document.getElementById('modal-title');
+    const controls = document.getElementById('modal-controls');
     
     if (!modal || !player) return;
     
+    const isFavorite = checkFav(v.id);
     title.innerText = v.title;
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    
+    if (controls) {
+        controls.innerHTML = `
+            <button class="btn btn-fav ${isFavorite ? 'active' : ''}" id="modal-fav-btn">
+                ${isFavorite ? '❤ 찜한 영상' : '🤍 마이 리스트 추가'}
+            </button>
+        `;
+        document.getElementById('modal-fav-btn').onclick = (e) => {
+            const btn = e.currentTarget;
+            const res = toggleFav(v);
+            btn.classList.toggle('active', res);
+            btn.innerText = res ? '❤ 찜한 영상' : '🤍 마이 리스트 추가';
+        };
+    }
     
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -92,17 +136,59 @@ function openModal(v) {
 
 function closeModal() {
     const modal = document.getElementById('video-modal');
-    const player = document.getElementById('player'); // ID 수정: player-area -> player
+    const player = document.getElementById('player');
     if (modal) modal.style.display = 'none';
     if (player) player.innerHTML = '';
     document.body.style.overflow = 'auto';
+    if (location.pathname.includes('index.html') || location.pathname === '/') {
+        renderMyList();
+    }
 }
 
-// 4. Initialization
+// 5. My List Renderer
+function renderMyList() {
+    const grid = document.getElementById('mylist-grid');
+    const row = document.getElementById('mylist-row');
+    if (!grid) return;
+    
+    const favs = getFavs();
+    if (favs.length === 0) {
+        if (row) row.style.display = 'none';
+        return;
+    }
+    
+    if (row) row.style.display = 'block';
+    grid.innerHTML = '';
+    
+    favs.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'video-card animate-in';
+        card.innerHTML = `
+            <div class="thumbnail-container">
+                <img src="${v.thumbnail}" alt="${v.title}">
+                <div class="fav-icon active">❤</div>
+                <div class="play-overlay"><span class="play-icon">▶</span></div>
+            </div>
+            <div class="video-info">
+                <h4>${v.title}</h4>
+                <p class="video-meta">${v.channel}</p>
+            </div>
+        `;
+        card.querySelector('.thumbnail-container').onclick = () => openModal(v);
+        card.querySelector('.video-info').onclick = () => openModal(v);
+        card.querySelector('.fav-icon').onclick = (e) => {
+            e.stopPropagation();
+            toggleFav(v);
+        };
+        grid.appendChild(card);
+    });
+}
+
+// 6. Initialization
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
+    renderMyList();
     
-    // Main Page Rows Auto-Detection
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => {
         if (document.getElementById(row + '-grid')) {
@@ -110,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Category Page Logic: URL 파라미터 감지
+    // Category Page Logic
     const params = new URLSearchParams(window.location.search);
     const catKey = params.get('c') || params.get('id');
     
@@ -128,18 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (titleEl && titleMap[catKey.toLowerCase()]) {
             titleEl.innerText = titleMap[catKey.toLowerCase()];
         }
-        
         load(catKey.toLowerCase(), { elementId: 'category-grid' });
     }
 
-    // v10.7 모달 닫기 이벤트 강화 (X버튼 및 외부 클릭)
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => {
-        const modal = document.getElementById('video-modal');
-        if (e.target === modal) closeModal();
+        if (e.target === document.getElementById('video-modal')) closeModal();
     });
 
-    // Header Scroll Effect
     window.addEventListener('scroll', () => {
         const header = document.getElementById('main-header');
         if (!header) return;
