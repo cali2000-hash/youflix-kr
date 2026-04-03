@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v14.2 - The Detail Finale) */
+/* YOUFLIX.KR Premium Style Sheet (v14.4 - The Margin Master) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -121,6 +121,7 @@ body {
     margin-top: -1px;
 }
 
+/* Video Grid Core */
 .video-grid {
     display: flex;
     overflow-x: auto;
@@ -137,15 +138,33 @@ body {
 .video-grid::-webkit-scrollbar-thumb { background: rgba(229, 9, 20, 0.3); border-radius: 2px; }
 .video-grid:hover::-webkit-scrollbar-thumb { background: var(--netflix-red); }
 
-/* Category Grid Override */
+/* Category Archive Page (v14.4 Balanced Layout) */
+.category-page {
+    padding: 100px 4% 40px;
+    min-height: 100vh;
+}
+.category-header {
+    margin-bottom: 40px;
+}
+#category-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    color: #fff;
+    text-transform: capitalize;
+}
+.video-grid-container {
+    width: 100%;
+}
 #category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    padding-right: 4%;
-    overflow-x: visible;
+    gap: 20px 15px;
+    width: 100%;
+    padding-right: 0; /* Align with 4% padding of .category-page */
 }
 
-/* Video Cards */
+/* Video Cards (v14.4 Unified) */
 .video-card {
     flex: 0 0 280px; 
     background: var(--card-bg);
@@ -154,7 +173,10 @@ body {
     cursor: pointer;
     transition: transform 0.3s;
 }
-#category-grid .video-card { flex: none; } 
+#category-grid .video-card { 
+    flex: none;
+    width: 100%; 
+}
 
 .video-card:hover { transform: scale(1.05); z-index: 10; }
 .thumbnail-container { position: relative; aspect-ratio: 16/9; }
@@ -205,7 +227,7 @@ body {
 
 /* Footer */
 footer { padding: 60px 4% 40px; text-align: center; color: #808080; font-size: 0.8rem; }
-.footer-links { margin-bottom: 20px; display: flex; justify-content: center; gap: 30px; }
+.footer-links { margin-bottom: 20px; display: center; justify-content: center; gap: 30px; }
 .footer-links a { color: #808080; text-decoration: none; }
 .footer-links a:hover { color: #fff; text-decoration: underline; }
 
