@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Stable Redirect Auth Engine (v5.2)
- * NO POPUP BLOCKED ERRORS
+ * YOUFLIX.IO - Ultimate Reliable Engine (v5.3)
+ * FULL AUTH WIRING & REDIRECT
  */
 
-console.log("🎬 YOUFLIX Engine v5.2: Redirect Mode...");
+console.log("🎬 YOUFLIX Engine v5.3: Ignition...");
 
 const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -20,10 +20,62 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
+// 1. Auth Action (Global for direct access)
+window.handleAuth = async function() {
+    console.log("🔐 Auth Button Clicked!");
+    try {
+        if (auth.currentUser) {
+            console.log("👋 Signing out...");
+            await auth.signOut();
+            window.location.reload();
+        } else {
+            console.log("🚀 Redirecting to Google Login...");
+            await auth.signInWithRedirect(provider);
+        }
+    } catch (e) {
+        console.error("🔑 Auth Error:", e.message);
+        alert("Auth failed: " + e.message);
+    }
+};
+
+// 2. Auth State Sync
+auth.onAuthStateChanged(user => {
+    console.log("👤 User State:", user ? user.displayName : "Logged Out");
+    
+    // Header Btn Update
+    const hBtn = document.getElementById('login-btn');
+    if (hBtn) {
+        hBtn.textContent = user ? 'Logout' : 'Google Login';
+        hBtn.classList.toggle('logged-in', !!user);
+        hBtn.onclick = window.handleAuth; // Ensure wiring
+    }
+
+    // Modal Btn Update (if open)
+    const mBtn = document.getElementById('modal-login-btn');
+    if (mBtn) {
+        mBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
+        mBtn.onclick = window.handleAuth;
+    }
+});
+
+// 3. Page Init
+document.addEventListener('DOMContentLoaded', () => {
+    auth.getRedirectResult().catch(e => console.error("Redirect Result Error:", e));
+    
+    const isCategory = !!document.getElementById('category-grid');
+    if (isCategory) initCategoryPage(); else initMainPage();
+    
+    // Initial wiring for safety
+    const hBtn = document.getElementById('login-btn');
+    if (hBtn) hBtn.onclick = window.handleAuth;
+    
+    setupGlobalUI();
+});
+
 const DEMO_DATA = {
-    kpop: [{ id: '900X9f_vWRE', title: 'Top K-POP Trends 2024', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800', desc: 'Global K-Content' }],
-    kdrama: [{ id: '900X9f_vWRE', title: 'K-Drama Essentials', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800', desc: 'Dramatic Moments' }],
-    kclassic: [{ id: 'TUTP6D_X3Ww', title: 'National Cinema Classic', channel: 'KOFA', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed0963c?auto=format&fit=crop&q=80&w=800', desc: 'Historical Gems' }]
+    kpop: [{ id: '900X9f_vWRE', title: 'Top K-POP MV', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800', desc: 'Premium K-POP' }],
+    kdrama: [{ id: '900X9f_vWRE', title: 'Hot K-Drama', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800', desc: 'Official Highlights' }],
+    kclassic: [{ id: 'TUTP6D_X3Ww', title: 'Classic Film', channel: 'KOFA', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed0963c?auto=format&fit=crop&q=80&w=800', desc: 'Cinema Gems' }]
 };
 
 const CATEGORIES = {
@@ -35,42 +87,6 @@ const CATEGORIES = {
     trending: { query: 'Trending K-POP 2024 Today', elementId: 'trending-grid' }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Handle Redirect Result
-    auth.getRedirectResult().then(result => {
-        if (result.user) console.log("👋 Welcome back, " + result.user.displayName);
-    }).catch(e => {
-        console.error("Redirect Error:", e.message);
-        if (e.code === 'auth/unauthorized-domain') {
-            alert("Please add 'youflix.kr' to Authorized Domains in Firebase Console Settings!");
-        }
-    });
-
-    const isCategory = !!document.getElementById('category-grid');
-    if (isCategory) initCategoryPage(); else initMainPage();
-    setupGeneric();
-});
-
-// Sync UI with Auth State
-auth.onAuthStateChanged(user => {
-    const headerBtn = document.getElementById('login-btn');
-    if (headerBtn) {
-        headerBtn.textContent = user ? 'Logout' : 'Google Login';
-        headerBtn.classList.toggle('logged-in', !!user);
-    }
-    const modalBtn = document.getElementById('modal-login-btn');
-    if (modalBtn) modalBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
-});
-
-async function handleAuth() {
-    if (auth.currentUser) {
-        await auth.signOut();
-    } else {
-        console.log("🚀 Redirecting to Google Login...");
-        await auth.signInWithRedirect(provider);
-    }
-}
-
 function initMainPage() {
     initHero();
     Object.entries(CATEGORIES).forEach(([k, c]) => load(k, c));
@@ -79,7 +95,7 @@ function initMainPage() {
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
-    grid.innerHTML = '<p class="loading-msg">Summoning content...</p>';
+    grid.innerHTML = '<p class="loading-msg">Searching content...</p>';
     
     let vids = [];
     try {
@@ -87,7 +103,7 @@ async function load(key, config) {
         vids = snap.docs.map(d => d.data());
         const last = localStorage.getItem(`f_${key}`);
         if (vids.length < 5 || !last || (Date.now() - last > 12 * 60 * 60 * 1000)) {
-            const raw = await fetchYT(CATEGORIES[key].query || key);
+            const raw = await fetchYT(CATEGORIES[key].query);
             if (raw.length > 0) {
                 vids = [...raw, ...vids].slice(0, 15);
                 sync(key, raw);
@@ -147,7 +163,7 @@ function open(id, title, channel) {
     if (!yt) {
         yt = document.createElement('a'); yt.id = 'modal-yt-link';
         yt.className = 'btn btn-primary'; yt.target = '_blank';
-        document.querySelector('.modal-info').appendChild(yt);
+        document.querySelector('.modal-controls').appendChild(yt);
     }
     yt.href = `https://www.youtube.com/watch?v=${id}`;
     yt.textContent = 'Watch on YouTube 🎬';
@@ -156,9 +172,9 @@ function open(id, title, channel) {
     if (!lb) {
         lb = document.createElement('button'); lb.id = 'modal-login-btn';
         lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px';
-        document.querySelector('.modal-info').appendChild(lb);
+        document.querySelector('.modal-controls').appendChild(lb);
     }
-    lb.onclick = handleAuth;
+    lb.onclick = window.handleAuth;
     lb.innerHTML = auth.currentUser ? `Logged in ✅` : `Login with Google 🔐`;
 
     if (player && player.loadVideoById) player.loadVideoById(id);
@@ -168,5 +184,5 @@ function open(id, title, channel) {
 function create(id) { player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }}); }
 function close() { document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
 function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function setupGeneric() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
+function setupGlobalUI() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
 function initHero() { const b = document.getElementById('hero-play-btn'); if (b) b.onclick = () => open('TUTP6D_X3Ww', 'Welcome', 'YOUFLIX'); }
