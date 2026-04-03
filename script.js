@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Ultimate Hybrid Auth Master (v6.0)
- * POPUP -> REDIRECT FALLBACK (UNSTOPPABLE)
+ * YOUFLIX.IO - Persistent Auth Master (v6.1)
+ * PERSISTENT LOGIN & DOMAIN SYNC
  */
 
-console.log("🎬 YOUFLIX Engine v6.0: Unstoppable Hybrid Auth Active...");
+console.log("🎬 YOUFLIX Engine v6.1: Persistent Auth Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -20,11 +20,17 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
+// IMPORTANT: Set Persistence to LOCAL (Stay logged in!)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => console.log("💾 Auth Persistence set to LOCAL"))
+    .catch(e => console.error("Persistence Error:", e));
+
 let currentVideo = null;
 let player = null;
 
 // Unified UI Update
 function updateAuthUI(user) {
+    console.log("🛠️ Sync UI for:", user ? user.displayName : "Guest");
     const hBtn = document.getElementById('login-btn');
     if (hBtn) {
         if (user) {
@@ -50,23 +56,19 @@ window.handleAuth = async function() {
             await auth.signOut();
             window.location.reload();
         } else {
-            // Save state just in case we need to redirect
             const state = { url: window.location.href, video: currentVideo };
             sessionStorage.setItem('uf_recovery', JSON.stringify(state));
 
             try {
-                // Try Popup First
                 const result = await auth.signInWithPopup(provider);
                 console.log("🌟 Popup Login Success:", result.user.displayName);
                 updateAuthUI(result.user);
-                sessionStorage.removeItem('uf_recovery'); // Not needed if popup worked
+                sessionStorage.removeItem('uf_recovery');
             } catch (pError) {
                 if (pError.code === 'auth/popup-blocked') {
-                    console.log("🛰️ Popup blocked! Switching to Redirect mode automatically...");
+                    console.log("🛰️ Popup blocked! Switching to Redirect mode...");
                     await auth.signInWithRedirect(provider);
-                } else {
-                    throw pError;
-                }
+                } else { throw pError; }
             }
         }
     } catch (e) {
@@ -75,14 +77,17 @@ window.handleAuth = async function() {
     }
 };
 
-// State Change Observer
-auth.onAuthStateChanged(user => { updateAuthUI(user); });
+auth.onAuthStateChanged(user => { 
+    updateAuthUI(user); 
+});
 
 // Watchdog (Force sync)
 setInterval(() => { if (auth.currentUser) updateAuthUI(auth.currentUser); }, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle Redirect Result & Recovery
+    // Check initial user already logged in
+    if (auth.currentUser) updateAuthUI(auth.currentUser);
+
     auth.getRedirectResult().then(result => {
         if (result.user) updateAuthUI(result.user);
         
