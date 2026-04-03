@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUFLIX - 프리미엄 유튜브 큐레이션</title>
+    <meta name="description" content="당신만의 유튜브 알고리즘, YOUFLIX.KR에서 넷플릭스 스타일로 감상하세요.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="main-header">
+        <div class="container header-content">
+            <div class="logo">
+                <h1 style="color: #E50914; font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.4)); letter-spacing: -2px; font-weight: 900;">YOUFLIX</h1>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" class="active">홈</a></li>
+                    <li><a href="#">TV 프로그램</a></li>
+                    <li><a href="#">영화</a></li>
+                    <li><a href="#">최신 콘텐츠</a></li>
+                    <li><a href="#">내가 찜한 콘텐츠</a></li>
+                </ul>
+            </nav>
+            <div class="search-bar">
+                <input type="text" id="video-search" placeholder="제목, 사람, 장르">
+                <button type="button" id="search-btn">🔍</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="container hero-content">
+                <h2 id="hero-title">지금 가장 뜨거운 영상</h2>
+                <p id="hero-desc">유튜브에서 가장 인기 있는 동영상을 지금 바로 확인하세요. 하드 용량 걱정 없이 즐기는 고화질 스트리밍 블로그 앱.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="hero-play-btn">▶ 재생</button>
+                    <button class="btn btn-secondary">ⓘ 상세 정보</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rows of videos -->
+        <div class="rows-container">
+            <section class="video-row container">
+                <h3 class="row-title">시각적 압도: 8K 자연 & 여행</h3>
+                <div class="video-grid" id="nature-grid">
+                    <!-- Loaded via JS -->
+                </div>
+            </section>
+
+            <section class="video-row container">
+                <h3 class="row-title">미니멀 & 테크: 프리미엄 리뷰</h3>
+                <div class="video-grid" id="tech-grid">
+                    <!-- Loaded via JS -->
+                </div>
+            </section>
+
+            <section class="video-row container">
+                <h3 class="row-title">학습의 재발견: 깊은 인사이트</h3>
+                <div class="video-grid" id="knowledge-grid">
+                    <!-- Loaded via JS -->
+                </div>
+            </section>
+
+            <section class="video-row container">
+                <h3 class="row-title">몰입형 휴식: Lo-fi & 앰비언트</h3>
+                <div class="video-grid" id="lofi-grid">
+                    <!-- Loaded via JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="container">
+            <p>&copy; 2026 YOUFLIX.KR - No limits, Just watch.</p>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">유튜브 API를 정식으로 사용하며, 어떠한 데이터도 기기에 저장하지 않습니다.</p>
+        </div>
+    </footer>
+
+    <!-- Video Modal Player -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="player-container">
+                <div id="player"></div>
+            </div>
+            <div class="video-details">
+                <h2 id="modal-title">영상 제목</h2>
+                <p id="modal-desc">영상 설명이 여기에 들어갑니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
