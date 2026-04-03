@@ -6,16 +6,16 @@
     <title>Category | YOUFLIX.KR Archive</title>
     <meta name="description" content="Explore your favorite category in depth on YOUFLIX.KR. The ultimate premium YouTube archive.">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=13.6">
     
-    <!-- Firebase SDK (v12.0 Powered) -->
+    <!-- Firebase SDK (v13.6 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="script.js" defer></script>
+    <script src="script.js?v=13.6" defer></script>
 
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
     
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VG6LSVY1EW"></script>
@@ -52,20 +52,17 @@
         </div>
     </header>
 
-    <main class="category-main container">
+    <main class="category-main">
         <div class="category-header">
-            <h1 id="category-title" class="row-title" style="font-size: 3rem; margin-bottom: 0.5rem;">Archive Explorer</h1>
-            <p id="category-subtitle" style="color: #999; margin-bottom: 2rem;">Discover the curated collection of timeless YouTube moments.</p>
+            <h1 id="category-title" class="row-title">Archive Explorer</h1>
+            <p id="category-description">Premium curation of high-quality Korean contents.</p>
         </div>
 
-        <div id="category-grid" class="category-grid">
-            <!-- Videos will be dynamically loaded here by script.js -->
-            <p style="padding: 4rem 0; color: #666; text-align: center;">Opening the vault...</p>
+        <div class="video-grid animate-in" id="category-grid">
+            <!-- Videos will be injected here via script.js -->
+            <p class="loading-msg">Searching the national archives...</p>
         </div>
-        
-        <div class="load-more-container" id="load-more-area" style="display: none;">
-            <button id="load-more-btn" class="btn-load-more">Load More Treasures</button>
-        </div>
+    </main>
 
     <!-- Global Video Modal -->
     <div id="video-modal" class="modal">
@@ -83,7 +80,7 @@
             </div>
         </div>
     </div>
-    
+
     <footer>
         <div class="footer-links">
             <a href="about.html">About</a>
@@ -94,6 +91,7 @@
         <p>© 2024 YOUFLIX.KR / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
     </footer>
 
-    <script src="script.js?v=13.1"></script>
+    <!-- Fixed script tag with versioning -->
+    <script src="script.js?v=13.6"></script>
 </body>
 </html>
