@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX.KR | The Premium Korea Movie & Drama Archive</title>
-    <meta name="description" content="Discover K-POP MVs, Official K-Drama Clips, and Full Korean Classics from KOFA on YOUFLIX.KR. The ultimate Korea video archive.">
+    <title>YOUFLIX.KR | The Premium YouTube Archive</title>
+    <meta name="description" content="Premium curation of high-quality Korean contents including K-Pop, K-Drama, and variety shows.">
+    <link rel="canonical" href="https://youflix.kr/index.html">
     
-    <!-- Open Graph / Social Media -->
+    <!-- Open Graph for Social -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://youflix.kr/">
-    <meta property="og:title" content="YOUFLIX.KR | The National Korea Movie Archive">
+    <meta property="og:url" content="https://youflix.kr/index.html">
+    <meta property="og:title" content="YOUFLIX.KR | The Premium YouTube Archive">
     <meta property="og:description" content="Classic Korean Full Movies and Official K-Drama Teasers. Korea’s visual history curated.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200">
 
-    <!-- Firebase SDK (v13.8 Powered) -->
+    <!-- Firebase SDK (v13.9 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <link rel="stylesheet" href="style.css?v=13.8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <link rel="stylesheet" href="style.css?v=13.9">
     
     <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VG6LSVY1EW"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -27,9 +32,6 @@
       gtag('js', new Date());
       gtag('config', 'G-VG6LSVY1EW');
     </script>
-
-    <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <header id="main-header" class="navbar">
@@ -54,116 +56,54 @@
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="Search archive...">
             </div>
+            <div id="auth-zone" class="auth-zone">
+                <!-- User Profile or Sign In button will be injected here -->
+            </div>
         </div>
     </header>
 
-    <main>
-        <!-- Dynamic Hero Section -->
-        <section id="hero" class="hero">
-            <div class="hero-content">
-                <span class="hero-tag">KOFA CLASSIC CINEMA LIVE</span>
-                <h1 id="hero-title">K-CINEMA: FULL MASTERPIECES</h1>
-                <p id="hero-desc">Explore the deep history of South Korea's cinematic gold. We meticulously curate full-length classics provided by the Korean Movie Archive.</p>
-                <div class="hero-btns">
-                    <button id="hero-play-btn" class="btn btn-primary">Watch Full Movie</button>
-                    <button class="btn btn-secondary">Explore KOFA</button>
-                </div>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">KOFA CLASSIC CINEMA LIVE</div>
+            <h1>K-CINEMA: FULL MASTERPIECES</h1>
+            <p>Explore the deep history of South Korea's cinematic gold. We meticulously curate full-length classics provided by the Korean Movie Archive.</p>
+            <div class="hero-actions">
+                <button class="btn btn-primary" onclick="alert('Join the archive today!')">Watch Full Movie</button>
+                <button class="btn btn-secondary" onclick="window.open('https://www.youtube.com/@KoreanFilm', '_blank')">Explore KOFA</button>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <div class="rows-container">
-            <!-- 💖 My List Row (v11.0) -->
-            <section id="mylist-row" class="row" style="display: none; background: rgba(229, 9, 20, 0.05); border-bottom: 1px solid rgba(229, 9, 20, 0.1);">
-                <div class="row-header">
-                    <h3 class="row-title" style="color: var(--netflix-red);">❤ My Favorite List</h3>
-                </div>
-                <div class="video-grid" id="mylist-grid"></div>
-            </section>
+    <main id="content-rows">
+        <!-- Rows for K-Pop, K-Drama, K-Movies will be injected here via script.js -->
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">K-POP MV: The Official Archive</h2>
+                <a href="category.html?c=kpop" class="view-all-link">View All ›</a>
+            </div>
+            <div id="row-kpop" class="video-grid animate-in">
+                <p class="loading-msg">Summoning the stars...</p>
+            </div>
+        </div>
 
-            <!-- 1. K-POP Row -->
-            <section id="kpop" class="row">
-                <div class="row-header">
-                    <h3 class="row-title">K-POP MV: The Official Archive</h3>
-                    <a href="category.html?id=kpop" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kpop-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kpop" class="btn">Explore All Official K-POP MVs</a>
-                </div>
-            </section>
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">K-Drama World: Official Highlights</h2>
+                <a href="category.html?c=kdrama" class="view-all-link">View All ›</a>
+            </div>
+            <div id="row-kdrama" class="video-grid animate-in">
+                <p class="loading-msg">Preparing the series...</p>
+            </div>
+        </div>
 
-            <!-- 2. K-Drama Row -->
-            <section id="kdrama" class="row">
-                <div class="row-header">
-                    <h3 class="row-title">K-Drama World: Official Highlights</h3>
-                    <a href="category.html?id=kdrama" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kdrama-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kdrama" class="btn">Experience Iconic K-Drama Clips</a>
-                </div>
-            </section>
-
-            <!-- 2.5 TV Literature Row (NEW) -->
-            <section id="tvlit" class="row">
-                <div class="row-header" style="border-left: 4px solid #ffd700; padding-left: 15px;">
-                    <h3 class="row-title">TV Literature Hall: 📽 TV문학관 📽</h3>
-                    <a href="category.html?id=tvlit" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="tvlit-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=tvlit" class="btn">Explore Korean Literary Masterpieces</a>
-                </div>
-            </section>
-
-            <!-- 3. K-Classic Row -->
-            <section id="kclassic" class="row">
-                <div class="row-header" style="border-left: 4px solid var(--accent-color); padding-left: 15px;">
-                    <h3 class="row-title">K-Classic: Korea Movie Archive (KOFA)</h3>
-                    <span class="hero-tag" style="margin: 0 10px; font-size: 0.6rem;">FULL MOVIE</span>
-                    <a href="category.html?id=kclassic" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kclassic-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kclassic" class="btn">Browse National Film Archive</a>
-                </div>
-            </section>
-
-            <!-- 4. K-Movie Row -->
-            <section id="kmovie" class="row">
-                <div class="row-header">
-                    <h3 class="row-title">K-Cinema: Premium Film Explorer</h3>
-                    <a href="category.html?id=kmovie" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kmovie-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kmovie" class="btn">Explore Cinematic Masterpieces</a>
-                </div>
-            </section>
-
-            <!-- 5. K-Variety Row -->
-            <section id="kvariety" class="row">
-                <div class="row-header">
-                    <h3 class="row-title">K-Variety Buzz: Viral Moments & Fun</h3>
-                    <a href="category.html?id=kvariety" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kvariety-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kvariety" class="btn">Stay Tuned for More Joy</a>
-                </div>
-            </section>
-
-            <!-- 6. K-Trending Row -->
-            <section id="trending" class="row">
-                <div class="row-header">
-                    <h3 class="row-title">NOW: Trending in Korea High 24h</h3>
-                    <a href="category.html?id=trending" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="trending-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=trending" class="btn">Explore Viral Trends in Seoul</a>
-                </div>
-            </section>
+        <div class="row">
+            <div class="row-header">
+                <h2 class="row-title">TV Literature Hall: 📽 TV문학관 📽</h2>
+                <a href="category.html?c=tvlit" class="view-all-link">View All ›</a>
+            </div>
+            <div id="row-tvlit" class="video-grid animate-in">
+                <p class="loading-msg">Deep diving into literature...</p>
+            </div>
         </div>
     </main>
 
@@ -175,9 +115,7 @@
                 <div id="player"></div>
             </div>
             <div class="modal-info">
-                <div class="modal-controls" id="modal-controls" style="margin-bottom: 20px;">
-                    <!-- Buttons will be injected here via script.js -->
-                </div>
+                <div class="modal-controls" id="modal-controls" style="margin-bottom: 20px;"></div>
                 <h2 id="modal-title">Video Title</h2>
                 <p id="modal-desc" style="margin-top: 15px; color: #ccc; font-size: 0.9rem; line-height: 1.6;">
                     Special curation from Korea's National Movie & Music archive.
@@ -196,6 +134,7 @@
         <p>© 2024 YOUFLIX.KR / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
     </footer>
 
-    <script src="script.js?v=13.7"></script>
+    <!-- Fixed script tag with versioning -->
+    <script src="script.js?v=13.9"></script>
 </body>
 </html>
