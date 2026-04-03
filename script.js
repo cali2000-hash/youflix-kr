@@ -54,8 +54,8 @@ function initHero() {
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
     try {
-        // maxResults를 10으로 상향하여 더욱 풍성한 리스트 제공
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
+        // videoEmbeddable=true 옵션을 추가하여 퍼가기 금지된 영상은 아예 목록에서 제외
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
