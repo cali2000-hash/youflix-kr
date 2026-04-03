@@ -74,22 +74,29 @@ function initHero() {
 
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
+    const debugEl = getOrCreateDebugEl();
     try {
         console.log(`[API Diagnostic] Fetching for: "${query}" using key ending in: ...${API_KEY.substring(API_KEY.length - 5)}`);
+        if (debugEl) debugEl.textContent = `API Status: Fetching "${query.substring(0,10)}..."`;
+        
         const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
             console.error('[API Error Detail]:', data.error.code, data.error.message, data.error.status);
+            if (debugEl) {
+                debugEl.style.color = '#ff4b4b';
+                debugEl.textContent = `API Error ${data.error.code}: ${data.error.message.substring(0, 40)}...`;
+            }
             return [];
         }
 
-        if (!data.items || data.items.length === 0) {
-            console.warn(`[API Info]: No search results found for "${query}"`);
-            return [];
+        if (debugEl) {
+            debugEl.style.color = '#4CAF50';
+            debugEl.textContent = `API Status: OK (Fetched ${data.items ? data.items.length : 0} items)`;
         }
 
-        console.log(`[API Success]: Found ${data.items.length} videos for "${query}"`);
+        if (!data.items || data.items.length === 0) return [];
 
         return data.items.map(item => ({
             id: item.id.videoId,
@@ -101,8 +108,29 @@ async function fetchYouTubeVideos(query) {
         }));
     } catch (error) {
         console.error('[Network Error]:', error);
+        if (debugEl) debugEl.textContent = `Network Error: ${error.message}`;
         return [];
     }
+}
+
+function getOrCreateDebugEl() {
+    let el = document.getElementById('api-debug');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'api-debug';
+        el.style.position = 'fixed';
+        el.style.bottom = '10px';
+        el.style.right = '10px';
+        el.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        el.style.color = '#666';
+        el.style.fontSize = '10px';
+        el.style.padding = '5px 10px';
+        el.style.borderRadius = '5px';
+        el.style.zIndex = '9999';
+        el.style.pointerEvents = 'none';
+        document.body.appendChild(el);
+    }
+    return el;
 }
 
 async function fetchAllCategories() {
