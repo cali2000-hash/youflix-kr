@@ -101,12 +101,12 @@ function openModal(v) {
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
     if (controls) {
-        controls.innerHTML = `<button class="btn btn-fav ${isFavorite ? 'active' : ''}" id="modal-fav-btn">${isFavorite ? '❤ 찜한 영상' : '🤍 마이 리스트 추가'}</button>`;
+        controls.innerHTML = `<button class="btn btn-fav ${isFavorite ? 'active' : ''}" id="modal-fav-btn">${isFavorite ? '❤ In My List' : '🤍 Add to My List'}</button>`;
         document.getElementById('modal-fav-btn').onclick = (e) => {
             const btn = e.currentTarget;
             const res = toggleFav(v);
             btn.classList.toggle('active', res);
-            btn.innerText = res ? '❤ 찜한 영상' : '🤍 마이 리스트 추가';
+            btn.innerText = res ? '❤ In My List' : '🤍 Add to My List';
         };
     }
     modal.style.display = 'block';
