@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Ultimate Auth Sync & Persistence (v5.8)
- * FIXES LOCAL UI LAG & RECOVERY
+ * YOUFLIX.IO - Ultimate Popup Auth Engine (v5.9)
+ * REVERTED TO POPUP FOR BETTER UX
  */
 
-console.log("🎬 YOUFLIX Engine v5.8: Auth Watchdog Active...");
+console.log("🎬 YOUFLIX Engine v5.9: Popup Auth Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -23,9 +23,8 @@ const provider = new firebase.auth.GoogleAuthProvider();
 let currentVideo = null;
 let player = null;
 
-// UI Update with Watchdog
+// Unified UI Update
 function updateAuthUI(user) {
-    console.log("🛠️ Sync UI for:", user ? user.displayName : "Guest");
     const hBtn = document.getElementById('login-btn');
     if (hBtn) {
         if (user) {
@@ -45,34 +44,33 @@ function updateAuthUI(user) {
 }
 
 window.handleAuth = async function() {
+    console.log("🔐 Popup Auth Triggered...");
     try {
-        if (auth.currentUser) { await auth.signOut(); window.location.reload(); }
-        else {
-            const state = { url: window.location.href, video: currentVideo };
-            sessionStorage.setItem('uf_recovery', JSON.stringify(state));
-            await auth.signInWithRedirect(provider);
+        if (auth.currentUser) {
+            await auth.signOut();
+            window.location.reload();
+        } else {
+            const result = await auth.signInWithPopup(provider);
+            console.log("🌟 Login Success:", result.user.displayName);
+            updateAuthUI(result.user);
         }
-    } catch (e) { console.error("Auth Fail:", e.message); }
+    } catch (e) {
+        console.error("🔑 Popup Auth Error:", e.message);
+        if (e.code === 'auth/popup-blocked') {
+            alert("팝업이 차단되었습니다! 브라우저 설정에서 팝업을 허용해주세요. 🔓");
+        } else {
+            alert(`인증 에러: ${e.message}`);
+        }
+    }
 };
 
-// Periodic Check for Login State (Watchdog)
-setInterval(() => {
-    if (auth.currentUser) updateAuthUI(auth.currentUser);
-}, 2000);
-
+// State Change Observer
 auth.onAuthStateChanged(user => { updateAuthUI(user); });
 
-document.addEventListener('DOMContentLoaded', () => {
-    auth.getRedirectResult().then(result => {
-        if (result.user) { updateAuthUI(result.user); }
-        const rec = sessionStorage.getItem('uf_recovery');
-        if (rec) {
-            const state = JSON.parse(rec);
-            sessionStorage.removeItem('uf_recovery');
-            if (state.video) setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1500);
-        }
-    }).catch(e => console.error("Result Error:", e));
+// Watchdog (Force sync)
+setInterval(() => { if (auth.currentUser) updateAuthUI(auth.currentUser); }, 3000);
 
+document.addEventListener('DOMContentLoaded', () => {
     const iCat = !!document.getElementById('category-grid');
     if (iCat) initCategoryPage(); else initMainPage();
     setupUI();
@@ -146,13 +144,7 @@ function open(id, title, channel) {
     }
 }
 
-function create(id) { 
-    player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }, 
-        events: { 'onStateChange': (e) => { 
-            if (e.data === -1) { console.log("Video restricted or loading..."); }
-        }}
-    }); 
-}
+function create(id) { player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }}); }
 function close() { currentVideo = null; document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
 function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function setupUI() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
