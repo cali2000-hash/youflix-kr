@@ -1,11 +1,10 @@
 /**
- * YOUFLIX.IO - Ultimate Robust Engine (v5.0)
- * GUARANTEED RENDER MODE
+ * YOUFLIX.IO - Ultimate Robust Engine (v5.1)
+ * STABLE AUTH & RENDER
  */
 
-console.log("🎬 YOUFLIX Engine v5.0: Ignition...");
+console.log("🎬 YOUFLIX Engine v5.1: Ignition...");
 
-// 1. Config
 const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
     apiKey: "AIzaSyCjqOk6CidQvxXXFBVNa5liqshtpjQ3oQw",
@@ -16,19 +15,11 @@ const firebaseConfig = {
     appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
 };
 
-// Initialize
-try {
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    console.log("✅ Firebase Connected");
-} catch (e) {
-    console.error("❌ Firebase Error:", e);
-}
-
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// 2. Demo Backup Data (Emergency Mode)
 const DEMO_DATA = {
     kpop: [{ id: '900X9f_vWRE', title: 'Top K-POP Trends 2024', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=800', desc: 'Global K-Content' }],
     kdrama: [{ id: '900X9f_vWRE', title: 'K-Drama Essentials', channel: 'K-Archive', date: '2024-04-03', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800', desc: 'Dramatic Moments' }],
@@ -44,173 +35,154 @@ const CATEGORIES = {
     trending: { query: 'Trending K-POP 2024 Today', elementId: 'trending-grid', title: 'Trending' }
 };
 
-// 3. App Core
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("💎 DOM Ready: Initializing Hub...");
-    const categoryId = !!document.getElementById('category-grid');
-    if (categoryId) initCategoryPage();
-    else initMainPage();
+    const isCategory = !!document.getElementById('category-grid');
+    if (isCategory) initCategoryPage(); else initMainPage();
+    setupGeneric();
+});
+
+// UI Update Logic for Auth
+auth.onAuthStateChanged(user => {
+    console.log("👤 Auth State Changed:", user ? user.displayName : "Logged Out");
     
-    // Auth Listener
-    auth.onAuthStateChanged(user => {
-        const btn = document.getElementById('login-btn');
-        if (btn) {
-            btn.textContent = user ? 'Logout' : 'Google Login';
-            btn.classList.toggle('logged-in', !!user);
-        }
-    });
+    // Header Btn
+    const headerBtn = document.getElementById('login-btn');
+    if (headerBtn) {
+        headerBtn.textContent = user ? 'Logout' : 'Google Login';
+        headerBtn.classList.toggle('logged-in', !!user);
+    }
+    
+    // Modal Btn
+    const modalBtn = document.getElementById('modal-login-btn');
+    if (modalBtn) {
+        modalBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
+    }
 });
 
 async function handleAuth() {
     try {
-        if (auth.currentUser) await auth.signOut();
-        else await auth.signInWithPopup(provider);
-        window.location.reload();
+        if (auth.currentUser) {
+            await auth.signOut();
+            console.log("👋 Logged Out");
+        } else {
+            console.log("🔐 Starting Popup Login...");
+            await auth.signInWithPopup(provider);
+            console.log("🎉 Login Successful");
+        }
+        // No reload needed! onAuthStateChanged handles UI.
     } catch (e) {
-        console.error("Auth Fail:", e);
+        console.error("🔑 Auth Error:", e.code, e.message);
+        if (e.code === 'auth/unauthorized-domain') {
+            alert("This domain is not authorized in Firebase Console. Please add youflix.kr to Authorized Domains.");
+        } else {
+            alert("Auth failed: " + e.message);
+        }
     }
 }
 
 function initMainPage() {
     initHero();
-    Object.entries(CATEGORIES).forEach(([key, config]) => loadSection(key, config));
+    Object.entries(CATEGORIES).forEach(([k, c]) => load(k, c));
 }
 
-async function loadSection(key, config) {
+async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
-
     grid.innerHTML = '<p class="loading-msg">Summoning content...</p>';
     
-    let videos = [];
+    let vids = [];
     try {
         const snap = await db.collection(key).orderBy('date', 'desc').limit(15).get();
-        videos = snap.docs.map(d => d.data());
-        const lastFetch = localStorage.getItem(`fetch_${key}`);
-        if (videos.length < 5 || !lastFetch || (Date.now() - lastFetch > 12 * 60 * 60 * 1000)) {
-            const raw = await fetchYouTube(config.query);
+        vids = snap.docs.map(d => d.data());
+        const last = localStorage.getItem(`f_${key}`);
+        if (vids.length < 5 || !last || (Date.now() - last > 12 * 60 * 60 * 1000)) {
+            const raw = await fetchYT(config.query);
             if (raw.length > 0) {
-                videos = [...raw, ...videos].slice(0, 15);
-                syncToDB(key, raw);
-                localStorage.setItem(`fetch_${key}`, Date.now());
+                vids = [...raw, ...vids].slice(0, 15);
+                sync(key, raw);
+                localStorage.setItem(`f_${key}`, Date.now());
             }
         }
-    } catch (e) { console.warn(`⚠️ API Error for ${key}:`, e); }
+    } catch (e) { console.warn("Load Error:", e); }
 
-    if (videos.length === 0) videos = DEMO_DATA[key] || DEMO_DATA.kpop;
+    if (vids.length === 0) vids = DEMO_DATA[key] || DEMO_DATA.kpop;
     grid.innerHTML = '';
-    videos.forEach(v => grid.appendChild(createVideoCard(v)));
-    if (key === 'kpop' || key === 'kmovie') updateHero(videos[0]);
+    vids.forEach(v => grid.appendChild(card(v)));
+    if (key === 'kpop' || key === 'kmovie') hero(vids[0]);
 }
 
-async function fetchYouTube(query) {
+async function fetchYT(q) {
     try {
-        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
-        const data = await res.json();
-        return (data.items || []).map(item => ({
-            id: item.id.videoId,
-            title: item.snippet.title,
-            channel: item.snippet.channelTitle,
-            date: new Date(item.snippet.publishedAt).toLocaleDateString(),
-            thumbnail: item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : item.snippet.thumbnails.medium.url,
-            desc: item.snippet.description || ""
+        const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(q)}&type=video&key=${API_KEY}`);
+        const d = await r.json();
+        return (d.items || []).map(i => ({
+            id: i.id.videoId, title: i.snippet.title, channel: i.snippet.channelTitle,
+            date: new Date(i.snippet.publishedAt).toLocaleDateString(),
+            thumbnail: i.snippet.thumbnails.high ? i.snippet.thumbnails.high.url : i.snippet.thumbnails.medium.url,
+            desc: i.snippet.description || ""
         }));
     } catch (e) { return []; }
 }
 
-function syncToDB(col, videos) {
-    const batch = db.batch();
-    videos.forEach(v => batch.set(db.collection(col).doc(v.id), v));
-    batch.commit().catch(() => {});
+function sync(col, vids) {
+    const b = db.batch();
+    vids.forEach(v => b.set(db.collection(col).doc(v.id), v));
+    b.commit().catch(() => {});
 }
 
-function createVideoCard(v) {
-    const card = document.createElement('div');
-    card.className = 'video-card animate-in';
-    card.innerHTML = `
+function card(v) {
+    const c = document.createElement('div');
+    c.className = 'video-card animate-in';
+    c.innerHTML = `
         <div class="thumbnail-container">
-            <img src="${v.thumbnail}" alt="${v.title}" loading="lazy">
+            <img src="${v.thumbnail}" loading="lazy">
             <div class="play-overlay"><div class="play-icon">▶</div></div>
         </div>
         <div class="video-info">
-            <h4>${encodeHTML(v.title)}</h4>
-            <div class="video-meta"><span>${encodeHTML(v.channel)}</span> • <span>${v.date}</span></div>
+            <h4>${encode(v.title)}</h4>
+            <div class="video-meta"><span>${encode(v.channel)}</span> • <span>${v.date}</span></div>
         </div>
     `;
-    card.onclick = () => openModal(v.id, v.title, v.channel);
-    return card;
+    c.onclick = () => open(v.id, v.title, v.channel);
+    return c;
 }
 
-function updateHero(v) {
-    const title = document.getElementById('hero-title');
-    const desc = document.getElementById('hero-desc');
-    const hero = document.getElementById('hero');
-    const btn = document.getElementById('hero-play-btn');
-    if (title && v.title) title.textContent = v.title;
-    if (desc && v.desc) desc.textContent = v.desc.substring(0, 150) + "...";
-    if (hero && v.thumbnail) hero.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${v.thumbnail}')`;
-    if (btn) btn.onclick = () => openModal(v.id, v.title, v.channel);
+function hero(v) {
+    const h = document.getElementById('hero');
+    if (h && v.thumbnail) h.style.backgroundImage = `linear-gradient(to right, rgba(12,13,22,0.9), rgba(12,13,22,0.2)), url('${v.thumbnail}')`;
 }
 
 let player;
-function openModal(id, title, channel) {
-    const modal = document.getElementById('video-modal');
-    modal.style.display = 'block';
+function open(id, title, channel) {
+    const m = document.getElementById('video-modal');
+    m.style.display = 'block';
     document.body.style.overflow = 'hidden';
     document.getElementById('modal-title').textContent = title;
 
-    let ytBtn = document.getElementById('modal-yt-link');
-    if (!ytBtn) {
-        ytBtn = document.createElement('a');
-        ytBtn.id = 'modal-yt-link';
-        ytBtn.className = 'btn btn-primary';
-        ytBtn.target = '_blank';
-        document.querySelector('.modal-info').appendChild(ytBtn);
+    let yt = document.getElementById('modal-yt-link');
+    if (!yt) {
+        yt = document.createElement('a'); yt.id = 'modal-yt-link';
+        yt.className = 'btn btn-primary'; yt.target = '_blank';
+        document.querySelector('.modal-info').appendChild(yt);
     }
-    ytBtn.href = `https://www.youtube.com/watch?v=${id}`;
-    ytBtn.textContent = 'Watch on YouTube 🎬';
+    yt.href = `https://www.youtube.com/watch?v=${id}`;
+    yt.textContent = 'Watch on YouTube 🎬';
 
-    let modalLoginBtn = document.getElementById('modal-login-btn');
-    if (!modalLoginBtn) {
-        modalLoginBtn = document.createElement('button');
-        modalLoginBtn.id = 'modal-login-btn';
-        modalLoginBtn.className = 'btn btn-secondary';
-        document.querySelector('.modal-info').appendChild(modalLoginBtn);
+    let lb = document.getElementById('modal-login-btn');
+    if (!lb) {
+        lb = document.createElement('button'); lb.id = 'modal-login-btn';
+        lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px';
+        document.querySelector('.modal-info').appendChild(lb);
     }
-    
-    const updateModalBtn = (u) => {
-        modalLoginBtn.innerHTML = u ? `Logged in ✅` : `Login with Google 🔐`;
-        modalLoginBtn.onclick = handleAuth;
-    };
-    updateModalBtn(auth.currentUser);
+    lb.onclick = handleAuth;
+    lb.innerHTML = auth.currentUser ? `Logged in ✅` : `Login with Google 🔐`;
 
     if (player && player.loadVideoById) player.loadVideoById(id);
-    else {
-        if (window.YT) createYT(id);
-        else {
-            const tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            document.body.appendChild(tag);
-            window.onYouTubeIframeAPIReady = () => createYT(id);
-        }
-    }
+    else { if (window.YT) create(id); else { const t = document.createElement('script'); t.src = "https://www.youtube.com/iframe_api"; document.body.appendChild(t); window.onYouTubeIframeAPIReady = () => create(id); } }
 }
 
-function createYT(id) {
-    player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }});
-}
-
-function closeModal() {
-    document.getElementById('video-modal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    if (player && player.stopVideo) player.stopVideo();
-}
-document.querySelector('.close-modal').onclick = closeModal;
-window.onclick = (e) => { if (e.target.id === 'video-modal') closeModal(); };
-
-function encodeHTML(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-function initHero() {
-    const btn = document.getElementById('hero-play-btn');
-    if (btn) btn.onclick = () => openModal('TUTP6D_X3Ww', 'Welcome to Archive', 'YOUFLIX');
-}
+function create(id) { player = new YT.Player('player', { height: '100%', width: '100%', videoId: id, playerVars: { 'autoplay': 1, 'controls': 1 }}); }
+function close() { document.getElementById('video-modal').style.display = 'none'; document.body.style.overflow = 'auto'; if (player && player.stopVideo) player.stopVideo(); }
+function encode(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function setupGeneric() { document.querySelector('.close-modal').onclick = close; window.onclick = (e) => { if (e.target.id === 'video-modal') close(); }; }
+function initHero() { const b = document.getElementById('hero-play-btn'); if (b) b.onclick = () => open('TUTP6D_X3Ww', 'Welcome', 'YOUFLIX'); }
