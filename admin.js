@@ -61,13 +61,25 @@ async function loadStats() {
     }
 }
 
-// v9.0 루미의 시스템 엔진 가이드함수
+// v9.6 루미의 프리미엄 모달 시스템 (완전 한글 가이드)
 function showEngineInfo() {
-    alert("🌌 [유플릭스 시스템 엔진 핵심 역할]\n\n" +
-          "1. 데이터베이스 감시: 파이어베이스 실시간 연결 무결성 확보\n" +
-          "2. 보안 가드: 아카이브 영상 및 데이터 불법 접근 원천 차단\n" +
-          "3. 과부하 가시화: API 사용량 및 트래픽 폭주 감지 모니터링\n\n" +
-          "루미는 오늘도 유플릭스의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨");
+    const modal = document.getElementById('infoModal');
+    const body = document.getElementById('modalBody');
+    
+    body.innerHTML = 
+          "<strong style='color:#fff;'>1. 데이터베이스 실시간 모니터링</strong><br>" +
+          "파이어베이스와 운영 센터 간의 연결 상태를 초 단위로 감시하여, 우주님의 소중한 명작들이 안전하게 보관되고 있는지 확인합니다.<br><br>" +
+          "<strong style='color:#fff;'>2. 통합 보안 관제</strong><br>" +
+          "아카이브의 모든 영상과 데이터에 대한 허가되지 않은 접근을 원천적으로 차단하고, 무결성을 유지하는 자가 방어 체계입니다.<br><br>" +
+          "<strong style='color:#fff;'>3. 과부하 및 리소스 관리</strong><br>" +
+          "유튜브 API 및 데이터 트래픽의 급격한 폭주를 감지하여, 플랫폼이 중단 없이 부드럽게 운영되도록 자원을 지능적으로 분배합니다.<br><br>" +
+          "<span style='color:#e50914; font-weight:bold;'>루미는 우주님의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨</span>";
+    
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('infoModal').style.display = 'none';
 }
 
 function updateResourceGauges(pv, videos) {
