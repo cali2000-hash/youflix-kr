@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX.KR | The Premium K-Drama & Cinema Archive</title>
-    <meta name="description" content="Discover curated K-POP Music Videos, Official K-Drama Clips, and Premium K-Movie Trailers on YOUFLIX.KR. The ultimate Korea video archive.">
+    <title>YOUFLIX.KR | The Premium Korea Movie & Drama Archive</title>
+    <meta name="description" content="Discover K-POP MVs, Official K-Drama Clips, and Full Korean Classics from KOFA on YOUFLIX.KR. The ultimate Korea video archive.">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://youflix.kr/">
-    <meta property="og:title" content="YOUFLIX.KR | The Premium K-Content Archive">
-    <meta property="og:description" content="Official K-Drama Teasers and Cinematic Movie Highlights. Korea’s visual essence curated.">
+    <meta property="og:title" content="YOUFLIX.KR | The National Korea Movie Archive">
+    <meta property="og:description" content="Classic Korean Full Movies and Official K-Drama Teasers. Korea’s visual history curated.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200">
 
     <!-- Firebase SDKs -->
@@ -31,8 +31,8 @@
             <a href="#kpop">K-POP MV</a>
             <a href="#kdrama">K-Drama</a>
             <a href="#kmovie">K-Movie</a>
+            <a href="#kclassic">K-Classic</a>
             <a href="#kvariety">K-Variety</a>
-            <a href="#kstage">K-Stage</a>
             <a href="#trending">Trending</a>
         </nav>
         <div class="search-bar">
@@ -45,12 +45,12 @@
         <!-- Dynamic Hero Section -->
         <section id="hero" class="hero-section">
             <div class="hero-content">
-                <span class="hero-tag">PREMIUM CINEMA ARCHIVE LIVE</span>
-                <h1 id="hero-title">DRAMA & CINEMA: THE CORE</h1>
-                <p id="hero-desc">Experience the pinnacle of Korea's storytelling. Our archive meticulously curates official K-Drama highlights and cinematic movie masterpieces.</p>
+                <span class="hero-tag">KOFA CLASSIC CINEMA LIVE</span>
+                <h1 id="hero-title">K-CINEMA: FULL MASTERPIECES</h1>
+                <p id="hero-desc">Explore the deep history of South Korea's cinematic gold. We meticulously curate full-length classics provided by the Korean Movie Archive.</p>
                 <div class="hero-btns">
-                    <button id="hero-play-btn" class="btn btn-primary">Watch Trailers</button>
-                    <button class="btn btn-secondary">Browse Cinema</button>
+                    <button id="hero-play-btn" class="btn btn-primary">Watch Full Movie</button>
+                    <button class="btn btn-secondary">Explore KOFA</button>
                 </div>
             </div>
         </section>
@@ -64,7 +64,7 @@
                 </div>
                 <div class="video-grid" id="kpop-grid"></div>
                 <div class="row-footer-btn">
-                    <a href="category.html?id=kpop" class="btn">Explore All Official K-POP</a>
+                    <a href="category.html?id=kpop" class="btn">Explore All Official K-POP MVs</a>
                 </div>
             </section>
 
@@ -76,11 +76,24 @@
                 </div>
                 <div class="video-grid" id="kdrama-grid"></div>
                 <div class="row-footer-btn">
-                    <a href="category.html?id=kdrama" class="btn">Browse All DRAMA Gems</a>
+                    <a href="category.html?id=kdrama" class="btn">Experience Iconic K-Drama Clips</a>
                 </div>
             </section>
 
-            <!-- 3. K-Movie Row -->
+            <!-- 3. K-Classic Row -->
+            <section id="kclassic" class="video-row container">
+                <div class="row-header" style="border-left: 4px solid var(--accent-color); padding-left: 15px;">
+                    <h3 class="row-title">K-Classic: Korea Movie Archive (KOFA)</h3>
+                    <span class="hero-tag" style="margin: 0 10px; font-size: 0.6rem;">FULL MOVIE</span>
+                    <a href="category.html?id=kclassic" class="view-all-link">View All <span>›</span></a>
+                </div>
+                <div class="video-grid" id="kclassic-grid"></div>
+                <div class="row-footer-btn">
+                    <a href="category.html?id=kclassic" class="btn">Browse National Film Archive</a>
+                </div>
+            </section>
+
+            <!-- 4. K-Movie Row -->
             <section id="kmovie" class="video-row container">
                 <div class="row-header">
                     <h3 class="row-title">K-Cinema: Premium Film Explorer</h3>
@@ -88,31 +101,19 @@
                 </div>
                 <div class="video-grid" id="kmovie-grid"></div>
                 <div class="row-footer-btn">
-                    <a href="category.html?id=kmovie" class="btn">Experience Cinematic Masterpieces</a>
+                    <a href="category.html?id=kmovie" class="btn">Explore Cinematic Masterpieces</a>
                 </div>
             </section>
 
-            <!-- 4. K-Variety Row -->
+            <!-- 5. K-Variety Row -->
             <section id="kvariety" class="video-row container">
                 <div class="row-header">
-                    <h3 class="row-title">K-Variety Buzz: Viral Highlights</h3>
+                    <h3 class="row-title">K-Variety Buzz: Viral Moments & Fun</h3>
                     <a href="category.html?id=kvariety" class="view-all-link">View All <span>›</span></a>
                 </div>
                 <div class="video-grid" id="kvariety-grid"></div>
                 <div class="row-footer-btn">
-                    <a href="category.html?id=kvariety" class="btn">More Viral Entertainment</a>
-                </div>
-            </section>
-
-            <!-- 5. K-Stage Row -->
-            <section id="kstage" class="video-row container">
-                <div class="row-header">
-                    <h3 class="row-title">K-Stage Live: Iconics Performance</h3>
-                    <a href="category.html?id=kstage" class="view-all-link">View All <span>›</span></a>
-                </div>
-                <div class="video-grid" id="kstage-grid"></div>
-                <div class="row-footer-btn">
-                    <a href="category.html?id=kstage" class="btn">See In-depth Stage Focus</a>
+                    <a href="category.html?id=kvariety" class="btn">Stay Tuned for More Joy</a>
                 </div>
             </section>
 
@@ -124,7 +125,7 @@
                 </div>
                 <div class="video-grid" id="trending-grid"></div>
                 <div class="row-footer-btn">
-                    <a href="category.html?id=trending" class="btn">Explore Current Viral Trends</a>
+                    <a href="category.html?id=trending" class="btn">Explore Viral Trends in Seoul</a>
                 </div>
             </section>
         </div>
@@ -139,13 +140,13 @@
             </div>
             <div class="modal-info">
                 <h2 id="modal-title">Video Title</h2>
-                <p id="modal-desc">Curated Premium Cinema & Drama Archive.</p>
+                <p id="modal-desc">Special curation from Korea’s National Movie & Music archive.</p>
             </div>
         </div>
     </div>
 
     <footer class="footer">
-        <p>&copy; 2024 YOUFLIX.KR | The Ultimate K-Drama & Cinema Experience</p>
+        <p>&copy; 2024 YOUFLIX.KR | The Ultimate K-Media National Archive Experience</p>
     </footer>
 
     <script src="script.js"></script>
