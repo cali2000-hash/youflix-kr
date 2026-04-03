@@ -64,6 +64,13 @@ function updateAuthUI(user) {
             authZone.innerHTML = `<button class="btn btn-login" onclick="login()">SIGN IN</button>`;
         }
     });
+
+    // Handle Admin Link Visibility (Admin Only)
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) {
+        const isAdmin = user && user.email === 'cali20000@gmail.com';
+        adminLink.style.display = isAdmin ? 'inline-block' : 'none';
+    }
 }
 
 // 4. Cloud Sync Engine
