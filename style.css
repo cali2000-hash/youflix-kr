@@ -1,6 +1,6 @@
 /*
- * YOUFLIX.KR Premium Global Style (v6.6 - Minimalist Cleanup)
- * K-Content Archive Styling
+ * YOUFLIX.KR Premium Global Style (v6.7 - Major Layout Fix)
+ * K-Content Archive Styling: Horizontal Scrolls & Layout Balance
  */
 
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700&display=swap');
@@ -24,21 +24,21 @@
      -webkit-font-smoothing: antialiased;
  }
  
- /* Header Clean Upgrade */
- header {
+ /* Header Fixed (Corrected Overlap) */
+ header#main-header {
      position: fixed;
      top: 0;
      width: 100%;
-     height: 70px;
+     height: 80px;
      padding: 0 4%;
      background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
      display: flex;
      align-items: center;
      justify-content: space-between;
-     z-index: 1000;
+     z-index: 2000;
      transition: background 0.3s;
  }
- header.scrolled { background: var(--bg-black); }
+ header#main-header.scrolled { background: var(--bg-black); }
  
  .logo {
      color: var(--netflix-red);
@@ -66,9 +66,7 @@
      border: 1px solid rgba(255,255,255,0.2);
      border-radius: 20px;
      padding: 6px 15px;
-     transition: border-color 0.3s;
  }
- .search-box:focus-within { border-color: var(--netflix-red); }
  .search-box input {
      background: transparent;
      border: none;
@@ -78,18 +76,18 @@
      font-size: 0.85rem;
  }
  
- /* Hero Section */
+ /* Hero Section (Fix Header Overlap) */
  .hero {
-     height: 85vh;
+     height: 100vh; /* Changed to full viewport for premium feel */
      position: relative;
      display: flex;
      align-items: center;
-     padding: 0 4%;
+     padding: 80px 4% 0; /* Match Header Height */
      background-size: cover;
      background-position: center;
      background-image: linear-gradient(to right, rgba(0,0,0,0.85) 0%, transparent 60%), url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000');
  }
- .hero-content { max-width: 700px; transform: translateY(0); animation: slideUp 1s cubic-bezier(0.23, 1, 0.32, 1); }
+ .hero-content { max-width: 700px; transform: translateY(-40px); }
  .hero-content h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; line-height: 1.1; }
  .hero-content p { font-size: 1.25rem; color: var(--text-gray); margin-bottom: 35px; max-width: 500px; }
  
@@ -106,87 +104,89 @@
      text-decoration: none;
  }
  .btn-primary { background: white; color: black; border: none; }
- .btn-primary:hover { background: rgba(255,255,255,0.7); }
  .btn-secondary { background: rgba(109, 109, 110, 0.7); color: white; border: none; backdrop-filter: blur(10px); }
- .btn-secondary:hover { background: rgba(109, 109, 110, 0.4); }
  
- /* Rows */
- .row { padding: 50px 4% 0; }
- .row-title { font-size: 1.6rem; font-weight: bold; margin-bottom: 20px; color: #fff; border-left: 4px solid var(--netflix-red); padding-left: 15px; }
- .video-grid {
-     display: grid;
-     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-     gap: 15px;
+ /* Netflix Style Horizontal Scroll Rows */
+ .row { 
+    padding: 20px 4% 30px; 
+    position: relative; 
+    z-index: 5;
+    margin-top: -30px; /* Slight overlap for premium look if near hero */
  }
+ .row-title { font-size: 1.6rem; font-weight: bold; margin-bottom: 15px; color: #fff; }
+ 
+ .video-grid {
+     display: flex;
+     overflow-x: scroll; /* Horizontal Scroll */
+     overflow-y: hidden;
+     gap: 12px;
+     padding: 10px 0 30px;
+     -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+     scrollbar-width: none;    /* Hide scrollbar Firefox */
+     scroll-behavior: smooth;
+ }
+ .video-grid::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
  
  .video-card {
-     position: relative;
+     flex: 0 0 calc(20% - 10px); /* 5 cards per row */
+     min-width: 250px;
      background: var(--card-bg);
-     border-radius: 8px;
+     border-radius: 4px;
      overflow: hidden;
      transition: var(--transition);
      cursor: pointer;
  }
- .video-card:hover { transform: scale(1.04) translateY(-10px); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+ .video-card:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
  
  .thumbnail-container { position: relative; aspect-ratio: 16/9; overflow: hidden; }
- .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
- .video-card:hover .thumbnail-container img { transform: scale(1.1); }
-
- .video-info { padding: 15px; }
- .video-info h4 { font-size: 1rem; margin-bottom: 5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
- .video-meta { font-size: 0.8rem; color: var(--text-gray); }
+ .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
+ .video-info { padding: 12px; }
+ .video-info h4 { font-size: 0.95rem; margin-bottom: 5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ .video-meta { font-size: 0.75rem; color: var(--text-gray); }
  
- /* Modal */
+ /* Footer Links Fix */
+ footer { 
+    margin-top: 50px; 
+    padding: 60px 4% 100px; /* Higher bottom padding to ensure visibility */
+    border-top: 1px solid #1a1a1a; 
+    text-align: center; 
+    color: #444; 
+    background: #000;
+    position: relative;
+    z-index: 100;
+ }
+ footer .footer-links { margin-bottom: 25px; }
+ footer .footer-links a { 
+    color: #888; 
+    text-decoration: none; 
+    margin: 0 15px; 
+    font-size: 0.85rem; 
+    display: inline-block; /* Ensure link area is solid */
+ }
+ footer .footer-links a:hover { color: var(--netflix-red); }
+ footer p { font-size: 0.75rem; letter-spacing: 2px; }
+
+ /* Modal Fixes */
  .modal {
      display: none;
      position: fixed;
      top: 0; left: 0; width: 100%; height: 100%;
      background: rgba(0,0,0,0.95);
-     z-index: 2000;
-     overflow-y: auto;
-     backdrop-filter: blur(20px);
+     z-index: 3000;
  }
  .modal-content {
      position: relative;
-     width: 95%;
-     max-width: 1000px;
+     width: 95%; max-width: 1000px;
      margin: 60px auto;
      background: #111;
      border-radius: 12px;
      overflow: hidden;
-     box-shadow: 0 0 100px rgba(229, 9, 20, 0.3);
  }
- .close-modal {
-     position: absolute;
-     top: 25px; right: 25px;
-     font-size: 2.5rem;
-     color: white;
-     cursor: pointer;
-     z-index: 2100;
-     text-shadow: 0 0 10px rgba(0,0,0,0.5);
- }
+ .close-modal { position: absolute; top: 25px; right: 25px; font-size: 2.5rem; color: white; cursor: pointer; z-index: 3100; }
  
- .video-player-container { width: 100%; aspect-ratio: 16/9; background: #000; }
- .modal-info { padding: 40px; }
- .modal-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
- 
- @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
- /* Footer */
- footer { margin-top: 150px; padding: 80px 0; border-top: 1px solid #1a1a1a; text-align: center; color: #444; }
- footer .footer-links { margin-bottom: 30px; }
- footer .footer-links a { color: #888; text-decoration: none; margin: 0 15px; font-size: 0.85rem; }
- footer .footer-links a:hover { color: var(--netflix-red); }
- footer p { font-size: 0.75rem; letter-spacing: 2px; }
-
- @media (max-width: 1024px) {
-    .nav-links { gap: 10px; }
-    nav { margin-left: 20px; }
- }
+ @media (max-width: 1200px) { .video-card { flex: 0 0 calc(25% - 10px); } }
  @media (max-width: 768px) {
-    header { height: 60px; padding: 0 20px; }
-    nav { display: none; }
+    .video-card { flex: 0 0 calc(50% - 10px); min-width: 200px; }
     .hero-content h1 { font-size: 2.5rem; }
-    .video-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    nav { display: none; }
  }
