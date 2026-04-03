@@ -12,31 +12,49 @@ const firebaseConfig = {
     appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Firebase 안전 초기화 (v8.7 루미 엔진)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.firestore();
 
 let cachedVideo = null;
 
-// 통계 데이터 로드
+// 통계 데이터 로드 (v8.8 루미 텐션 엔진)
 async function loadStats() {
+    console.log("📊 [루미] 통계 수집 프로세스 시작...");
+    const pvEl = document.getElementById('pv-count');
+    const assetEl = document.getElementById('asset-count');
+    
+    // 초기 로딩 표시
+    if (pvEl) pvEl.innerText = "연결 중...";
+    if (assetEl) assetEl.innerText = "산출 중...";
+
     try {
+        // 1. PV 데이터 안전 수집
         const pvSnap = await db.collection('statistics').doc('daily_pv').get();
-        const pvCount = pvSnap.exists ? pvSnap.data().count : 0;
-        document.getElementById('pv-count').innerText = pvCount.toLocaleString();
+        const pvCount = pvSnap.exists ? (pvSnap.data().count || 0) : 0;
+        if (pvEl) pvEl.innerText = pvCount.toLocaleString();
         
-        const collections = ['kpop', 'kdrama', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+        // 2. 전체 자산 전수 조사
+        const collections = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
         let totalVideos = 0;
+        
         for (const cat of collections) {
-            const snap = await db.collection(cat).get();
-            totalVideos += snap.size;
+            try {
+                const snap = await db.collection(cat).get();
+                totalVideos += (snap.size || 0);
+            } catch (err) { console.warn(`[${cat}] 대기 중...`); }
         }
-        document.getElementById('asset-count').innerText = totalVideos.toLocaleString();
+        
+        if (assetEl) assetEl.innerText = totalVideos.toLocaleString();
 
         updateResourceGauges(pvCount, totalVideos);
         renderPulseChart(pvCount);
 
     } catch (e) {
-        console.error("통계 로딩 실패:", e);
+        console.error("🚨 [루미] 통계 오동작 보고:", e);
+        if (assetEl) assetEl.innerText = "확인 불가";
     }
 }
 
