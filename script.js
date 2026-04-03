@@ -34,7 +34,7 @@ async function login() {
         await auth.signInWithPopup(provider);
     } catch (e) {
         console.error("Login Failed", e);
-        alert("로그인에 실패했습니다.");
+        alert("로그인 실패 사유: " + e.message);
     }
 }
 
