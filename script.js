@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Intelligent State Recovery Engine (v5.6)
- * REMEMBERS WHERE YOU WERE
+ * YOUFLIX.IO - Ultimate Visual Auth Engine (v5.7)
+ * SHOWS USER PROFILE & SYNC FIX
  */
 
-console.log("🎬 YOUFLIX Engine v5.6: State Recovery Active...");
+console.log("🎬 YOUFLIX Engine v5.7: Visual Auth & Profile Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -20,61 +20,76 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Current Video Tracking
 let currentVideo = null;
 
+// Unified UI Update function
+function updateAuthUI(user) {
+    console.log("🛠️ Updating UI for:", user ? user.displayName : "Guest");
+    
+    // 1. Header Btn
+    const hBtn = document.getElementById('login-btn');
+    if (hBtn) {
+        if (user) {
+            hBtn.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <img src="${user.photoURL || ''}" style="width:24px; height:24px; border-radius:50%; border:1px solid #fff;">
+                    <span>Logout</span>
+                </div>
+            `;
+            hBtn.classList.add('logged-in');
+        } else {
+            hBtn.innerHTML = 'Google Login';
+            hBtn.classList.remove('logged-in');
+        }
+        hBtn.onclick = window.handleAuth;
+    }
+
+    // 2. Modal Btn
+    const mBtn = document.getElementById('modal-login-btn');
+    if (mBtn) {
+        mBtn.innerHTML = user ? `Welcome, ${user.displayName.split(' ')[0]} ✅` : `Login with Google 🔐`;
+        mBtn.onclick = window.handleAuth;
+    }
+}
+
 window.handleAuth = async function() {
-    console.log("🔐 Saving state and handles Auth...");
+    console.log("🔐 Auth Button Triggered...");
     try {
         if (auth.currentUser) {
             await auth.signOut();
             window.location.reload();
         } else {
-            // Save current context for recovery
-            const state = {
-                url: window.location.href,
-                video: currentVideo
-            };
+            const state = { url: window.location.href, video: currentVideo };
             sessionStorage.setItem('uf_recovery', JSON.stringify(state));
-            console.log("🚀 Redirecting with status saved:", state);
             await auth.signInWithRedirect(provider);
         }
     } catch (e) { console.error("🔑 Auth Error:", e.message); }
 };
 
 auth.onAuthStateChanged(user => {
-    const headerBtn = document.getElementById('login-btn');
-    if (headerBtn) {
-        headerBtn.textContent = user ? 'Logout' : 'Google Login';
-        headerBtn.classList.toggle('logged-in', !!user);
-        headerBtn.onclick = window.handleAuth;
-    }
-    const mBtn = document.getElementById('modal-login-btn');
-    if (mBtn) {
-        mBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
-        mBtn.onclick = window.handleAuth;
-    }
+    updateAuthUI(user);
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Handle Auth Redirect & Recovery
-    auth.getRedirectResult().then(() => {
+    // Handle Redirect & Recovery
+    auth.getRedirectResult().then(result => {
+        if (result.user) {
+            console.log("🌟 Redirect Success:", result.user.displayName);
+            updateAuthUI(result.user);
+        }
+        
         const recoveryData = sessionStorage.getItem('uf_recovery');
         if (recoveryData) {
             const state = JSON.parse(recoveryData);
-            sessionStorage.removeItem('uf_recovery'); // Use once
-            console.log("♻️ Recovery Check:", state);
+            sessionStorage.removeItem('uf_recovery');
             if (state.video) {
-                // Wait for player to be ready or open directly
                 setTimeout(() => open(state.video.id, state.video.title, state.video.channel), 1000);
             }
         }
-    }).catch(e => console.error("Redirect Result Error:", e));
+    }).catch(e => console.error("Redirect Error:", e));
 
     const iCat = !!document.getElementById('category-grid');
     if (iCat) initCategoryPage(); else initMainPage();
-    const hBtn = document.getElementById('login-btn');
-    if (hBtn) hBtn.onclick = window.handleAuth;
     setupUI();
 });
 
@@ -129,7 +144,8 @@ function open(id, title, channel) {
     ctrls.innerHTML = '';
     const yt = document.createElement('a'); yt.id = 'modal-yt-link'; yt.className = 'btn btn-primary'; yt.target = '_blank'; yt.href = `https://www.youtube.com/watch?v=${id}`; yt.textContent = 'Watch on YouTube 🎬';
     ctrls.appendChild(yt);
-    const lb = document.createElement('button'); lb.id = 'modal-login-btn'; lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px'; lb.onclick = window.handleAuth; lb.innerHTML = auth.currentUser ? `Logged in ✅` : `Login with Google 🔐`;
+    const lb = document.createElement('button'); lb.id = 'modal-login-btn'; lb.className = 'btn btn-secondary'; lb.style.marginLeft = '10px'; lb.onclick = window.handleAuth;
+    lb.innerHTML = auth.currentUser ? `Welcome, ${auth.currentUser.displayName.split(' ')[0]} ✅` : `Login with Google 🔐`;
     ctrls.appendChild(lb);
     if (player && player.loadVideoById) player.loadVideoById(id);
     else { if (window.YT) create(id); else { const t = document.createElement('script'); t.src = "https://www.youtube.com/iframe_api"; document.body.appendChild(t); window.onYouTubeIframeAPIReady = () => create(id); } }
