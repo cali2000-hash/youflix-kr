@@ -121,25 +121,34 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* v10.2 모바일 스와이프 삭제 스타일 */
+        /* v10.3 모바일 카드형 스와이프 리스트 스타일 */
         @media (max-width: 768px) {
+            .admin-table thead { display: none !important; }
             .admin-table tbody tr {
                 display: block !important;
                 position: relative !important;
-                overflow: hidden !important;
                 background: #111 !important;
-                margin-bottom: 2px !important;
-                transition: transform 0.3s ease;
-                touch-action: pan-y; /* 세로 스크롤은 유지 */
+                margin-bottom: 5px !important;
+                border-radius: 8px !important;
+                overflow: hidden !important;
             }
             .admin-table td {
+                display: block !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            .swipe-wrapper {
                 display: flex !important;
                 align-items: center !important;
-                border-bottom: none !important;
+                padding: 15px !important;
+                background: #111 !important;
+                transition: transform 0.3s ease;
+                position: relative !important;
+                z-index: 2 !important;
             }
             .swipe-delete-area {
                 position: absolute !important;
-                right: -100px !important;
+                right: 0 !important;
                 top: 0 !important;
                 width: 100px !important;
                 height: 100% !important;
@@ -149,12 +158,10 @@
                 justify-content: center !important;
                 color: #fff !important;
                 font-weight: bold !important;
-                font-size: 0.9rem !important;
-                z-index: 5 !important;
+                font-size: 0.95rem !important;
+                z-index: 1 !important;
             }
-            .swiped {
-                transform: translateX(-100px) !important;
-            }
+            .btn-del { display: none !important; }
         }
     </style>
 </head>

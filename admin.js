@@ -179,37 +179,48 @@ async function loadList() {
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">로딩 중...</td></tr>';
     const snap = await db.collection(cat).orderBy('date', 'desc').limit(20).get();
     tbody.innerHTML = '';
+    
     if (snap.empty) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#555;">데이터가 없습니다.</td></tr>';
         return;
     }
+    
     snap.forEach(doc => {
         const v = doc.data();
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><img src="${v.thumbnail}" class="thumb-mini"></td>
-            <td style="flex:1;"><b>${v.title}</b></td>
-            <td><span style="color:#e50914;">${cat.toUpperCase()}</span></td>
-            <td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>
-            <div class="swipe-delete-area" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</div>
-        `;
+        const isMobile = window.innerWidth <= 768;
         
-        // v10.2 루미의 스마트 터치 핸들러
-        let startX = 0;
-        tr.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-        }, {passive: true});
-        
-        tr.addEventListener('touchend', (e) => {
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            if (diff > 50) {
-                tr.classList.add('swiped');
-            } else if (diff < -50) {
-                tr.classList.remove('swiped');
-            }
-        });
-        
+        if (isMobile) {
+            // v10.3 모바일 카드형 스와이프 레이아웃
+            tr.innerHTML = `
+                <td colspan="4">
+                    <div class="swipe-wrapper">
+                        <img src="${v.thumbnail}" class="thumb-mini" style="width:50px; border-radius:4px; margin-right:15px;">
+                        <div style="flex:1;">
+                            <b style="font-size:0.8rem; display:block; color:#fff; word-break:break-all; line-height:1.4;">${v.title}</b>
+                            <span style="color:#e50914; font-size:0.7rem; font-weight:bold;">${cat.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div class="swipe-delete-area" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</div>
+                </td>`;
+            
+            const wrapper = tr.querySelector('.swipe-wrapper');
+            let startX = 0;
+            wrapper.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
+            wrapper.addEventListener('touchend', (e) => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                if (diff > 50) wrapper.style.transform = 'translateX(-100px)';
+                else if (diff < -50) wrapper.style.transform = 'translateX(0)';
+            });
+        } else {
+            // PC용 기존 테이블 레이아웃
+            tr.innerHTML = `
+                <td><img src="${v.thumbnail}" class="thumb-mini"></td>
+                <td><b>${v.title}</b></td>
+                <td><span style="color:#e50914;">${cat.toUpperCase()}</span></td>
+                <td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>`;
+        }
         tbody.appendChild(tr);
     });
 }
