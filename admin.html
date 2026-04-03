@@ -120,6 +120,42 @@
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* v10.2 모바일 스와이프 삭제 스타일 */
+        @media (max-width: 768px) {
+            .admin-table tbody tr {
+                display: block !important;
+                position: relative !important;
+                overflow: hidden !important;
+                background: #111 !important;
+                margin-bottom: 2px !important;
+                transition: transform 0.3s ease;
+                touch-action: pan-y; /* 세로 스크롤은 유지 */
+            }
+            .admin-table td {
+                display: flex !important;
+                align-items: center !important;
+                border-bottom: none !important;
+            }
+            .swipe-delete-area {
+                position: absolute !important;
+                right: -100px !important;
+                top: 0 !important;
+                width: 100px !important;
+                height: 100% !important;
+                background: #e50914 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: #fff !important;
+                font-weight: bold !important;
+                font-size: 0.9rem !important;
+                z-index: 5 !important;
+            }
+            .swiped {
+                transform: translateX(-100px) !important;
+            }
+        }
     </style>
 </head>
 <body>

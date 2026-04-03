@@ -186,7 +186,30 @@ async function loadList() {
     snap.forEach(doc => {
         const v = doc.data();
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><img src="${v.thumbnail}" class="thumb-mini"></td><td><b>${v.title}</b></td><td><span style="color:#e50914;">${cat.toUpperCase()}</span></td><td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>`;
+        tr.innerHTML = `
+            <td><img src="${v.thumbnail}" class="thumb-mini"></td>
+            <td style="flex:1;"><b>${v.title}</b></td>
+            <td><span style="color:#e50914;">${cat.toUpperCase()}</span></td>
+            <td><button class="btn-del" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</button></td>
+            <div class="swipe-delete-area" onclick="deleteVideo('${cat}','${v.id}','${v.title.replace(/'/g, "\\'")}')">삭제</div>
+        `;
+        
+        // v10.2 루미의 스마트 터치 핸들러
+        let startX = 0;
+        tr.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        }, {passive: true});
+        
+        tr.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            if (diff > 50) {
+                tr.classList.add('swiped');
+            } else if (diff < -50) {
+                tr.classList.remove('swiped');
+            }
+        });
+        
         tbody.appendChild(tr);
     });
 }
