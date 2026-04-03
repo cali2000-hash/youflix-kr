@@ -67,7 +67,15 @@
      border-radius: 20px;
      padding: 6px 15px;
  }
- /* v12.0 Auth & Profile UI */
+ .user-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.auth-zone {
+    display: flex;
+    align-items: center;
+}
 .profile-img {
     width: 35px;
     height: 35px;

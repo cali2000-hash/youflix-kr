@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v12.7 - AUTH-INVESTIGATION Edition)
- * Features: Google Auth (Redirect), Cloud Sync, Robust UI Syncing, Forced Persistence
+ * YOUFLIX.KR Premium Archive Engine (v12.9 - CO-EXISTENCE Edition)
+ * Features: Google Auth (Redirect), Cloud Sync, Real-time Profile Swap without deleting SearchBox
  */
 
 const firebaseConfig = {
@@ -24,15 +24,14 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Actions (v12.7 - Forced Persistence)
+// 2. Auth Actions
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
-        // 세션 영구 유지 설정 (Local)
         await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         await auth.signInWithRedirect(provider);
     } catch (e) {
-        alert("인증 시작 실패: " + e.message);
+        alert("Login process failed: " + e.message);
     }
 }
 
@@ -41,17 +40,23 @@ async function logout() {
     location.reload();
 }
 
-// 3. Robust UI Update Engine
+// 3. Smart UI Engine (v12.9 - Protects SearchBox)
 function updateAuthUI(user) {
     const targets = document.querySelectorAll('.user-nav');
-    if (targets.length === 0) return;
-    
     targets.forEach(nav => {
+        // 기존에 생성된 버튼이나 프로필이 있는지 확인
+        let authZone = nav.querySelector('.auth-zone');
+        if (!authZone) {
+            authZone = document.createElement('div');
+            authZone.className = 'auth-zone';
+            nav.appendChild(authZone); // 검색창 뒤에 추가
+        }
+
         if (user) {
             const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
-            nav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Click to Logout (${user.displayName})">`;
+            authZone.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout (${user.displayName})">`;
         } else {
-            nav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
+            authZone.innerHTML = `<button class="btn btn-login" onclick="login()">SIGN IN</button>`;
         }
     });
 }
@@ -63,7 +68,6 @@ async function syncFavorites() {
     try {
         const doc = await userRef.get();
         let localFavs = JSON.parse(localStorage.getItem('youflix_favs') || '[]');
-        
         if (doc.exists) {
             cloudFavs = doc.data().favs || [];
             const newOnes = localFavs.filter(l => !cloudFavs.some(c => c.id === l.id));
@@ -122,12 +126,6 @@ async function load(key, config) {
                 <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
             `;
             card.querySelector('.thumbnail-container').onclick = () => openModal(v);
-            card.querySelector('.video-info').onclick = () => openModal(v);
-            card.querySelector('.fav-icon').onclick = async (e) => {
-                e.stopPropagation();
-                const res = await toggleFav(v);
-                e.target.classList.toggle('active', res);
-            };
             grid.appendChild(card);
         });
     } catch (e) { console.error(e); }
@@ -145,10 +143,9 @@ function openModal(v) {
     if (controls) {
         controls.innerHTML = `<button class="btn btn-fav ${isFav ? 'active' : ''}" id="modal-fav-btn">${isFav ? '❤ In My List' : '🤍 Add to My List'}</button>`;
         document.getElementById('modal-fav-btn').onclick = async (e) => {
-            const btn = e.currentTarget;
             const res = await toggleFav(v);
-            btn.classList.toggle('active', res);
-            btn.innerText = res ? '❤ In My List' : '🤍 Add to My List';
+            e.currentTarget.classList.toggle('active', res);
+            e.currentTarget.innerText = res ? '❤ In My List' : '🤍 Add to My List';
         };
     }
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
@@ -156,8 +153,8 @@ function openModal(v) {
 
 function closeModal() {
     const modal = document.getElementById('video-modal');
-    const player = document.getElementById('player');
     if (modal) modal.style.display = 'none';
+    const player = document.getElementById('player');
     if (player) player.innerHTML = '';
     document.body.style.overflow = 'auto';
 }
@@ -175,53 +172,29 @@ function renderMyList(targetGridId = 'mylist-grid') {
         card.className = 'video-card animate-in';
         card.innerHTML = `<div class="thumbnail-container"><img src="${v.thumbnail}" alt="${v.title}"><div class="fav-icon active">❤</div><div class="play-overlay"><span class="play-icon">▶</span></div></div><div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel}</p></div>`;
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
-        card.querySelector('.video-info').onclick = () => openModal(v);
-        card.querySelector('.fav-icon').onclick = (e) => { e.stopPropagation(); toggleFav(v); };
         grid.appendChild(card);
     });
 }
 
-// 6. Global Auth Listener (v12.7 Investigating)
+// 6. Auth Listener
 auth.onAuthStateChanged(async (user) => {
-    console.log("[Auth] State changed. User found:", !!user);
     currentUser = user;
-    if (user) {
-        await syncFavorites();
-        updateAuthUI(user);
-    } else {
-        updateAuthUI(null);
-    }
+    if (user) await syncFavorites();
+    updateAuthUI(user);
     renderMyList('mylist-grid');
 });
 
 // 7. Initialization
 document.addEventListener('DOMContentLoaded', async () => {
     trackPV();
+    auth.getRedirectResult().catch(e => { console.error(e); if (e.code !== 'auth/internal-error') alert("Redirect Login Result: " + e.message); });
     
-    // 리다이렉트 결과 정밀 수사
-    try {
-        const result = await auth.getRedirectResult();
-        if (result.user) console.log("[Auth] New Login via Redirect detected.");
-    } catch (e) {
-        // 인증 도메인 문제나 브라우저 쿠키 문제 시 경고 출력
-        console.error("[Auth] Redirect Result Failure", e);
-        if (e.code !== 'auth/internal-error') alert("인증 데이터 처리 중 오류: " + e.message);
-    }
-
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
-
-    const params = new URLSearchParams(window.location.search);
-    const cat = (params.get('c') || params.get('id'))?.toLowerCase();
-    if (cat === 'fav') { 
-        const el = document.getElementById('category-title'); if (el) el.innerText = '❤ My Favorite List';
-        setTimeout(() => renderMyList('category-grid'), 1000); 
-    } else if (cat) {
-        const el = document.getElementById('category-title');
-        if (el) el.innerText = cat.toUpperCase() + ' Archive';
-        load(cat, { elementId: 'category-grid' });
-    }
-
+    
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
-    window.addEventListener('click', (e) => { if (e.target === document.getElementById('video-modal')) closeModal(); });
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('main-header');
+        if (header) window.scrollY > 50 ? header.classList.add('scrolled') : header.classList.remove('scrolled');
+    });
 });
