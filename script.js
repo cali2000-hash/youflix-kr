@@ -128,6 +128,13 @@ const CATEGORIES = {
 async function load(key, config) {
     const grid = document.getElementById(config.elementId); if (!grid) return;
     grid.innerHTML = '<p class="loading-msg">Searching content...</p>';
+    
+    // Increment Global PV Count (For Admin Stats)
+    db.collection('statistics').doc('daily_pv').set({
+        count: firebase.firestore.FieldValue.increment(1),
+        lastUpdate: new Date().toLocaleDateString()
+    }, { merge: true });
+
     let vids = [];
     try {
         const snap = await db.collection(key).orderBy('date', 'desc').limit(15).get();
