@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v13.4) */
+/* YOUFLIX.KR Premium Style Sheet (v13.5 - Emergency Fix) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -62,7 +62,7 @@ body {
 .dropdown li a { padding: 8px 20px; display: block; }
 .has-dropdown:hover .dropdown { display: block; }
 
-/* Search & Auth Zone (v13.4 - Rounded Pill Shape) */
+/* Search & Auth Zone (v13.5 Fine Tuning) */
 .user-nav {
     display: flex;
     align-items: center;
@@ -72,19 +72,27 @@ body {
     display: flex;
     align-items: center;
 }
-.search-input {
-    background: rgba(0,0,0,0.6);
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+/* Fixed Selector from .search-input to #search-input */
+#search-input {
+    background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
     padding: 6px 15px;
-    border-radius: 20px; /* Rounded Pill */
+    border-radius: 20px;
     width: 200px;
-    transition: width 0.3s ease, border-color 0.3s ease;
+    transition: all 0.3s ease;
     height: 32px;
     font-size: 0.85rem;
+    font-family: var(--font-main);
 }
-.search-input:focus {
-    width: 250px;
+#search-input:focus {
+    width: 260px;
+    background: rgba(255,255,255,0.25);
     border-color: var(--netflix-red);
     outline: none;
 }
@@ -94,7 +102,7 @@ body {
     padding: 0 18px;
     font-size: 0.8rem;
     font-weight: 700;
-    border-radius: 20px; /* Rounded Pill */
+    border-radius: 20px;
     letter-spacing: 1px;
     height: 32px;
     display: flex;
@@ -102,7 +110,7 @@ body {
     justify-content: center;
     border: none;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: all 0.2s ease;
 }
 .btn-login:hover {
     background: #ff0f1a;
