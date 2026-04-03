@@ -5,7 +5,7 @@
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14',
-    authDomain: "gen-lang-client-0874410222.firebaseapp.com",
+    authDomain: "youflix.kr",
     projectId: "gen-lang-client-0874410222",
     storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
     messagingSenderId: "970801923265",
