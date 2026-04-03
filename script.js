@@ -84,12 +84,8 @@ async function loadSection(key, config) {
     
     let videos = [];
     try {
-        // Step 1: Firestore
         const snap = await db.collection(key).orderBy('date', 'desc').limit(15).get();
         videos = snap.docs.map(d => d.data());
-        console.log(`📡 Loaded ${videos.length} docs from ${key}`);
-
-        // Step 2: YouTube Fetch if empty or stale
         const lastFetch = localStorage.getItem(`fetch_${key}`);
         if (videos.length < 5 || !lastFetch || (Date.now() - lastFetch > 12 * 60 * 60 * 1000)) {
             const raw = await fetchYouTube(config.query);
@@ -99,13 +95,9 @@ async function loadSection(key, config) {
                 localStorage.setItem(`fetch_${key}`, Date.now());
             }
         }
-    } catch (e) {
-        console.warn(`⚠️ API Error for ${key}:`, e);
-    }
+    } catch (e) { console.warn(`⚠️ API Error for ${key}:`, e); }
 
-    // Step 3: Render or Demo Fallback
     if (videos.length === 0) videos = DEMO_DATA[key] || DEMO_DATA.kpop;
-    
     grid.innerHTML = '';
     videos.forEach(v => grid.appendChild(createVideoCard(v)));
     if (key === 'kpop' || key === 'kmovie') updateHero(videos[0]);
@@ -154,14 +146,12 @@ function updateHero(v) {
     const desc = document.getElementById('hero-desc');
     const hero = document.getElementById('hero');
     const btn = document.getElementById('hero-play-btn');
-
     if (title && v.title) title.textContent = v.title;
     if (desc && v.desc) desc.textContent = v.desc.substring(0, 150) + "...";
     if (hero && v.thumbnail) hero.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${v.thumbnail}')`;
     if (btn) btn.onclick = () => openModal(v.id, v.title, v.channel);
 }
 
-// Player / Modal
 let player;
 function openModal(id, title, channel) {
     const modal = document.getElementById('video-modal');
@@ -175,15 +165,27 @@ function openModal(id, title, channel) {
         ytBtn.id = 'modal-yt-link';
         ytBtn.className = 'btn btn-primary';
         ytBtn.target = '_blank';
-        ytBtn.style.marginTop = '20px';
         document.querySelector('.modal-info').appendChild(ytBtn);
     }
     ytBtn.href = `https://www.youtube.com/watch?v=${id}`;
     ytBtn.textContent = 'Watch on YouTube 🎬';
 
-    if (player && player.loadVideoById) {
-        player.loadVideoById(id);
-    } else {
+    let modalLoginBtn = document.getElementById('modal-login-btn');
+    if (!modalLoginBtn) {
+        modalLoginBtn = document.createElement('button');
+        modalLoginBtn.id = 'modal-login-btn';
+        modalLoginBtn.className = 'btn btn-secondary';
+        document.querySelector('.modal-info').appendChild(modalLoginBtn);
+    }
+    
+    const updateModalBtn = (u) => {
+        modalLoginBtn.innerHTML = u ? `Logged in ✅` : `Login with Google 🔐`;
+        modalLoginBtn.onclick = handleAuth;
+    };
+    updateModalBtn(auth.currentUser);
+
+    if (player && player.loadVideoById) player.loadVideoById(id);
+    else {
         if (window.YT) createYT(id);
         else {
             const tag = document.createElement('script');
@@ -203,7 +205,6 @@ function closeModal() {
     document.body.style.overflow = 'auto';
     if (player && player.stopVideo) player.stopVideo();
 }
-
 document.querySelector('.close-modal').onclick = closeModal;
 window.onclick = (e) => { if (e.target.id === 'video-modal') closeModal(); };
 
