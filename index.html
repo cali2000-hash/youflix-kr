@@ -3,11 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX.KR - Premium YouTube Curation</title>
+    <title>YOUFLIX.KR - Premium YouTube Curation & 8K Visual Escape</title>
     
-    <!-- Meta Tags -->
-    <meta name="description" content="A premium Netflix-style YouTube curation blog for Nature, Tech, Knowledge, and Lofi.">
-    <meta name="keywords" content="YouTube Curation, Netflix Style, Wellness, Tech, Nature, Lofi">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Discover premium curated YouTube content on YOUFLIX.KR. Experience Nature 8K, Minimalist Tech, Knowledge Essays, and Lofi beats in a sleek Netflix-style interface.">
+    <meta name="keywords" content="YouTube Curation, 8K Nature, Tech Reviews, Lofi Beats, Documentary, Video Essays, YOUFLIX">
+    <link rel="canonical" href="https://youflix.kr" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://youflix.kr">
+    <meta property="og:title" content="YOUFLIX.KR - Your Premium YouTube Curation">
+    <meta property="og:description" content="Escape the noise. Experience the world's best YouTube content curated just for you. Nature, Tech, Knowledge and more.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1200">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://youflix.kr">
+    <meta property="twitter:title" content="YOUFLIX.KR - Premium YouTube Curation">
+    <meta property="twitter:description" content="Dive into 8K Nature and Minimalist Tech. Premium curated YouTube streaming at your fingertips.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1492619339914-5d5276f72e39?auto=format&fit=crop&q=80&w=1200">
+
     <link rel="stylesheet" href="style.css">
     
     <!-- Google Fonts -->
@@ -21,9 +37,9 @@
             <div class="logo">
                 <a href="index.html" style="color: #E50914; font-size: 1.8rem; text-decoration: none; font-weight: 900;">YOUFLIX</a>
             </div>
-            <nav>
+            <nav aria-label="Main Navigation">
                 <ul class="nav-links">
-                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="#">TV Shows</a></li>
                     <li><a href="#">Movies</a></li>
                     <li><a href="#">New & Popular</a></li>
@@ -32,8 +48,8 @@
             </nav>
             <div class="header-tools">
                 <div class="search-bar">
-                    <input type="text" id="video-search" placeholder="Titles, channels, genres">
-                    <button type="button" id="search-btn">🔍</button>
+                    <input type="text" id="video-search" placeholder="Titles, channels, genres" aria-label="Search videos">
+                    <button type="button" id="search-btn" aria-label="Submit Search">🔍</button>
                 </div>
             </div>
         </div>
@@ -44,7 +60,7 @@
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <div class="badge">Trending Now</div>
-            <h2 id="hero-title">Experience the Best</h2>
+            <h1 id="hero-title">Experience the Best</h1>
             <p id="hero-desc">
                 Escape the noise. Dive into your own world with premium-curated YouTube content tailored to your taste in Nature, Tech, and more.
             </p>
