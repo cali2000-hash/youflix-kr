@@ -25,11 +25,11 @@ const db = firebase.firestore();
 // 2. Category Configuration (K-Content Focus)
 const CATEGORIES = {
     kpop: { query: 'Official K-POP Music Video 2024 New 4K', title: 'K-POP MV: The Official Archive', elementId: 'kpop-grid' },
-    kdrama: { query: 'K-Drama Official Highlights Playlist 4K', title: 'K-Drama World: Teasers & Clips', elementId: 'kdrama-grid' },
+    kdrama: { query: 'Official K-Drama Teaser Highlights Playlist 4K', title: 'K-Drama World: Official Highlights', elementId: 'kdrama-grid' },
+    kmovie: { query: 'South Korea Official Movie Trailer 2024 4K UHD', title: 'K-Cinema: Premium Film Explorer', elementId: 'kmovie-grid' },
     kvariety: { query: 'Korean Variety Show Highlight Funny 2024', title: 'K-Variety Buzz: Viral Moments', elementId: 'kvariety-grid' },
     kstage: { query: 'K-POP Live Performance Stage 4K Focus', title: 'K-Stage Live: Absolute Performance', elementId: 'kstage-grid' },
-    trending: { query: 'K-POP Trending Video South Korea 2024', title: 'NOW: Trending in Korea', elementId: 'trending-grid' },
-    kfood: { query: 'Korean Street Food Mukbang 4K UHD High Quality', title: 'K-Food & Mukbang Essentials', elementId: 'kfood-grid' }
+    trending: { query: 'K-POP Trending Video South Korea 2024', title: 'NOW: Trending in Korea', elementId: 'trending-grid' }
 };
 
 const FALLBACK_DATA = {
