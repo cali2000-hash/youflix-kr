@@ -1,7 +1,7 @@
-/* YOUFLIX.KR Premium Style Sheet (v15.3 - The Ultimate Space) */
+/* YOUFLIX.KR Premium Style Sheet (v15.4 - Symmetrical Masterpiece) */
 :root {
     --netflix-red: #e50914;
-    --dark-bg: #141414; /* Slightly lighter black for depth */
+    --dark-bg: #141414;
     --card-bg: #1a1a1a;
     --text-color: #fff;
     --accent-color: #0080ff;
@@ -17,7 +17,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar (v15.3 Absolute Shield) */
+/* Navbar (v15.4 Absolute Shield) */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -25,7 +25,7 @@ body {
     padding: 15px 4%;
     position: fixed;
     top: 0; width: 100%;
-    z-index: 2000; /* Higher z-index */
+    z-index: 2000;
     background: #000 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     height: 70px;
@@ -54,15 +54,19 @@ body {
     display: flex; align-items: center; text-decoration: none;
 }
 
-/* Category Archive Page (Ultimate Spacer v15.3) */
+/* Category Archive Page (Perfected Symmetry v15.4) */
 .category-page {
-    padding: 220px 4% 100px 4% !important; /* Unified symmetrical padding */
+    padding: 160px 0 100px 0 !important; /* Vertical spacing only */
     min-height: 100vh;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center everything horizontally */
 }
 .category-header { 
-    margin-bottom: 60px; 
-    max-width: 1200px;
+    margin-bottom: 50px; 
+    width: 92%; /* 4% margin each side (92% width) */
+    max-width: 1400px;
+    text-align: left;
 }
 #category-title { 
     display: block !important;
@@ -70,22 +74,21 @@ body {
     font-weight: 900; 
     letter-spacing: -2px; 
     color: #fff; 
-    margin-bottom: 15px;
-    text-transform: capitalize;
+    margin-bottom: 10px;
 }
 .category-header p { 
-    font-size: 1.2rem; 
-    color: rgba(255,255,255,0.6); 
+    font-size: 1.1rem; 
+    color: rgba(255,255,255,0.5);
     max-width: 800px;
 }
 
-/* Symmetrical Grid (Centered v15.3) */
+/* Symmetrical Grid (Absolute Symmetry v15.4) */
 #category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 40px 20px;
-    width: 100%;
-    justify-content: center; /* Center items to fix right margin look */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px 18px;
+    width: 92%; /* Forces 4% left and right margin */
+    max-width: 1400px;
 }
 
 /* Video Cards (Premium Cinematic Style) */
@@ -105,10 +108,6 @@ body {
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .video-meta { font-size: 0.8rem; color: #999; }
-
-/* Animations */
-.animate-in { animation: fadeInUp 0.6s ease forwards; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Main Page Rows (Restored Symmetry) */
 .row { padding: 50px 4% 20px 4%; }

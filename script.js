@@ -212,13 +212,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
     });
 
-    // Category Page Logic (Single Filter)
+    // Category Page Logic (v15.4 - Full Title Support)
     const params = new URLSearchParams(window.location.search);
     const cat = params.get('c');
     if (cat && document.getElementById('category-grid')) {
         const catTitle = document.getElementById('category-title');
-        const titles = { 'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 'kclassic': 'Eternal Cinema', 'fav': 'My Secret List' };
-        if (catTitle && titles[cat]) catTitle.innerText = titles[cat];
+        const titles = { 
+            'kpop': 'K-Pop Universe', 
+            'kdrama': 'Drama World', 
+            'tvlit': 'TV Literature Hall', 
+            'kclassic': 'Eternal Cinema', 
+            'kmovie': 'Cinema Masterpieces',
+            'kvariety': 'Variety Show Stars',
+            'trending': 'Trending Now',
+            'fav': 'My Secret List' 
+        };
+        
+        if (catTitle) {
+            // Priority: Defined title > Capitalized category name fallback
+            catTitle.innerText = titles[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+        }
         
         if (cat === 'fav') renderMyList('category-grid');
         else load(cat, { elementId: 'category-grid' });
