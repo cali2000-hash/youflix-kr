@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v12.2 - BLOCK-PROOF Edition)
- * Features: Google Auth (Redirect Method), Cloud Sync, Persistent Sessions
+ * YOUFLIX.KR Premium Archive Engine (v12.4 - INSTANT UI Edition)
+ * Features: Google Auth (Redirect), Cloud Sync, Robust UI Syncing
  */
 
 const firebaseConfig = {
@@ -24,16 +24,11 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Logic (v12.2 Redirect Method - Popup-Blocker Proof)
+// 2. Auth Actions
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-        // 팝업 차단을 피하기 위해 리다이렉트 방식으로 변경
-        await auth.signInWithRedirect(provider);
-    } catch (e) {
-        console.error("Login Trigger Failed", e);
-        alert("로그인 시작 실패: " + e.message);
-    }
+    try { await auth.signInWithRedirect(provider); } 
+    catch (e) { alert("Login failed: " + e.message); }
 }
 
 async function logout() {
@@ -41,29 +36,20 @@ async function logout() {
     location.reload();
 }
 
-// 리다이렉트 로그인 결과 수신 로직
-auth.getRedirectResult().then(async (result) => {
-    if (result.user) console.log("Cloud Redirect Login Success");
-}).catch((e) => {
-    console.error("Redirect Result Error", e);
-    if (e.code !== 'auth/internal-error') alert("로그인 결과 처리 실패: " + e.message);
-});
-
-auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
+// 3. UI Update Engine (v12.4)
+function updateAuthUI(user) {
     const userNav = document.querySelector('.user-nav');
-    if (userNav) {
-        if (user) {
-            userNav.innerHTML = `<img src="${user.photoURL}" alt="Profile" class="profile-img" onclick="logout()" title="Logout">`;
-            await syncFavorites();
-        } else {
-            userNav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
-        }
-    }
-    renderMyList('mylist-grid');
-});
+    if (!userNav) return;
 
-// 3. Cloud Sync Engine
+    if (user) {
+        const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
+        userNav.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout from ${user.displayName}">`;
+    } else {
+        userNav.innerHTML = `<button class="btn btn-login" onclick="login()">Sign In</button>`;
+    }
+}
+
+// 4. Cloud Sync Engine
 async function syncFavorites() {
     if (!currentUser) return;
     const userRef = db.collection('users').doc(currentUser.uid);
@@ -106,7 +92,7 @@ async function toggleFav(v) {
     return result;
 }
 
-// 4. Component Loaders
+// 5. Component Loaders
 async function load(key, config) {
     const grid = document.getElementById(config.elementId);
     if (!grid) return;
@@ -133,11 +119,10 @@ async function load(key, config) {
                 e.stopPropagation();
                 const res = await toggleFav(v);
                 e.target.classList.toggle('active', res);
-                e.target.classList.add('beat'); setTimeout(() => e.target.classList.remove('beat'), 500);
             };
             grid.appendChild(card);
         });
-    } catch (e) { console.error(e); grid.innerHTML = '<p class="loading-msg">System temporary offline.</p>'; }
+    } catch (e) { console.error(e); }
 }
 
 function openModal(v) {
@@ -167,7 +152,6 @@ function closeModal() {
     if (modal) modal.style.display = 'none';
     if (player) player.innerHTML = '';
     document.body.style.overflow = 'auto';
-    renderMyList('mylist-grid');
 }
 
 function renderMyList(targetGridId = 'mylist-grid') {
@@ -189,11 +173,23 @@ function renderMyList(targetGridId = 'mylist-grid') {
     });
 }
 
-// 5. Initialization
+// 6. Global Initialization
+auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+    if (user) await syncFavorites();
+    updateAuthUI(user);
+    renderMyList('mylist-grid');
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     trackPV();
+    updateAuthUI(auth.currentUser); // 초기 UI 로드 시도
+    
+    auth.getRedirectResult().catch(e => console.error(e));
+    
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { if (document.getElementById(row + '-grid')) load(row, { elementId: row + '-grid' }); });
+
     const params = new URLSearchParams(window.location.search);
     const cat = (params.get('c') || params.get('id'))?.toLowerCase();
     if (cat === 'fav') { 
@@ -205,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el && titleMap[cat]) el.innerText = titleMap[cat];
         load(cat, { elementId: 'category-grid' });
     }
+
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('video-modal')) closeModal(); });
     window.addEventListener('scroll', () => {
