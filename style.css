@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v14.9 - Universal Harmony) */
+/* YOUFLIX.KR Premium Style Sheet (v15.2 - Symmetrical Harmony) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -17,12 +17,12 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar (v14.9 Solid & Sleek) */
+/* Navbar (v15.2 Symmetrical Alignment) */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 4%;
+    padding: 15px 4%; /* Horizontal gutter aligned to 4% */
     position: fixed;
     top: 0; width: 100%;
     z-index: 1000;
@@ -31,6 +31,7 @@ body {
     transition: background 0.3s ease;
 }
 .navbar.scrolled { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
 .logo {
     color: var(--netflix-red);
     font-size: 1.8rem;
@@ -43,7 +44,7 @@ body {
 .nav-links { display: flex; list-style: none; gap: 20px; align-items: center; }
 .nav-links li { position: relative; }
 .nav-links a { color: #e5e5e5; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; }
-.nav-links a:hover { color: #fff; }
+.nav-links li:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
 
 .dropdown-menu {
     display: none; position: absolute; top: 100%; left: 0;
@@ -51,11 +52,10 @@ body {
     min-width: 170px; padding: 10px 0; border-radius: 4px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-top: 10px;
 }
-.nav-links li:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
-.dropdown-menu a { display: block; padding: 8px 20px; font-size: 0.85rem; color: #bbb; transition: all 0.3s; }
+.dropdown-menu a { display: block; padding: 8px 20px; font-size: 0.85rem; color: #bbb; transition: all 0.3s; text-decoration: none; }
 .dropdown-menu a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 25px; }
 
-/* User Nav Elements */
+/* User Nav Elements (Aligned H-Metrics) */
 .user-nav { display: flex; align-items: center; gap: 15px; }
 #search-input {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
@@ -64,9 +64,8 @@ body {
 .btn-login {
     background: var(--netflix-red) !important; color: #fff; padding: 0 18px !important;
     font-size: 0.8rem !important; font-weight: 700 !important; border-radius: 20px !important; height: 32px !important;
-    display: flex !important; align-items: center; justify-content: center;
+    display: flex !important; align-items: center; justify-content: center; text-decoration: none;
 }
-.profile-img { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid var(--netflix-red); }
 
 /* Hero */
 .hero {
@@ -77,12 +76,12 @@ body {
 }
 .hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -2px; }
 
-/* Horizon Scroll Row (Restored v14.9) */
-.row { padding: 40px 0 10px 4%; position: relative; z-index: 2; overflow: hidden; }
-.row-header { padding-right: 4%; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+/* Horizon Scroll Row (Symmetrical Padding 4% Left/Right) */
+.row { padding: 40px 4% 10px 4%; position: relative; z-index: 2; overflow: hidden; }
+.row-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
 
-/* View All Pill Button (Restored v14.9) */
+/* View All Pill Button (Restored v15.2) */
 .view-all-link { 
     color: #e5e5e5; text-decoration: none; font-size: 0.75rem; font-weight: 800; 
     background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px;
@@ -90,7 +89,6 @@ body {
     display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase;
 }
 .view-all-link:hover { background: #fff; color: #000; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,255,255,0.3); }
-.view-all-link:after { content: '›'; font-size: 1.1rem; line-height: 0; }
 
 /* Video Grid (Flex for Main Page Scroll) */
 .video-grid {
@@ -105,9 +103,9 @@ body {
 .video-grid::-webkit-scrollbar { height: 4px; }
 .video-grid::-webkit-scrollbar-thumb { background: var(--netflix-red); border-radius: 2px; }
 
-/* Category Archive Page (Optimized v14.9) */
+/* Category Archive Page (Perfected v15.2 Symmetrical Spacer) */
 .category-page {
-    padding: 160px 4% 80px !important;
+    padding: 160px 4% 80px 4% !important; /* Fixed left/right 4% symmetrical padding */
     min-height: 100vh;
 }
 .category-header { margin-bottom: 50px; max-width: 900px; }
