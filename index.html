@@ -24,24 +24,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo-container">
-            <h1 class="logo">YOUFLIX<span>.KR</span></h1>
-        </div>
-        <nav class="nav-links">
-            <a href="#kpop">K-POP</a>
-            <a href="#kdrama">Cinema</a>
-            <a href="#kclassic">Classic</a>
-            <a href="#kvariety">Variety</a>
-            <a href="#trending">Trending</a>
+    <header id="main-header" class="navbar">
+        <a href="index.html" class="logo">YOUFLIX.KR</a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="category.html?c=kpop">K-Pop</a></li>
+                <li><a href="category.html?c=kdrama">Drama</a></li>
+                <li><a href="category.html?c=kclassic">Classic</a></li>
+                <li><a href="category.html?c=kvariety">Variety</a></li>
+                <li><a href="category.html?c=trending">Trending</a></li>
+            </ul>
         </nav>
-        <div class="header-actions">
-            <div class="search-bar">
-                <input type="text" id="video-search" placeholder="Explore K-Archive...">
-                <button id="search-btn">Search</button>
-            </div>
-            <div class="auth-container">
-                <button id="login-btn" onclick="handleAuth()" class="btn btn-login">Google Login</button>
+        <div class="user-nav">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search archive...">
             </div>
         </div>
     </header>
