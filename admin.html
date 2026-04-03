@@ -69,15 +69,23 @@
         }
         .info-icon:hover { background: var(--admin-primary); }
 
-        /* v9.7 모바일 최적화 레이아웃 */
+        /* v9.8 모바일 와이드(가로형 행) 레이아웃 */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 15px; text-align: center; }
-            .stat-grid { grid-template-columns: 1fr; gap: 15px; }
+            header { flex-direction: column; gap: 15px; text-align: center; margin-bottom: 25px; }
+            .stat-grid { grid-template-columns: 1fr; gap: 10px; }
             .admin-controls { grid-template-columns: 1fr; }
-            .stat-card { min-height: auto; padding: 20px; }
-            .stat-value { font-size: 2rem; }
-            .modal-content { width: 95%; padding: 20px; }
-            h1 { font-size: 1.5rem !important; }
+            .stat-card { 
+                min-height: auto !important; 
+                padding: 15px; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center;
+                justify-content: center;
+            }
+            .stat-value { font-size: 1.8rem; margin: 10px 0; }
+            .stat-change { font-size: 0.8rem; }
+            .modal-content { width: 92%; padding: 20px; }
+            h1 { font-size: 1.3rem !important; }
         }
 
         /* v9.6 커스텀 모달 스타일 */
