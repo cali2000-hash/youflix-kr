@@ -204,8 +204,49 @@
  .close-modal { position: absolute; top: 25px; right: 25px; font-size: 2.5rem; color: white; cursor: pointer; z-index: 3100; }
  
  @media (max-width: 1200px) { .video-card { flex: 0 0 calc(25% - 10px); } }
- @media (max-width: 768px) {
-    .video-card { flex: 0 0 calc(50% - 10px); min-width: 200px; }
-    .hero-content h1 { font-size: 2.5rem; }
-    nav { display: none; }
- }
+@media (max-width: 768px) {
+   .video-card { flex: 0 0 calc(50% - 10px); min-width: 200px; }
+   .hero-content h1 { font-size: 2.5rem; }
+   nav { display: none; }
+}
+
+/* 🚀 Advanced Cinema & Grid System (v7.9-FORCE) */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 30px 4% 80px;
+}
+
+.category-main {
+    padding-top: 100px;
+    min-height: 90vh;
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Fixed 16:9 Ratio */
+    height: 0;
+    background: #000;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-info {
+    padding: 25px;
+    background: #111;
+}
+
+.modal-info h2 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 5px;
+}
