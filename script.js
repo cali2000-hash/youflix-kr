@@ -98,15 +98,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (catKey) {
         const titleMap = {
             'kpop': 'K-POP MV Archive',
-            'kdrama': 'K-Drama World',
-            'kclassic': 'K-Classic (KOFA)',
-            'kvariety': 'K-Variety Buzz',
-            'trending': 'Trending Now'
+            'kdrama': 'K-Drama World: Official Clips',
+            'kclassic': 'Korean Classic Cinema (KOFA)',
+            'kvariety': 'K-Variety: Entertainment Buzz',
+            'kmovie': 'K-Cinema: Premium Masterpieces',
+            'trending': 'Trending Now in Seoul'
         };
         const titleEl = document.getElementById('category-title');
-        if (titleEl && titleMap[catKey]) titleEl.innerText = titleMap[catKey];
+        if (titleEl && titleMap[catKey.toLowerCase()]) {
+            titleEl.innerText = titleMap[catKey.toLowerCase()];
+        }
         
-        load(catKey, { elementId: 'category-grid' });
+        load(catKey.toLowerCase(), { elementId: 'category-grid' });
     }
 
     // Header Scroll Effect
