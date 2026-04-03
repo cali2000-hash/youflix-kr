@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Ultimate Robust Engine (v5.1)
- * STABLE AUTH & RENDER
+ * YOUFLIX.IO - Stable Redirect Auth Engine (v5.2)
+ * NO POPUP BLOCKED ERRORS
  */
 
-console.log("🎬 YOUFLIX Engine v5.1: Ignition...");
+console.log("🎬 YOUFLIX Engine v5.2: Redirect Mode...");
 
 const API_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -27,56 +27,47 @@ const DEMO_DATA = {
 };
 
 const CATEGORIES = {
-    kpop: { query: 'Official K-POP MV 4K', elementId: 'kpop-grid', title: 'K-POP MV' },
-    kdrama: { query: 'Official K-Drama Trailer 4K', elementId: 'kdrama-grid', title: 'K-Drama' },
-    kclassic: { query: 'KoreanClassicFilm Full Movie High Quality', elementId: 'kclassic-grid', title: 'K-Classic' },
-    kmovie: { query: 'South Korea Movie Trailer 2024', elementId: 'kmovie-grid', title: 'K-Cinema' },
-    kvariety: { query: 'Korean Variety Show Highlight 2024', elementId: 'kvariety-grid', title: 'K-Variety' },
-    trending: { query: 'Trending K-POP 2024 Today', elementId: 'trending-grid', title: 'Trending' }
+    kpop: { query: 'Official K-POP MV 4K', elementId: 'kpop-grid' },
+    kdrama: { query: 'Official K-Drama Trailer 4K', elementId: 'kdrama-grid' },
+    kclassic: { query: 'KoreanClassicFilm Full Movie High Quality', elementId: 'kclassic-grid' },
+    kmovie: { query: 'South Korea Movie Trailer 2024', elementId: 'kmovie-grid' },
+    kvariety: { query: 'Korean Variety Show Highlight 2024', elementId: 'kvariety-grid' },
+    trending: { query: 'Trending K-POP 2024 Today', elementId: 'trending-grid' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Handle Redirect Result
+    auth.getRedirectResult().then(result => {
+        if (result.user) console.log("👋 Welcome back, " + result.user.displayName);
+    }).catch(e => {
+        console.error("Redirect Error:", e.message);
+        if (e.code === 'auth/unauthorized-domain') {
+            alert("Please add 'youflix.kr' to Authorized Domains in Firebase Console Settings!");
+        }
+    });
+
     const isCategory = !!document.getElementById('category-grid');
     if (isCategory) initCategoryPage(); else initMainPage();
     setupGeneric();
 });
 
-// UI Update Logic for Auth
+// Sync UI with Auth State
 auth.onAuthStateChanged(user => {
-    console.log("👤 Auth State Changed:", user ? user.displayName : "Logged Out");
-    
-    // Header Btn
     const headerBtn = document.getElementById('login-btn');
     if (headerBtn) {
         headerBtn.textContent = user ? 'Logout' : 'Google Login';
         headerBtn.classList.toggle('logged-in', !!user);
     }
-    
-    // Modal Btn
     const modalBtn = document.getElementById('modal-login-btn');
-    if (modalBtn) {
-        modalBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
-    }
+    if (modalBtn) modalBtn.innerHTML = user ? `Logged in ✅` : `Login with Google 🔐`;
 });
 
 async function handleAuth() {
-    try {
-        if (auth.currentUser) {
-            await auth.signOut();
-            console.log("👋 Logged Out");
-        } else {
-            console.log("🔐 Starting Popup Login...");
-            await auth.signInWithPopup(provider);
-            console.log("🎉 Login Successful");
-        }
-        // No reload needed! onAuthStateChanged handles UI.
-    } catch (e) {
-        console.error("🔑 Auth Error:", e.code, e.message);
-        if (e.code === 'auth/unauthorized-domain') {
-            alert("This domain is not authorized in Firebase Console. Please add youflix.kr to Authorized Domains.");
-        } else {
-            alert("Auth failed: " + e.message);
-        }
+    if (auth.currentUser) {
+        await auth.signOut();
+    } else {
+        console.log("🚀 Redirecting to Google Login...");
+        await auth.signInWithRedirect(provider);
     }
 }
 
@@ -96,7 +87,7 @@ async function load(key, config) {
         vids = snap.docs.map(d => d.data());
         const last = localStorage.getItem(`f_${key}`);
         if (vids.length < 5 || !last || (Date.now() - last > 12 * 60 * 60 * 1000)) {
-            const raw = await fetchYT(config.query);
+            const raw = await fetchYT(CATEGORIES[key].query || key);
             if (raw.length > 0) {
                 vids = [...raw, ...vids].slice(0, 15);
                 sync(key, raw);
@@ -108,7 +99,6 @@ async function load(key, config) {
     if (vids.length === 0) vids = DEMO_DATA[key] || DEMO_DATA.kpop;
     grid.innerHTML = '';
     vids.forEach(v => grid.appendChild(card(v)));
-    if (key === 'kpop' || key === 'kmovie') hero(vids[0]);
 }
 
 async function fetchYT(q) {
@@ -147,12 +137,6 @@ function card(v) {
     return c;
 }
 
-function hero(v) {
-    const h = document.getElementById('hero');
-    if (h && v.thumbnail) h.style.backgroundImage = `linear-gradient(to right, rgba(12,13,22,0.9), rgba(12,13,22,0.2)), url('${v.thumbnail}')`;
-}
-
-let player;
 function open(id, title, channel) {
     const m = document.getElementById('video-modal');
     m.style.display = 'block';
