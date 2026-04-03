@@ -54,8 +54,7 @@ function initHero() {
 // 4. YouTube API Logic
 async function fetchYouTubeVideos(query) {
     try {
-        // Fetch up to 10 videos per row to provide a rich horizontal scroll
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`);
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`);
         const data = await response.json();
         
         if (data.error) {
@@ -68,7 +67,8 @@ async function fetchYouTubeVideos(query) {
             title: item.snippet.title,
             channel: item.snippet.channelTitle,
             date: new Date(item.snippet.publishedAt).toLocaleDateString(),
-            thumbnail: item.snippet.thumbnails.medium.url
+            thumbnail: item.snippet.thumbnails.high.url || item.snippet.thumbnails.medium.url,
+            desc: item.snippet.description || ""
         }));
     } catch (error) {
         console.error('Fetch error:', error);
@@ -77,14 +77,36 @@ async function fetchYouTubeVideos(query) {
 }
 
 async function fetchAllCategories() {
+    let heroInitialized = false;
+
     for (const [key, category] of Object.entries(CATEGORIES)) {
         const videos = await fetchYouTubeVideos(category.query);
         const grid = document.getElementById(category.elementId);
         
         if (grid && videos.length > 0) {
-            grid.innerHTML = ''; // Remove loading/placeholder
+            grid.innerHTML = '';
             videos.forEach(v => grid.appendChild(createVideoCard(v)));
+
+            // Update Hero dynamically with the first video from the 'nature' or first category
+            if (!heroInitialized && key === 'nature') {
+                updateHeroContent(videos[0]);
+                heroInitialized = true;
+            }
         }
+    }
+}
+
+function updateHeroContent(video) {
+    if (heroTitle) heroTitle.textContent = video.title;
+    if (heroDesc) heroDesc.textContent = video.desc.substring(0, 150) + "...";
+    if (heroSection) {
+        // High quality thumbnail as background
+        heroSection.style.backgroundImage = `linear-gradient(to right, rgba(12, 13, 22, 0.9) 15%, rgba(12, 13, 22, 0.4) 50%, rgba(12, 13, 22, 0.2) 100%), url('${video.thumbnail}')`;
+    }
+    
+    const heroPlayBtn = document.getElementById('hero-play-btn');
+    if (heroPlayBtn) {
+        heroPlayBtn.onclick = () => openVideo(video.id, video.title, video.channel);
     }
 }
 
@@ -93,7 +115,7 @@ function createVideoCard(video) {
     card.className = 'video-card';
     card.innerHTML = `
         <div class="thumbnail-container">
-            <img src="${video.thumbnail || `https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}" alt="${video.title}" loading="lazy">
+            <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
             <div class="play-overlay">
                 <div class="play-icon">▶</div>
             </div>
@@ -158,12 +180,6 @@ function setupEventListeners() {
     window.onclick = (event) => {
         if (event.target == modal) closeVideoModal();
     };
-
-    const heroPlayBtn = document.getElementById('hero-play-btn');
-    if (heroPlayBtn) {
-        heroPlayBtn.onclick = () => {
-            openVideo(HERO_VIDEO.id, HERO_VIDEO.title, 'YOUFLIX');
-        };
-    }
+    // hero-play-btn listener is now handled dynamically in updateHeroContent()
 }
 
