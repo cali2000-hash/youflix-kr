@@ -1,9 +1,9 @@
 /**
- * YOUFLIX.IO - Debugging & Diagnostics Master (v6.2)
- * LIVE ERROR TRACKING & TOAST NOTIFICATIONS
+ * YOUFLIX.IO - Infinite Loop Breaker (v6.3)
+ * ANTI-LOOP & DOMAIN SYNC MASTER
  */
 
-console.log("🎬 YOUFLIX Engine v6.2: Diagnostics Active...");
+console.log("🎬 YOUFLIX Engine v6.3: Loop Breaker Active...");
 
 const UNIVERSAL_KEY = 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14';
 const firebaseConfig = {
@@ -21,23 +21,21 @@ const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
 
-// Persistence
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e => console.error(e));
+// Stay logged in forever
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentVideo = null;
 let player = null;
 
-// Notification System
 function showToast(msg, color = "#e50914") {
     const t = document.createElement('div');
-    t.style = `position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:${color}; color:#fff; padding:12px 24px; border-radius:30px; z-index:10000; font-weight:bold; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-family:sans-serif;`;
+    t.style = `position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:${color}; color:#fff; padding:12px 24px; border-radius:30px; z-index:10000; font-weight:bold; box-shadow:0 10px 30px rgba(0,0,0,0.5);`;
     t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 4000);
 }
 
 function updateAuthUI(user) {
-    console.log("👤 State Check:", user ? user.displayName : "None");
     const hBtn = document.getElementById('login-btn');
     if (hBtn) {
         if (user) {
@@ -57,45 +55,49 @@ function updateAuthUI(user) {
 }
 
 window.handleAuth = async function() {
+    console.log("🔐 Triggering Unstoppable Auth...");
     try {
         if (auth.currentUser) {
             await auth.signOut();
-            showToast("로그아웃 되었습니다.", "#444");
             window.location.reload();
         } else {
             const state = { url: window.location.href, video: currentVideo };
             sessionStorage.setItem('uf_recovery', JSON.stringify(state));
+
+            // Anti-Loop Tracker
+            const attempts = parseInt(sessionStorage.getItem('uf_attempts') || '0') + 1;
+            sessionStorage.setItem('uf_attempts', attempts);
+            if (attempts > 3) {
+                alert("로그인 루프가 감지되었습니다.\n\n해결방법:\n1. 브라우저 설정에서 '제3자 쿠키 허용'을 켜주세요.\n2. 파이어베이스 콘솔에 'youflix.kr'이 등록되었는지 확인해주세요.\n3. GCP 콘솔에서 API 키 제한을 '제한 없음'으로 풀어주세요.");
+                sessionStorage.setItem('uf_attempts', '0');
+                return;
+            }
+
             try {
                 const res = await auth.signInWithPopup(provider);
-                showToast(`로그인 성공! 반가워요, ${res.user.displayName}님! ✨`, "#2ecc71");
-                updateAuthUI(res.user);
+                showToast(`성공! ✨`, "#2ecc71");
+                sessionStorage.setItem('uf_attempts', '0');
             } catch (pErr) {
                 if (pErr.code === 'auth/popup-blocked') {
-                    showToast("팝업 차단 감지: 리다이렉트 모드로 자동 전환합니다... 🚀");
                     await auth.signInWithRedirect(provider);
                 } else { throw pErr; }
             }
         }
     } catch (e) {
-        console.error("Critical Auth Error:", e);
-        if (e.code === 'auth/unauthorized-domain') {
-            alert("❌ 도메인 승인 에러: Firebase Console에서 'youflix.kr'을 승인된 도메인으로 추가해야 합니다!");
-        } else {
-            alert(`🔍 인증 확인 실패: ${e.message} (에러코드: ${e.code})`);
-        }
+        alert(`❌ 인증 실패: ${e.message}\n(에러코드: ${e.code})`);
     }
 };
 
 auth.onAuthStateChanged(user => { 
-    if (user) console.log("👑 User Detected:", user.displayName);
+    if (user) sessionStorage.setItem('uf_attempts', '0');
     updateAuthUI(user); 
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     auth.getRedirectResult().then(result => {
         if (result.user) {
-            showToast(`리다이렉트 로그인 성공! ✨`, "#2ecc71");
-            updateAuthUI(result.user);
+            showToast(`리다이렉트 성공! ✨`, "#2ecc71");
+            sessionStorage.setItem('uf_attempts', '0');
         }
         const rec = sessionStorage.getItem('uf_recovery');
         if (rec) {
@@ -104,9 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (st.video) setTimeout(() => open(st.video.id, st.video.title, st.video.channel), 1500);
         }
     }).catch(e => {
-        console.error("Redirect Result Error:", e);
         if (e.code === 'auth/unauthorized-domain') {
-            alert("❌ 도메인 승인 에러: 'youflix.kr'을 파이어베이스에 먼저 등록해 주세요!");
+            alert("❌ 도메인 승인 누락: 파이어베이스 설정에서 'youflix.kr'을 승인된 도메인에 추가해 주세요!");
         }
     });
 
