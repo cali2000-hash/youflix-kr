@@ -1,4 +1,4 @@
-/* YOUFLIX.KR Premium Style Sheet (v14.8 - Force Collision Fix) */
+/* YOUFLIX.KR Premium Style Sheet (v14.9 - Universal Harmony) */
 :root {
     --netflix-red: #e50914;
     --dark-bg: #000;
@@ -17,18 +17,18 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar (v14.8 Solid Protection) */
+/* Navbar (v14.9 Solid & Sleek) */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 4%;
+    padding: 15px 4%;
     position: fixed;
     top: 0; width: 100%;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.98) !important; /* Force solid background to prevent see-through overlap */
+    background: rgba(0, 0, 0, 0.98) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
 }
 .navbar.scrolled { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 .logo {
@@ -39,30 +39,34 @@ body {
     letter-spacing: -1.5px;
 }
 
-/* Nav Links & Dropdown */
-.nav-links { display: flex; list-style: none; gap: 25px; align-items: center; }
-.nav-links a { color: #e5e5e5; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.3s; }
+/* Nav Links & Dropdown (Premium Styling) */
+.nav-links { display: flex; list-style: none; gap: 20px; align-items: center; }
+.nav-links li { position: relative; }
+.nav-links a { color: #e5e5e5; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; }
 .nav-links a:hover { color: #fff; }
 
-/* Premium Dropdown Style */
 .dropdown-menu {
     display: none; position: absolute; top: 100%; left: 0;
-    background: rgba(10, 10, 10, 0.98); border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 180px; padding: 10px 0; border-radius: 4px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-top: 15px;
+    background: rgba(15, 15, 15, 0.98); border: 1px solid rgba(255, 255, 255, 0.15);
+    min-width: 170px; padding: 10px 0; border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-top: 10px;
 }
 .nav-links li:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
+.dropdown-menu a { display: block; padding: 8px 20px; font-size: 0.85rem; color: #bbb; transition: all 0.3s; }
+.dropdown-menu a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 25px; }
 
-.user-nav { display: flex; align-items: center; gap: 20px; }
+/* User Nav Elements */
+.user-nav { display: flex; align-items: center; gap: 15px; }
 #search-input {
-    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-    color: #fff; padding: 6px 15px; border-radius: 20px !important; width: 220px; height: 34px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; padding: 6px 15px; border-radius: 20px !important; width: 180px; height: 32px;
 }
 .btn-login {
-    background: var(--netflix-red) !important; padding: 0 20px !important;
-    font-size: 0.85rem !important; font-weight: 700 !important; border-radius: 20px !important; height: 34px !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
+    background: var(--netflix-red) !important; color: #fff; padding: 0 18px !important;
+    font-size: 0.8rem !important; font-weight: 700 !important; border-radius: 20px !important; height: 32px !important;
+    display: flex !important; align-items: center; justify-content: center;
 }
+.profile-img { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid var(--netflix-red); }
 
 /* Hero */
 .hero {
@@ -71,32 +75,45 @@ body {
     background-size: cover; background-position: center;
     display: flex; align-items: center; padding: 0 4%; margin-bottom: -100px;
 }
+.hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -2px; }
 
-/* Category Page (v14.8 Super-Spacer Fix) */
+/* Horizon Scroll Row (Restored v14.9) */
+.row { padding: 40px 0 10px 4%; position: relative; z-index: 2; overflow: hidden; }
+.row-header { padding-right: 4%; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+.row-title { font-size: 1.4rem; font-weight: 700; color: #e5e5e5; }
+
+/* View All Pill Button (Restored v14.9) */
+.view-all-link { 
+    color: #e5e5e5; text-decoration: none; font-size: 0.75rem; font-weight: 800; 
+    background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase;
+}
+.view-all-link:hover { background: #fff; color: #000; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,255,255,0.3); }
+.view-all-link:after { content: '›'; font-size: 1.1rem; line-height: 0; }
+
+/* Video Grid (Flex for Main Page Scroll) */
+.video-grid {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding-bottom: 25px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.video-grid::-webkit-scrollbar { height: 4px; }
+.video-grid::-webkit-scrollbar-thumb { background: var(--netflix-red); border-radius: 2px; }
+
+/* Category Archive Page (Optimized v14.9) */
 .category-page {
-    padding: 220px 4% 80px !important; /* Force extreme top padding to push content below fixed navbar */
+    padding: 160px 4% 80px !important;
     min-height: 100vh;
 }
-.category-header {
-    margin-bottom: 50px;
-    max-width: 900px;
-}
-#category-title {
-    font-size: 2.8rem; /* Slightly smaller for better fit */
-    font-weight: 900;
-    letter-spacing: -2px;
-    color: #fff;
-    margin-bottom: 12px;
-    text-transform: capitalize;
-}
-.category-header p {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.5);
-    line-height: 1.5;
-    font-weight: 400;
-}
+.category-header { margin-bottom: 50px; max-width: 900px; }
+#category-title { font-size: 2.8rem; font-weight: 900; letter-spacing: -2px; color: #fff; margin-bottom: 10px; }
+.category-header p { font-size: 1.1rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
 
-/* Grid & Rows */
 #category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -107,17 +124,26 @@ body {
 
 /* Video Cards Core */
 .video-card {
+    flex: 0 0 280px; 
     background: var(--card-bg);
     border-radius: 4px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.video-card:hover { transform: scale(1.05); z-index: 10; }
+.video-card:hover { transform: scale(1.06); z-index: 10; }
 .thumbnail-container { position: relative; aspect-ratio: 16/9; }
 .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
+.play-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
+}
+.video-card:hover .play-overlay { opacity: 1; }
+.play-icon { font-size: 3rem; color: #fff; }
 .video-info { padding: 12px; }
 .video-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.video-meta { font-size: 0.75rem; color: #808080; }
 
 /* Footer */
 footer { padding: 80px 4% 40px; text-align: center; color: #808080; font-size: 0.8rem; }
