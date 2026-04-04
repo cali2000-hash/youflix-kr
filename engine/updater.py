@@ -75,20 +75,30 @@ class YouflixEngine:
                 print(f"❌ '{kw}' 검색 실패: {e}")
         return results
 
-    def fetch_by_playlist(self, category, playlist_ids, limit=10):
-        """특정 재생목록 내의 영상 수집"""
+    def fetch_by_playlist(self, category, playlist_ids):
+        """특정 재생목록 내의 모든 영상 소환 (v19.2)"""
         results = []
         for pid in playlist_ids:
-            try:
-                request = self.youtube.playlistItems().list(
-                    part="snippet",
-                    playlistId=pid,
-                    maxResults=limit
-                )
-                response = request.execute()
-                results.extend(self._parse_items(response.get('items', []), category))
-            except Exception as e:
-                print(f"❌ 재생목록 '{pid}' 수집 실패: {e}")
+            print(f"🔍 [{category}] 재생목록 전수 수집 시작: {pid}")
+            next_page_token = None
+            while True:
+                try:
+                    request = self.youtube.playlistItems().list(
+                        part="snippet",
+                        playlistId=pid,
+                        maxResults=50,
+                        pageToken=next_page_token
+                    )
+                    response = request.execute()
+                    items = response.get('items', [])
+                    results.extend(self._parse_items(items, category))
+                    
+                    next_page_token = response.get('nextPageToken')
+                    if not next_page_token: break
+                except Exception as e:
+                    print(f"❌ 재생목록 '{pid}' 수집 실패: {e}")
+                    break
+        print(f"✅ [{category}] 총 {len(results)}개 영상 수집 완료.")
         return results
 
     def _parse_items(self, items, category):
@@ -159,7 +169,7 @@ class YouflixEngine:
             if setting['strategy'] == 'trending':
                 videos = self.fetch_trending(setting['maxResults'])
             elif setting['strategy'] == 'playlist':
-                videos = self.fetch_by_playlist(cat, setting['playlists'], setting['maxResults'])
+                videos = self.fetch_by_playlist(cat, setting['playlists'])
             elif setting['strategy'] == 'search':
                 videos = self.fetch_by_search(
                     cat, 
