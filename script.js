@@ -97,18 +97,21 @@ function getFavs() { return currentUser ? cloudFavs : JSON.parse(localStorage.ge
 function checkFav(id) { return getFavs().some(f => f.id === id); }
 
 async function toggleFav(v) {
+    if (!currentUser) {
+        if (confirm("❤ 이 기능은 로그인이 필요합니다. 지금 로그인하시겠습니까?")) {
+            login();
+        }
+        return false;
+    }
     let favs = [...getFavs()];
     const idx = favs.findIndex(f => f.id === v.id);
     let result = false;
     if (idx > -1) { favs.splice(idx, 1); result = false; }
     else { favs.unshift(v); result = true; }
     
-    if (currentUser) {
-        cloudFavs = favs;
-        await db.collection('users').doc(currentUser.uid).set({ favs: cloudFavs }, { merge: true });
-    } else {
-        localStorage.setItem('youflix_favs', JSON.stringify(favs));
-    }
+    cloudFavs = favs;
+    await db.collection('users').doc(currentUser.uid).set({ favs: cloudFavs }, { merge: true });
+    
     renderMyList('mylist-grid');
     if (new URLSearchParams(window.location.search).get('c') === 'fav') renderMyList('category-grid');
     return result;
@@ -135,6 +138,11 @@ async function load(key, config) {
                 </div>
                 <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
             `;
+            card.querySelector('.fav-icon').onclick = async (e) => {
+                e.stopPropagation();
+                const res = await toggleFav(v);
+                e.currentTarget.classList.toggle('active', res);
+            };
             card.querySelector('.thumbnail-container').onclick = () => openModal(v);
             grid.appendChild(card);
         });
@@ -187,6 +195,10 @@ function renderMyList(targetGridId = 'mylist-grid') {
         const card = document.createElement('div');
         card.className = 'video-card animate-in';
         card.innerHTML = `<div class="thumbnail-container"><img src="${v.thumbnail}" alt="${v.title}"><div class="fav-icon active">❤</div><div class="play-overlay"><span class="play-icon">▶</span></div></div><div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel}</p></div>`;
+        card.querySelector('.fav-icon').onclick = async (e) => {
+            e.stopPropagation();
+            await toggleFav(v);
+        };
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
         grid.appendChild(card);
     });
