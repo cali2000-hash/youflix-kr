@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v14.0 - Data Integrity Edition)
- * Fixes: ID Synchronization for Video Grids, Category Loading Stability
+ * YOUFLIX.KR Premium Archive Engine (v17.0 - Infinite Scroll Edition)
+ * Features: Pagination with Firestore, IntersectionObserver, and Dynamic Curation
  */
 
 const firebaseConfig = {
@@ -18,13 +18,18 @@ const auth = firebase.auth();
 let currentUser = null;
 let cloudFavs = [];
 
+// Pagination State (v17.0)
+const lastDocMap = {};
+const loadingMap = {};
+const reachedEndMap = {};
+
 // 1. Visit Counter
 function trackPV() {
     if (localStorage.getItem('youflix_admin') === 'true') return;
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-// 2. Auth Actions (v13.1 - Popup Restored)
+// 2. Auth Actions
 async function login() {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
@@ -117,41 +122,99 @@ async function toggleFav(v) {
     return result;
 }
 
-// 5. Component Loaders (v14.0 - Reliable IDs)
-async function load(key, config) {
-    const grid = document.getElementById(config.elementId);
+// 5. Infinite Load Engine (v17.0 Upgrade)
+async function load(key, config = {}, isAppend = false) {
+    const gridId = config.elementId || 'category-grid';
+    const grid = document.getElementById(gridId);
     if (!grid) return;
+    
+    // Prevent double loading
+    if (loadingMap[key] || reachedEndMap[key]) return;
+    loadingMap[key] = true;
+
+    // Show spinner if appending
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel && isAppend) sentinel.classList.add('loading');
+
     try {
-        const snap = await db.collection(key).orderBy('date', 'desc').limit(20).get();
-        grid.innerHTML = '';
-        if (snap.empty) { grid.innerHTML = '<p class="loading-msg">현재 준비된 영상이 없습니다.</p>'; return; }
-        snap.forEach(doc => {
-            const v = doc.data(); v.category = key;
-            const isFav = checkFav(v.id);
-            const card = document.createElement('div');
-            card.className = 'video-card animate-in';
-            card.innerHTML = `
-                <div class="thumbnail-container">
-                    <img src="${v.thumbnail}" alt="${v.title}">
-                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${v.id}">❤</div>
-                    <div class="play-overlay"><span class="play-icon">▶</span></div>
-                </div>
-                <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
-            `;
-            card.querySelector('.fav-icon').onclick = async (e) => {
-                e.stopPropagation();
-                const res = await toggleFav(v);
-                e.currentTarget.classList.toggle('active', res);
-            };
-            card.querySelector('.thumbnail-container').onclick = () => openModal(v);
-            grid.appendChild(card);
-        });
+        // Category-specific order (v18.0)
+        let orderField = 'timestamp';
+        let orderDirection = 'desc';
+        if (key === 'tvlit') {
+            orderField = 'sort_idx';
+            orderDirection = 'asc';
+        }
+        
+        let query = db.collection(key).orderBy(orderField, orderDirection).limit(20);
+        
+        // Paging logic (v17.5 / v18.0)
+        if (isAppend && lastDocMap[key]) {
+            query = query.startAfter(lastDocMap[key]);
+        }
+
+        const snap = await query.get();
+        if (!isAppend) grid.innerHTML = '';
+        
+        if (snap.empty) {
+            if (!isAppend) grid.innerHTML = '<p class="loading-msg">현재 준비된 영상이 없습니다.</p>';
+            reachedEndMap[key] = true;
+            if (sentinel) sentinel.style.display = 'none';
+        } else {
+            lastDocMap[key] = snap.docs[snap.docs.length - 1];
+            
+            snap.forEach(doc => {
+                const v = doc.data(); v.category = key;
+                const isFav = checkFav(v.id);
+                const card = document.createElement('div');
+                card.className = 'video-card animate-in';
+                card.innerHTML = `
+                    <div class="thumbnail-container">
+                        <img src="${v.thumbnail}" alt="${v.title}">
+                        <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${v.id}">❤</div>
+                        <div class="play-overlay"><span class="play-icon">▶</span></div>
+                    </div>
+                    <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
+                `;
+                card.querySelector('.fav-icon').onclick = async (e) => {
+                    e.stopPropagation();
+                    const res = await toggleFav(v);
+                    e.currentTarget.classList.toggle('active', res);
+                };
+                card.querySelector('.thumbnail-container').onclick = () => openModal(v);
+                grid.appendChild(card);
+            });
+            
+            // If fewer than limit returned, we've reached the end
+            if (snap.docs.length < 20) {
+                reachedEndMap[key] = true;
+                if (sentinel) sentinel.style.display = 'none';
+            }
+        }
     } catch (e) { 
         console.error("Load Error for " + key, e); 
-        grid.innerHTML = '<p class="loading-msg">데이터 소환 중 오류가 발생했습니다.</p>';
+        if (!isAppend) grid.innerHTML = '<p class="loading-msg">데이터 소환 중 오류가 발생했습니다.</p>';
+    } finally {
+        loadingMap[key] = false;
+        if (sentinel) sentinel.classList.remove('loading');
     }
 }
 
+// 6. Intersection Observer for Infinite Scroll
+function setupInfiniteScroll(key) {
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        // Ensure we ONLY load more if we are NOT already loading (v18.0 Fix)
+        if (entries[0].isIntersecting && !loadingMap[key] && !reachedEndMap[key]) {
+            load(key, { elementId: 'category-grid' }, true);
+        }
+    }, { threshold: 0.01 });
+
+    observer.observe(sentinel);
+}
+
+// 7. Modals
 function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
@@ -180,6 +243,7 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
+// 8. My List
 function renderMyList(targetGridId = 'mylist-grid') {
     const grid = document.getElementById(targetGridId);
     if (!grid) return;
@@ -204,7 +268,7 @@ function renderMyList(targetGridId = 'mylist-grid') {
     });
 }
 
-// 6. Auth Listener
+// 9. Init & Listeners
 auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     if (user) await syncFavorites();
@@ -212,41 +276,38 @@ auth.onAuthStateChanged(async (user) => {
     renderMyList('mylist-grid');
 });
 
-// 7. Initialization
 document.addEventListener('DOMContentLoaded', async () => {
     trackPV();
-    auth.getRedirectResult().catch(e => { console.error(e); });
-
-    // Multi-Row Support (Main Page)
+    
+    // Main Page Rows
     const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { 
         const gridId = row + '-grid';
         if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
     });
 
-    // Category Page Logic (v15.4 - Full Title Support)
+    // Category Page (v17.0 Infinite Scroll Integration)
     const params = new URLSearchParams(window.location.search);
     const cat = params.get('c');
     if (cat && document.getElementById('category-grid')) {
-        const catTitle = document.getElementById('category-title');
         const titles = { 
-            'kpop': 'K-Pop Universe', 
-            'kdrama': 'Drama World', 
-            'tvlit': 'TV Literature Hall', 
-            'kclassic': 'Eternal Cinema', 
-            'kmovie': 'Cinema Masterpieces',
-            'kvariety': 'Variety Show Stars',
-            'trending': 'Trending Now',
-            'fav': 'My Secret List' 
+            'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
+            'kclassic': 'Eternal Cinema', 'kmovie': 'Cinema Masterpieces',
+            'kvariety': 'Variety Show Stars', 'trending': 'Trending Now', 'fav': 'My Secret List' 
         };
+        const catTitle = document.getElementById('category-title');
+        if (catTitle) catTitle.innerText = titles[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
         
-        if (catTitle) {
-            // Priority: Defined title > Capitalized category name fallback
-            catTitle.innerText = titles[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+        if (cat === 'fav') {
+            renderMyList('category-grid');
+            const sentinel = document.getElementById('scroll-sentinel');
+            if (sentinel) sentinel.style.display = 'none';
+        } else {
+            // Sequential load (v18.0)
+            load(cat, { elementId: 'category-grid' }).then(() => {
+                setupInfiniteScroll(cat);
+            });
         }
-        
-        if (cat === 'fav') renderMyList('category-grid');
-        else load(cat, { elementId: 'category-grid' });
     }
     
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);

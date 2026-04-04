@@ -6,13 +6,13 @@
     <title>Category | YOUFLIX.KR Archive</title>
     <meta name="description" content="Explore your favorite category in depth on YOUFLIX.KR. The ultimate premium YouTube archive.">
     
-    <link rel="stylesheet" href="style.css?v=16.1">
+    <link rel="stylesheet" href="style.css?v=18.0">
     
-    <!-- Firebase SDK (v16.1 Powered) -->
+    <!-- Firebase SDK (v18.0 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="script.js?v=16.1" defer></script>
+    <script src="script.js?v=18.0" defer></script>
 
     <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
@@ -63,6 +63,10 @@
             <!-- Videos will be injected here via script.js -->
             <p class="loading-msg">Searching the national archives...</p>
         </div>
+
+        <div id="scroll-sentinel">
+            <div class="spinner"></div>
+        </div>
     </main>
 
     <!-- Global Video Modal -->
@@ -93,6 +97,6 @@
     </footer>
 
     <!-- Fixed script tag with versioning -->
-    <script src="script.js?v=16.1"></script>
+    <script src="script.js?v=18.0"></script>
 </body>
 </html>
