@@ -52,27 +52,39 @@ class YouflixEngine:
             print(f"❌ Trending 수집 실패: {e}")
             return []
 
-    def fetch_by_search(self, category, keywords, limit=5, channel_id=None):
-        """키워드 기반 수집 (공식 채널 필터링 지원)"""
+    def fetch_by_search(self, category, keywords, max_total=50, channel_id=None):
+        """키워드 기반 수집 (v21.3: 페이징 지원)"""
         results = []
         for kw in keywords:
-            try:
-                params = {
-                    "part": "snippet",
-                    "q": kw,
-                    "type": "video",
-                    "maxResults": limit,
-                    "relevanceLanguage": "ko",
-                    "order": "date"
-                }
-                if channel_id:
-                    params["channelId"] = channel_id
-                
-                request = self.youtube.search().list(**params)
-                response = request.execute()
-                results.extend(self._parse_items(response.get('items', []), category))
-            except Exception as e:
-                print(f"❌ '{kw}' 검색 실패: {e}")
+            print(f"🔍 [{category}] 검색 수집 시작 (Max {max_total}): {kw}")
+            next_page_token = None
+            kw_results = []
+            
+            while len(kw_results) < max_total:
+                try:
+                    params = {
+                        "part": "snippet",
+                        "q": kw,
+                        "type": "video",
+                        "maxResults": min(50, max_total - len(kw_results)),
+                        "relevanceLanguage": "ko",
+                        "order": "date",
+                        "pageToken": next_page_token
+                    }
+                    if channel_id:
+                        params["channelId"] = channel_id
+                    
+                    request = self.youtube.search().list(**params)
+                    response = request.execute()
+                    items = response.get('items', [])
+                    kw_results.extend(self._parse_items(items, category))
+                    
+                    next_page_token = response.get('nextPageToken')
+                    if not next_page_token or not items: break
+                except Exception as e:
+                    print(f"❌ '{kw}' 검색 실패: {e}")
+                    break
+            results.extend(kw_results)
         return results
 
     def fetch_by_playlist(self, category, playlist_ids):
@@ -134,8 +146,8 @@ class YouflixEngine:
                 'timestamp': firestore.SERVER_TIMESTAMP # 정렬용
             }
 
-            # TV문학관 화수 추출 (v18.0)
-            if category == 'tvlit' or 'TV문학관' in snippet['title']:
+            # TV문학관 & 드라마게임 화수 추출 (v21.5)
+            if category in ['tvlit', 'dramagame'] or '드라마게임' in snippet['title'] or 'TV문학관' in snippet['title']:
                 import re
                 match = re.search(r'(\d+)화', snippet['title'])
                 video_data['sort_idx'] = int(match.group(1)) if match else 9999

@@ -30,7 +30,7 @@ CONFIG = {
             "strategy": "search",
             "keywords": ["한국고전영화 본편", "Korean Classic Movie", "KOFA"],
             "channelId": "UCvH6u_Qzn5RQdz9W198umDw", # KOFA 공식
-            "maxResults": 40
+            "maxResults": 300 # 대폭 상향 (고전영화 전수 수집용)
         },
         "kmovie": {
             "strategy": "search",
@@ -41,6 +41,11 @@ CONFIG = {
             "strategy": "search",
             "keywords": ["무한도전 레전드 명장면", "런닝맨 명장면", "예능 레전드"],
             "maxResults": 30
+        },
+        "dramagame": {
+            "strategy": "playlist",
+            "playlists": ["PLN47-pAnbHKRd3AWteraUorO1RC9VYtH9"],
+            "maxResults": 50 
         }
     },
     "db_project_id": "gen-lang-client-0874410222",

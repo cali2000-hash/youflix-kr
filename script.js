@@ -140,7 +140,7 @@ async function load(key, config = {}, isAppend = false) {
         // Category-specific order (v18.0)
         let orderField = 'timestamp';
         let orderDirection = 'desc';
-        if (key === 'tvlit') {
+        if (key === 'tvlit' || key === 'dramagame') {
             orderField = 'sort_idx';
             orderDirection = 'asc';
         }
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     trackPV();
     
     // Main Page Rows
-    const rows = ['kpop', 'kdrama', 'tvlit', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+    const rows = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { 
         const gridId = row + '-grid';
         if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
@@ -292,6 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cat && document.getElementById('category-grid')) {
         const titles = { 
             'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
+            'dramagame': 'Drama Game Archive',
             'kclassic': 'Eternal Cinema', 'kmovie': 'Cinema Masterpieces',
             'kvariety': 'Variety Show Stars', 'trending': 'Trending Now', 'fav': 'My Secret List' 
         };
