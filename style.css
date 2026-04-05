@@ -126,7 +126,7 @@ body {
 .play-icon { font-size: 3.5rem; color: #fff; filter: drop-shadow(0 0 20px rgba(0,0,0,0.9)); }
 
 .video-info { padding: 18px 5px; }
-.video-info h4 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.video-info h4 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .video-meta { font-size: 0.95rem; color: #999; }
 
 /* Category Archive Page (v16.0 Layout) */
