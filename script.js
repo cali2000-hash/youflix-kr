@@ -328,9 +328,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             'kvariety': 'Variety Show Stars', 'trending': 'Trending Now', 'fav': 'My Secret List' 
         };
         const catTitle = document.getElementById('category-title');
-        if (catTitle) catTitle.innerText = titles[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+        if (catTitle) {
+            if (cat && titles[cat]) {
+                catTitle.innerText = titles[cat];
+            } else if (cat) {
+                catTitle.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+            } else {
+                catTitle.innerText = "Archive Explorer";
+            }
+        }
         
-        if (cat === 'fav') {
+        if (!cat) {
+            const grid = document.getElementById('category-grid');
+            if (grid) grid.innerHTML = '<p class="loading-msg">Please select a category from the menu.</p>';
+            const sentinel = document.getElementById('scroll-sentinel');
+            if (sentinel) sentinel.style.display = 'none';
+        } else if (cat === 'fav') {
             renderMyList('category-grid');
             const sentinel = document.getElementById('scroll-sentinel');
             if (sentinel) sentinel.style.display = 'none';
