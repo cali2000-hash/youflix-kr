@@ -133,7 +133,7 @@ body {
 /* Category Archive Page (v16.0 Layout) */
 .category-page { padding: 180px 0 100px 0 !important; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 .category-header { margin-bottom: 65px; width: 92%; max-width: 1600px; border-left: 8px solid var(--netflix-red); padding-left: 30px; }
-#category-title { font-size: 3rem; font-weight: 950; letter-spacing: -2px; line-height: 1; margin-bottom: 10px; }
+#category-title { font-size: 24px; font-weight: 950; letter-spacing: -1.5px; line-height: 1.2; margin-bottom: 15px; }
 #category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 45px 25px; width: 92%; max-width: 1600px; }
 
 /* Modal & Footer */
@@ -210,7 +210,7 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
 
     .hero-content h1 { font-size: 2.8rem; letter-spacing: -1px; }
     .hero-content p { font-size: 1rem; }
-    .category-header h1 { font-size: 20px; letter-spacing: -1px; }
+    .category-header h1 { font-size: 24px; letter-spacing: -1px; }
 
     /* Fix row header for mobile */
     .row-header { padding-left: 15px; margin-bottom: 20px; }
