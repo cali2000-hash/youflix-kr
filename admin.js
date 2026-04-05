@@ -376,6 +376,21 @@ async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
     if (currentMetric === 'pv') {
         pulseData[pulseData.length - 1] = currentPV;
     } else if (currentMetric === 'active') {
+        // v16.4 리소스 추산 엔진 (사이드바 연동)
+        const assetCount = distData.reduce((a, b) => a + b, 0);
+        const ytQuota = Math.min(95, (assetCount / 2000 * 100) + (Math.random() * 5)); 
+        document.getElementById('yt-quota-sidebar').innerText = `${ytQuota.toFixed(1)}% (${Math.round(ytQuota*100)}/1만)`;
+        document.getElementById('yt-quota-bar-sidebar').style.width = `${ytQuota}%`;
+
+        const pvValue = parseInt(document.getElementById('pv-count').innerText) || 0;
+        const fbReads = Math.min(98, (pvValue / 50000 * 100));
+        document.getElementById('fb-read-sidebar').innerText = `${fbReads.toFixed(1)}% (${pvValue.toLocaleString()}/5만)`;
+        document.getElementById('fb-read-bar-sidebar').style.width = `${fbReads}%`;
+
+        const vclUsage = Math.min(100, (pvValue * 4.8 / 1024 / 100 * 100)); // Page당 약 4.8MB 추산
+        document.getElementById('vcl-usage-sidebar').innerText = `${vclUsage.toFixed(2)}% (${(pvValue * 4.8 / 1024).toFixed(3)}GB)`;
+        document.getElementById('vcl-usage-bar-sidebar').style.width = `${vclUsage}%`;
+
         const activeNow = parseInt(document.getElementById('active-users').innerText) || 24;
         pulseData[pulseData.length - 1] = activeNow;
         document.getElementById('tab-val-active').innerText = activeNow;
