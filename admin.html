@@ -153,6 +153,22 @@
     </header>
 
     <div class="stats-grid">
+        <!-- v15.1 GA 스타일 페이지 분석 카드 -->
+        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <p class="stat-label" style="margin:0;">페이지 제목별 조회수 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
+                    <div style="font-size:0.6rem; color:#666;">실시간 집계 중</div>
+                </div>
+                <div id="page-popularity-list" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="color:#666; font-size:0.75rem; text-align:center; padding:20px;">데이터를 불러오는 중...</div>
+                </div>
+            </div>
+            <div style="margin-top:15px; text-align:right; border-top:1px solid #333; padding-top:10px;">
+                <span style="font-size:0.65rem; color:#4285F4; cursor:pointer;" onclick="window.open('https://analytics.google.com/')">페이지 및 화면 보기 →</span>
+            </div>
+        </div>
+
         <div class="stat-card">
             <p class="stat-label">Google Analytics <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
             <p class="stat-value">실시간 추적 중</p>
@@ -173,31 +189,29 @@
         </div>
         <div class="stat-card" style="text-align: left; position: relative;">
             <p class="stat-label">시스템 운영 레벨 (Phase 5) <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
-            <div style="margin-top:15px; display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
-                <div class="engine-indicator"><span class="dot active"></span> YouTube API</div>
-                <div class="engine-indicator"><span class="dot active"></span> Firestore DB</div>
-                <div class="engine-indicator"><span class="dot active"></span> Vercel Network</div>
-                <div class="engine-indicator"><span class="dot active"></span> Security Layer</div>
+            <div style="display:flex; align-items:center; gap:10px; margin: 15px 0 20px 0;">
+                <div class="status-pulse"></div>
+                <p class="stat-value" id="sys-status" style="margin:0; font-size:1.4rem;">최상 (Optimal)</p>
             </div>
-            <div style="margin-top:15px; background:rgba(0,255,0,0.1); padding:10px; border-radius:6px; border:1px solid rgba(0,255,0,0.2);">
-                <p style="font-size:0.65rem; color:#00ff00; margin:0;">Status: <strong>OPTIMAL</strong></p>
-                <p style="font-size:0.55rem; color:#aaa; margin:0; margin-top:2px;">All subsystems are performing within expected parameters.</p>
-            </div>
-        </div>
-        <!-- v15.1 GA 스타일 페이지 분석 카드 -->
-        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <p class="stat-label" style="margin:0;">페이지 제목별 조회수 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
-                    <div style="font-size:0.6rem; color:#666;">실시간 집계 중</div>
-                </div>
-                <div id="page-popularity-list" style="display:flex; flex-direction:column; gap:12px;">
-                    <div style="color:#666; font-size:0.75rem; text-align:center; padding:20px;">데이터를 불러오는 중...</div>
-                </div>
-            </div>
-            <div style="margin-top:15px; text-align:right; border-top:1px solid #333; padding-top:10px;">
-                <span style="font-size:0.65rem; color:#4285F4; cursor:pointer;" onclick="window.open('https://analytics.google.com/')">페이지 및 화면 보기 →</span>
-            </div>
+            
+            <ul style="list-style:none; padding:12px; margin:0; border-top:1px solid #333; padding-top:14px; display:flex; flex-direction:column; gap:10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● YouTube API v3</span>
+                    <span style="color:#00ff00; font-weight:bold;">CONNECTED</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Google Firestore</span>
+                    <span style="color:#00ff00; font-weight:bold;">STABLE</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Vercel Edge Server</span>
+                    <span style="color:#00ff00; font-weight:bold;">ACTIVE</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Encryption Shield</span>
+                    <span style="color:#00ff00; font-weight:bold;">PROTECTED</span>
+                </li>
+            </ul>
         </div>
 
         <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
