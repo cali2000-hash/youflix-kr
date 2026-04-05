@@ -153,6 +153,7 @@ class YouflixEngine:
                 'id': vid_id,
                 'title': snippet['title'],
                 'channel': snippet['channelTitle'],
+                'description': snippet.get('description', '')[:300], # AdSense 컨텐츠 가치 보강 (v4.6)
                 'thumbnail': thumb_url,
                 'date': today,
                 'category': category,

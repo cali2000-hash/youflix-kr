@@ -221,3 +221,22 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
 @media screen and (min-width: 769px) {
     .menu-toggle { display: none; }
 }
+
+/* AdSense Premium Containers (v1.0 - Stealth Integration) */
+.ads-container {
+    width: 92%; max-width: 1600px; margin: 60px auto;
+    background: rgba(255,255,255,0.02); border-radius: 12px;
+    padding: 30px 20px; border: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+}
+.ads-container::before {
+    content: 'SPONSORED AD'; position: absolute; top: 12px; left: 24px;
+    font-size: 10px; color: #444; font-weight: 900; letter-spacing: 2px;
+}
+.ads-slot { 
+    width: 100%; min-height: 120px; display: flex; 
+    align-items: center; justify-content: center; 
+    color: #222; font-size: 0.8rem; letter-spacing: 1px;
+}
+
