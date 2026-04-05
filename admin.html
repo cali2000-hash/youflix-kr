@@ -170,12 +170,12 @@
             <p class="stat-change" style="color:#00ff00;">● 현재 접속 중</p>
         </div>
         <div class="stat-card" style="text-align: left; position: relative;">
-            <p class="stat-label">시스템 엔진 (Phase 5) <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
-            <div style="display:flex; align-items:center; gap:8px; margin: 10px 0;">
-                <div class="status-pulse"></div>
-                <p class="stat-value" style="margin:0;">Optimal</p>
+            <p class="stat-label">YouTube API Quota <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('resource')">ⓘ</span></p>
+            <p class="stat-value" id="top-yt-quota" style="font-size:1.45rem;">0%</p>
+            <div style="height:6px; background:#222; border-radius:3px; overflow:hidden; margin-top:10px;">
+                <div id="top-yt-bar" style="width:0%; height:100%; background:linear-gradient(90deg, var(--admin-primary), #ff4d4d); transition:width 1s ease;"></div>
             </div>
-            <div style="font-size:0.6rem; color:#666; border-top:1px solid #333; padding-top:5px;">System Integrity Normal</div>
+            <p class="stat-change" id="top-yt-subtext" style="font-size:0.65rem; color:#666; margin-top:5px;">데이터 수집 중...</p>
         </div>
     </div>
 
@@ -226,6 +226,17 @@
         <!-- 우측 사이드바: 핵심 지표 통합 (v16.4) -->
         <div class="right-sidebar" style="display:flex; flex-direction:column; gap:25px;">
             
+            <!-- 시스템 엔진 (사이드바 최상단으로 이동) -->
+            <div class="stat-card" style="background:#111; border-left: 3px solid #00ff00; padding: 25px; text-align: left; position: relative;">
+                <p class="stat-label" style="font-size:1.1rem; font-weight:bold; color:#fff; margin-bottom:15px;">운영 시스템 엔진 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
+                <div style="display:flex; align-items:center; gap:8px; margin: 10px 0;">
+                    <div class="status-pulse"></div>
+                    <p class="stat-value" style="margin:0; font-size:1.4rem;">Phase 5</p>
+                </div>
+                <div style="font-size:0.7rem; color:#666; border-top:1px solid #333; padding-top:10px; margin-top:10px;">
+                    <span style="color:#00ff00;">●</span> System Integrity Normal
+                </div>
+            </div>
             <!-- 리소스 관제 (v17.7 오리지널 3단 행 복원) -->
             <div class="stat-card" style="background:#111; border-top: 3px solid var(--admin-primary); padding: 30px; text-align: left;">
                 <p class="stat-label" style="font-size:1.1rem; font-weight:bold; color:#fff; margin-bottom:20px;">리소스 사용 효율 <span style="font-size:0.75rem; color:var(--admin-primary); cursor:help;" onclick="showInfo('resource')">ⓘ</span></p>

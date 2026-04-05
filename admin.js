@@ -286,8 +286,15 @@ function updateResourceGauges(pv, videos) {
     const ytPerc = (ytUsed / ytQuotaMax * 100).toFixed(1);
     const ytBar = document.getElementById('yt-quota-bar');
     const ytText = document.getElementById('yt-quota-text');
+    const topYtQuota = document.getElementById('top-yt-quota');
+    const topYtBar = document.getElementById('top-yt-bar');
+    const topYtSubtext = document.getElementById('top-yt-subtext');
+
     if (ytBar) ytBar.style.width = `${ytPerc}%`;
     if (ytText) ytText.innerText = `${ytPerc}% (${ytUsed.toLocaleString()}/1만)`;
+    if (topYtQuota) topYtQuota.innerText = `${ytPerc}%`;
+    if (topYtBar) topYtBar.style.width = `${ytPerc}%`;
+    if (topYtSubtext) topYtSubtext.innerText = `${ytUsed.toLocaleString()} / 10,000 Unit`;
 
     const fbUsed = Math.min(pv * 40, fbReadMax);
     const fbPerc = (fbUsed / fbReadMax * 100).toFixed(1);
