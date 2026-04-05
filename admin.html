@@ -215,10 +215,18 @@
             <p class="stat-value" id="active-users" style="font-size:1.4rem;">0</p>
             <p class="stat-change" style="color:#00ff00;">● 현재 접속 중</p>
         </div>
-        <div class="stat-card">
-            <p class="stat-label">시스템 운영 레벨 (Phase 5) <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
-            <p class="stat-value" style="font-size:1.4rem;">OPTIMAL</p>
-            <p class="stat-change">All Subsystems Stable</p>
+        <div class="stat-card" style="text-align: left; position: relative;">
+            <p class="stat-label">시스템 엔진 (Phase 5) <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
+            <div style="display:flex; align-items:center; gap:10px; margin: 10px 0;">
+                <div class="status-pulse"></div>
+                <p class="stat-value" style="margin:0; font-size:1.2rem;">최상 (Optimal)</p>
+            </div>
+            <ul style="list-style:none; padding:8px; margin:0; border-top:1px solid #333; display:flex; flex-direction:column; gap:6px; background: rgba(255,255,255,0.02); border-radius: 6px;">
+                <li style="display:flex; justify-content:space-between; font-size:0.65rem;">
+                    <span style="color:#888;">● API / DB / Edge</span>
+                    <span style="color:#00ff00; font-weight:bold;">CONNECTED</span>
+                </li>
+            </ul>
         </div>
     </div>
 
