@@ -23,11 +23,27 @@ const lastDocMap = {};
 const loadingMap = {};
 const reachedEndMap = {};
 
-// 1. Visit Counter
+// 1. Visit Counter & Presence (v13.0)
+async function updatePresence() {
+    if (!db) return;
+    const sId = sessionStorage.getItem('yfx_session') || 
+                (sessionStorage.setItem('yfx_session', Math.random().toString(36).substr(2, 9)), sessionStorage.getItem('yfx_session'));
+    try {
+        await db.collection('presence').doc(sId).set({
+            last_active: firebase.firestore.FieldValue.serverTimestamp(),
+            lastUpdate: new Date().toISOString()
+        }, { merge: true });
+    } catch (e) {}
+}
+
 function trackPV() {
     if (localStorage.getItem('youflix_admin') === 'true') return;
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
+
+// 30초마다 존재 신호 발신
+updatePresence();
+setInterval(updatePresence, 30000);
 
 // 2. Auth Actions
 async function login() {

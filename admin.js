@@ -63,7 +63,15 @@ async function loadStats() {
         }
         
         if (assetEl) assetEl.innerText = totalVideos.toLocaleString();
-        if (activeEl) simulateActiveUsers(activeEl);
+        
+        // 실시간 존재 인원 전수 조사 (GA 대체용 진짜 엔진)
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        const presenceSnap = await db.collection('presence')
+                                     .where('last_active', '>=', twoMinutesAgo)
+                                     .get();
+        const realActiveCount = presenceSnap.size || 0;
+        if (activeEl) activeEl.innerText = realActiveCount;
+        document.getElementById('tab-val-active').innerText = realActiveCount;
 
         // 상단 탭 수치 갱신
         document.getElementById('tab-val-pv').innerText = pvCount.toLocaleString();
@@ -86,14 +94,31 @@ async function loadStats() {
     }
 }
 
-function simulateActiveUsers(el) {
-    let base = 24;
-    setInterval(() => {
-        const change = Math.floor(Math.random() * 5) - 2;
-        base = Math.max(1, base + change);
-        el.innerText = base;
-    }, 5000);
+function updateRealTimePresence() {
+    let lastCount = -1;
+    // 30초마다 차분하게 실시간 인원 갱신 (GA 스타일)
+    setInterval(async () => {
+        const activeEl = document.getElementById('active-users');
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        try {
+            const presenceSnap = await db.collection('presence')
+                                         .where('last_active', '>=', twoMinutesAgo)
+                                         .get();
+            const count = presenceSnap.size || 0;
+            
+            // 수치가 변했을 때만 자연스럽게 갱신
+            if (count !== lastCount) {
+                if (activeEl) activeEl.innerText = count;
+                const tabVal = document.getElementById('tab-val-active');
+                if (tabVal) tabVal.innerText = count;
+                lastCount = count;
+            }
+        } catch (e) { console.warn("Presence check sync paused."); }
+    }, 30000);
 }
+
+// 초기화 시 실시간 감시 시작
+updateRealTimePresence();
 
 function addLog(msg, type = 'info') {
     const monitor = document.getElementById('log-monitor');
@@ -417,6 +442,26 @@ async function deleteVideo(cat, id, title) {
         alert("삭제 및 아카이브 갱신 완료!");
         loadList();
     } catch (e) { alert("삭제 실패: " + e.message); }
+}
+
+// v13.0 유플릭스 실시간 존재 엔진 (Fire-Presence)
+async function updatePresence() {
+    if (!db) return;
+    const sessionId = sessionStorage.getItem('yfx_session') || 
+                     (sessionStorage.setItem('yfx_session', Math.random().toString(36).substr(2, 9)), sessionStorage.getItem('yfx_session'));
+    
+    try {
+        await db.collection('presence').doc(sessionId).set({
+            last_active: firebase.firestore.FieldValue.serverTimestamp(),
+            page: window.location.pathname
+        });
+    } catch (e) { console.warn("Presence sync fail."); }
+}
+
+// 30초마다 존재 신호 발신
+if (typeof firebase !== 'undefined') {
+    updatePresence();
+    setInterval(updatePresence, 30000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
