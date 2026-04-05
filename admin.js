@@ -192,8 +192,12 @@ function showInfo(type) {
 
     const info = {
         'ga': {
-            title: "📊 구글 분석 데이터 가이드",
-            body: "<strong style='color:#fff;'>실시간 방문 추적</strong><br>구글 분석기(GA4)를 통해 수집되는 실제 사용자 방문 데이터입니다.<br><br>• <strong>누적 방문</strong>: 사이트 오픈 이후 발생한 총 페이지뷰(PV)입니다.<br>• <strong>지연 시간</strong>: 구글 서버 특성상 실제 발생 후 약 1~5분의 집계 지연이 있을 수 있습니다."
+            title: "📊 구글 분석 통합 데이터",
+            body: "<strong style='color:#fff;'>글로벌 방문 추적 (GA4)</strong><br>구글의 전문 분석 엔진을 통해 수집되는 데이터입니다.<br><br>• <strong>누적 PV</strong>: 사이트 오픈 이후 기록된 모든 페이지 조회의 합산입니다.<br>• <strong>데이터 통계</strong>: 성별, 지역, 기기 등 정밀한 통계는 '대시보드 열기'를 통해 확인 가능합니다."
+        },
+        'page': {
+            title: "📑 페이지별 실시간 실적 가이드",
+            body: "<strong style='color:#fff;'>실시간 페이지 점유율</strong><br>현재 사용자들이 유플릭스의 어떤 섹션에 머물고 있는지 보여주는 실시간 관제 지표입니다.<br><br>• <strong>블루 그래프</strong>: 전체 활성 사용자 수 대비 해당 페이지의 점유 비중을 시각화한 것입니다.<br>• <strong>업데이트</strong>: 30초 주기로 방문 트렌드를 자동 갱신합니다."
         },
         'archive': {
             title: "📦 아카이브 자산 및 사용자 정보",
