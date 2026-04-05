@@ -81,11 +81,20 @@
         .info-icon:hover { background: var(--admin-primary); }
 
         /* v9.9 모바일 와이드 레이아웃 (오타 수정 및 강제 적용) */
+        @media screen and (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; padding: 15px !important; gap: 15px !important; margin: 10px 15px !important; }
+            .main-dashboard { grid-template-columns: 1fr !important; gap: 20px !important; margin: 0 15px 30px 15px !important; }
+            .right-sidebar { flex-direction: row !important; flex-wrap: wrap !important; gap: 15px !important; }
+            .stat-card { padding: 15px !important; }
+            .right-sidebar .stat-card { flex: 1; min-width: 300px; }
+        }
+        @media screen and (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr !important; }
+            .admin-header h1 { font-size: 1.1rem; }
+            .btn-home { font-size: 0.8rem; padding: 6px 12px; }
+        }
         @media (max-width: 768px) {
             header.admin-header { flex-direction: column !important; gap: 15px !important; text-align: center !important; margin-bottom: 25px !important; }
-            .stats-grid { grid-template-columns: 1fr !important; gap: 10px !important; display: grid !important; }
-            .admin-controls { grid-template-columns: 1fr !important; }
-            .main-dashboard { grid-template-columns: 1fr !important; gap: 15px !important; padding: 10px 4% !important; }
             .chart-section, .resource-section { padding: 15px !important; min-height: auto !important; }
             canvas { max-height: 220px !important; }
             .stat-card { 
@@ -152,8 +161,8 @@
         <a href="index.html" class="btn-home">🏠 홈으로 가기</a>
     </header>
 
-    <!-- 중앙 보조 지표 섹션 (v16.4 최상단 고정) -->
-    <div class="stats-grid" style="margin: 20px 30px; grid-template-columns: repeat(4, 1fr);">
+    <!-- 중앙 보조 지표 섹션 (v16.9 정밀 레이아웃) -->
+    <div class="stats-grid" id="main-stats-grid" style="margin: 20px 30px; display: grid; gap: 20px;">
         <div class="stat-card">
             <p class="stat-label">Google Analytics <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
             <p class="stat-value" id="pv-count" style="font-size:1.45rem;">0 PV</p>
@@ -162,7 +171,7 @@
         <div class="stat-card">
             <p class="stat-label">영상 아카이브 자산 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('archive')">ⓘ</span></p>
             <p class="stat-value" id="asset-count" style="font-size:1.45rem;">0</p>
-            <p class="stat-change">Firestore 컬렉션</p>
+            <p class="stat-change">제작 완료/추적 중</p>
         </div>
         <div class="stat-card">
             <p class="stat-label">실시간 활성 사용자</p>
