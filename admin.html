@@ -153,22 +153,6 @@
     </header>
 
     <div class="stats-grid">
-        <!-- v15.1 GA 스타일 페이지 분석 카드 -->
-        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <p class="stat-label" style="margin:0;">페이지 제목별 조회수 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('page')">ⓘ</span></p>
-                    <div style="font-size:0.6rem; color:#666;">실시간 집계 중</div>
-                </div>
-                <div id="page-popularity-list" style="display:flex; flex-direction:column; gap:12px;">
-                    <div style="color:#666; font-size:0.75rem; text-align:center; padding:20px;">데이터를 불러오는 중...</div>
-                </div>
-            </div>
-            <div style="margin-top:15px; text-align:right; border-top:1px solid #333; padding-top:10px;">
-                <span style="font-size:0.65rem; color:#4285F4; cursor:pointer;" onclick="window.open('https://analytics.google.com/')">페이지 및 화면 보기 →</span>
-            </div>
-        </div>
-
         <div class="stat-card">
             <p class="stat-label">Google Analytics <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
             <p class="stat-value">실시간 추적 중</p>
@@ -213,7 +197,6 @@
                 </li>
             </ul>
         </div>
-
         <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
             <div style="padding-bottom:15px; border-bottom:1px solid #333;">
                 <p class="stat-label" style="margin-bottom:10px;">예상 데이터 트래픽 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('resource')">ⓘ</span></p>
@@ -224,6 +207,24 @@
                 <p class="stat-label" style="margin-bottom:10px;">DB 저장 용량 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('db')">ⓘ</span></p>
                 <p class="stat-value" id="db-storage" style="font-size:1.6rem; margin:0;">14.2MB</p>
                 <div style="font-size:0.65rem; color:#666; margin-top:5px;">Firestore 총 용량</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- v15.6 GA 스타일 페이지 분석 카드 (리소스 하단부 개별 배치) -->
+    <div style="margin: 0 30px 30px 30px;">
+        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; max-width: 400px;">
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <p class="stat-label" style="margin:0;">페이지 제목별 조회수 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('page')">ⓘ</span></p>
+                    <div style="font-size:0.6rem; color:#666;">실시간 집계 중</div>
+                </div>
+                <div id="page-popularity-list" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="color:#666; font-size:0.75rem; text-align:center; padding:20px;">데이터를 불러오는 중...</div>
+                </div>
+            </div>
+            <div style="margin-top:15px; text-align:right; border-top:1px solid #333; padding-top:10px;">
+                <span style="font-size:0.65rem; color:#4285F4; cursor:pointer;" onclick="window.open('https://analytics.google.com/')">페이지 및 화면 보기 →</span>
             </div>
         </div>
     </div>
