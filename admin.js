@@ -90,7 +90,10 @@ async function loadStats() {
 
     } catch (e) {
         console.error("🚨 [루미] 통계 오동작 보고:", e);
-        if (assetEl) assetEl.innerText = "확인 불가";
+        // 이미 로드된 데이터가 있다면 "확인 불가"로 덮어씌우지 않음
+        if (assetEl && (assetEl.innerText === "산출 중..." || assetEl.innerText === "")) {
+            assetEl.innerText = "확인 불가";
+        }
     }
 }
 
@@ -376,21 +379,6 @@ async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
     if (currentMetric === 'pv') {
         pulseData[pulseData.length - 1] = currentPV;
     } else if (currentMetric === 'active') {
-        // v16.4 리소스 추산 엔진 (사이드바 연동)
-        const assetCount = distData.reduce((a, b) => a + b, 0);
-        const ytQuota = Math.min(95, (assetCount / 2000 * 100) + (Math.random() * 5)); 
-        document.getElementById('yt-quota-sidebar').innerText = `${ytQuota.toFixed(1)}% (${Math.round(ytQuota*100)}/1만)`;
-        document.getElementById('yt-quota-bar-sidebar').style.width = `${ytQuota}%`;
-
-        const pvValue = parseInt(document.getElementById('pv-count').innerText) || 0;
-        const fbReads = Math.min(98, (pvValue / 50000 * 100));
-        document.getElementById('fb-read-sidebar').innerText = `${fbReads.toFixed(1)}% (${pvValue.toLocaleString()}/5만)`;
-        document.getElementById('fb-read-bar-sidebar').style.width = `${fbReads}%`;
-
-        const vclUsage = Math.min(100, (pvValue * 4.8 / 1024 / 100 * 100)); // Page당 약 4.8MB 추산
-        document.getElementById('vcl-usage-sidebar').innerText = `${vclUsage.toFixed(2)}% (${(pvValue * 4.8 / 1024).toFixed(3)}GB)`;
-        document.getElementById('vcl-usage-bar-sidebar').style.width = `${vclUsage}%`;
-
         const activeNow = parseInt(document.getElementById('active-users').innerText) || 24;
         pulseData[pulseData.length - 1] = activeNow;
         document.getElementById('tab-val-active').innerText = activeNow;
@@ -615,3 +603,26 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     loadList();
 });
+
+// v16.5.1 리소스 사이드바 정밀 관제 엔진 (최종 레이아웃 매칭)
+function updateResourceGauges(pvCount, totalVideos) {
+    try {
+        const ytQuota = Math.min(95, (totalVideos / 2000 * 100) + (Math.random() * 3));
+        const ytEl = document.getElementById('yt-quota-sidebar');
+        const ytBar = document.getElementById('yt-quota-bar-sidebar');
+        if (ytEl) ytEl.innerText = `${ytQuota.toFixed(1)}% (${totalVideos.toLocaleString()}/2천)`;
+        if (ytBar) ytBar.style.width = `${ytQuota}%`;
+
+        const fbReads = Math.min(98, (pvCount / 50000 * 100));
+        const fbEl = document.getElementById('fb-read-sidebar');
+        const fbBar = document.getElementById('fb-read-bar-sidebar');
+        if (fbEl) fbEl.innerText = `${fbReads.toFixed(1)}% (${pvCount.toLocaleString()}/5만)`;
+        if (fbBar) fbBar.style.width = `${fbReads}%`;
+
+        const vclUsage = Math.min(100, (pvCount * 4.8 / 1024 / 100 * 100));
+        const vclEl = document.getElementById('vcl-usage-sidebar');
+        const vclBar = document.getElementById('vcl-usage-bar-sidebar');
+        if (vclEl) vclEl.innerText = `${vclUsage.toFixed(2)}% (${(pvCount * 4.8 / 1024).toFixed(3)}GB)`;
+        if (vclBar) vclBar.style.width = `${vclUsage}%`;
+    } catch (e) { console.warn("Resource sidebar sync deferred."); }
+}
