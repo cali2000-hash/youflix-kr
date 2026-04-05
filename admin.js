@@ -64,10 +64,10 @@ async function loadStats() {
         
         if (assetEl) assetEl.innerText = totalVideos.toLocaleString();
         
-        // 실시간 존재 인원 전수 조사 (GA 대체용 진짜 엔진)
-        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        // 실시간 존재 인원 전수 조사 (최근 1시간 확장)
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
         const presenceSnap = await db.collection('presence')
-                                     .where('last_active', '>=', twoMinutesAgo)
+                                     .where('last_active', '>=', oneHourAgo)
                                      .get();
         const realActiveCount = presenceSnap.size || 0;
         if (activeEl) activeEl.innerText = realActiveCount;
@@ -173,9 +173,9 @@ async function updateVisitorLocations() {
     const list = document.getElementById('visitor-geo-list');
     if (!list) return;
 
-    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const presenceSnap = await db.collection('presence')
-                                 .where('last_active', '>=', twoMinutesAgo)
+                                 .where('last_active', '>=', oneHourAgo)
                                  .get();
     
     const geoStats = {};
