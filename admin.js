@@ -145,8 +145,12 @@ function showEngineInfo() {
           "아카이브의 모든 영상과 데이터에 대한 허가되지 않은 접근을 원천적으로 차단하고, 무결성을 유지하는 자가 방어 체계입니다.<br><br>" +
           "<strong style='color:#fff;'>3. 과부하 및 리소스 관리</strong><br>" +
           "유튜브 API 및 데이터 트래픽의 급격한 폭주를 감지하여, 플랫폼이 중단 없이 부드럽게 운영되도록 자원을 지능적으로 분배합니다.<br><br>" +
-          "<strong style='color:#fff;'>🔗 예상 데이터 트래픽이란?</strong><br>" +
-          "사용자들이 유플릭스를 탐색할 때 발생하는 <span style='color:#ffd700;'>이미지(썸네일), 스크립트, DB 전송량의 합산인 '대역폭(Bandwidth)'</span>을 의미합니다. Vercel 무료 플랜(100GB) 범위 내에서 안전하게 운영되고 있는지 실시간으로 감시하는 매우 중요한 지표입니다.<br><br>" +
+          "<strong style='color:#fff;'>🔗 예상 데이터 트래픽 (Bandwidth) 상세 가이드</strong><br>" +
+          "사용자들이 유플릭스를 탐색할 때 발생하는 <span style='color:#ffd700;'>이미지, 스크립트, 데이터 전송량의 합산</span>을 의미합니다.<br><br>" +
+          "<strong style='color:#fff;'>📍 월간 100GB 제한 (Vercel Hobby Plan)</strong><br>" +
+          "매달 결제 주기(가입일 기준 30일)마다 **사용량이 0GB로 자동 초기화**됩니다. 개인 아카이브 용도로는 수만 명의 방문자가 발생해도 다 쓰기 어려울 만큼 넉넉한 공간입니다.<br><br>" +
+          "<strong style='color:#fff;'>🚀 최적화 설계</strong><br>" +
+          "유플릭스는 고화질 썸네일을 유튜브 서버에서 직접 불러오도록 설계되어 있어, 우주님의 리소스 소모를 최소화하고 있습니다. 현재 상태는 **'극도로 안정적'**입니다.<br><br>" +
           "<span style='color:#e50914; font-weight:bold;'>루미는 우주님의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨</span>";
     
     modal.style.display = 'flex';
