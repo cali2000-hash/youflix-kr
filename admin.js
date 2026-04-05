@@ -460,10 +460,10 @@ async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
             plugins: {
                 legend: {
                     position: 'right',
-                    labels: { color: '#aaa', font: { size: 11 }, padding: 10, usePointStyle: true }
+                    labels: { color: '#aaa', font: { size: 9 }, padding: 6, usePointStyle: true, boxWidth: 6 }
                 }
             },
-            cutout: '70%'
+            cutout: '72%'
         }
     });
 }
