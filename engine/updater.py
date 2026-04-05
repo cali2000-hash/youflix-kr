@@ -68,6 +68,7 @@ class YouflixEngine:
                         "type": "video",
                         "maxResults": min(50, max_total - len(kw_results)),
                         "relevanceLanguage": "ko",
+                        "regionCode": "KR", # 한국 지역 검색 강제
                         "order": "date",
                         "pageToken": next_page_token
                     }
@@ -135,6 +136,18 @@ class YouflixEngine:
             thumb_url = snippet.get('thumbnails', {}).get('high', {}).get('url', 
                         snippet.get('thumbnails', {}).get('default', {}).get('url', 
                         f"https://i.ytimg.com/vi/{vid_id}/hqdefault.jpg"))
+
+            # kpop 카테고리: 공식 채널 전용 필터링 (v4.5)
+            if category == 'kpop':
+                channel_name = snippet['channelTitle'].lower()
+                official_keywords = [
+                    'official', 'mnet', 'sbs', 'kbs', 'jyp', 'smtown', 'hybe', 'yg', 
+                    'stone', 'starship', 'woollim', 'tv', 'radio', 'entertainment', 
+                    'labels', 'music', 'artist', 'kpop', 'mbc', 'jtbc'
+                ]
+                if not any(okw in channel_name for okw in official_keywords):
+                    print(f"🚫 Filtering non-official channel: {snippet['channelTitle']}")
+                    continue
 
             video_data = {
                 'id': vid_id,

@@ -13,8 +13,9 @@ CONFIG = {
         },
         "kpop": {
             "strategy": "search",
-            "keywords": ["K-Pop Official MV", "Music Bank Stage", "MCountdown Stage"],
-            "maxResults": 20
+            "keywords": ["SBS KPOP Official", "Mnet K-POP Stage", "KBS WORLD TV Music", "HYBE LABELS Official", "SMTOWN Music", "JYP Entertainment Official", "Stone Music Entertainment"],
+            "regionCode": "KR",
+            "maxResults": 100
         },
         "kdrama": {
             "strategy": "search",

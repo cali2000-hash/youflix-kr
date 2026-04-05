@@ -57,7 +57,23 @@ class YouflixCleaner:
                 
                 valid_ids = []
                 for item in response.get('items', []):
-                    if item['snippet']['channelId'] == official_id:
+                    channel_title = item['snippet']['channelTitle']
+                    channel_id = item['snippet']['channelId']
+                    
+                    is_official = False
+                    if category == 'kpop':
+                        # kpop은 키워드 기반 공식 여부 판단 (v4.5)
+                        official_keywords = [
+                            'official', 'mnet', 'sbs', 'kbs', 'jyp', 'smtown', 'hybe', 'yg', 
+                            'stone', 'starship', 'woollim', 'tv', 'radio', 'entertainment', 
+                            'labels', 'music', 'artist', 'kpop', 'mbc', 'jtbc'
+                        ]
+                        if any(okw in channel_title.lower() for okw in official_keywords):
+                            is_official = True
+                    elif channel_id == official_id:
+                        is_official = True
+                        
+                    if is_official:
                         valid_ids.append(item['id'])
                 
                 # 비공식 영상 삭제
@@ -65,7 +81,7 @@ class YouflixCleaner:
                     if vid_id not in valid_ids:
                         doc_map[vid_id].delete()
                         delete_count += 1
-                        print(f"🗑️ Deleted Official-Mismatch: {vid_id}")
+                        print(f"🗑️ Deleted Non-Official: {vid_id}")
             except Exception as e:
                 print(f"❌ API 오류: {e}")
                 
@@ -74,7 +90,8 @@ class YouflixCleaner:
     def run_cleaning(self):
         targets = {
             'tvlit': CONFIG['categories']['tvlit'].get('channelId'),
-            'kclassic': CONFIG['categories']['kclassic'].get('channelId')
+            'kclassic': CONFIG['categories']['kclassic'].get('channelId'),
+            'kpop': 'INTERNAL_KEYWORDS_FILTER' # kpop 전용 필터 적용
         }
         
         for cat, official_id in targets.items():
