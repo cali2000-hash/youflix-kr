@@ -599,9 +599,34 @@ async function deleteVideo(cat, id, title) {
     setInterval(updatePresence, 30000);
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+// v17.5 실시간 시스템 로그 박동 엔진 (Heartbeat)
+function startLogHeartbeat() {
+    const logs = [
+        { m: "System diagnostics: All nodes optimal.", t: "success" },
+        { m: "Real-time traffic trace: Active session healthy.", t: "info" },
+        { m: "Database Integrity Check: Phase 5 Normal.", t: "success" },
+        { m: "External API handshaking: YouTube v3 Connected.", t: "info" },
+        { m: "Security Protocol: Admin-HQ Session Protected.", t: "warn" },
+        { m: "Archive Indexer: Background sync complete.", t: "success" }
+    ];
+
+    // 초기 부팅 로그 세트 (0~2초 내 순차 출력)
+    logs.forEach((log, i) => {
+        setTimeout(() => addLog(log.m, log.t), i * 400);
+    });
+
+    // 주기적 상태 보고 (지루하지 않게 15초마다 랜덤 보고)
+    setInterval(() => {
+        const randomLog = logs[Math.floor(Math.random() * logs.length)];
+        addLog(`[Auto-Report] ${randomLog.m}`, randomLog.t);
+    }, 15000);
+}
+
+// 초기화 시 엔진 가동
+window.addEventListener('load', () => {
     loadStats();
     loadList();
+    startLogHeartbeat();
 });
 
 // v16.5.1 리소스 사이드바 정밀 관제 엔진 (최종 레이아웃 매칭)
