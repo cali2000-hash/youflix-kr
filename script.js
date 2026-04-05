@@ -58,7 +58,6 @@ function trackPV() {
     db.collection('statistics').doc('daily_pv').set({ count: firebase.firestore.FieldValue.increment(1), lastUpdate: new Date().toLocaleDateString() }, { merge: true });
 }
 
-setInterval(updatePresence, 30000);
 
 // 2. Auth Actions
 async function login() {
@@ -168,6 +167,8 @@ async function load(key, config = {}, isAppend = false) {
     if (sentinel && isAppend) sentinel.classList.add('loading');
 
     try {
+        if (!isAppend) grid.innerHTML = '';
+        
         // Category-specific order (v18.0)
         let orderField = 'timestamp';
         let orderDirection = 'desc';
@@ -176,19 +177,27 @@ async function load(key, config = {}, isAppend = false) {
             orderDirection = 'asc';
         }
         
-        let query = db.collection(key).orderBy(orderField, orderDirection).limit(20);
+        let query;
+        try {
+            query = db.collection(key).orderBy(orderField, orderDirection).limit(20);
+        } catch (e) {
+            console.warn("Fast-order failed for " + key + ", falling back to basic query.");
+            query = db.collection(key).limit(20);
+        }
         
         // Paging logic (v17.5 / v18.0)
         if (isAppend && lastDocMap[key]) {
             query = query.startAfter(lastDocMap[key]);
         }
 
+
+        
         const snap = await query.get();
-        if (!isAppend) grid.innerHTML = '';
         
         if (snap.empty) {
-            if (!isAppend) grid.innerHTML = '<p class="loading-msg">현재 준비된 영상이 없습니다.</p>';
+            if (!isAppend) grid.innerHTML = '<p class="loading-msg" style="text-align:center; padding:50px; color:#666;">현재 준비된 영상이 없습니다.</p>';
             reachedEndMap[key] = true;
+            const sentinel = document.getElementById('scroll-sentinel');
             if (sentinel) sentinel.style.display = 'none';
         } else {
             lastDocMap[key] = snap.docs[snap.docs.length - 1];
@@ -218,6 +227,7 @@ async function load(key, config = {}, isAppend = false) {
             // If fewer than limit returned, we've reached the end
             if (snap.docs.length < 20) {
                 reachedEndMap[key] = true;
+                const sentinel = document.getElementById('scroll-sentinel');
                 if (sentinel) sentinel.style.display = 'none';
             }
         }
@@ -302,13 +312,15 @@ function renderMyList(targetGridId = 'mylist-grid') {
 
 // 9. Init & Listeners
 async function initApp() {
-    trackPV();
+    try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
     // Main Page Rows
     const rows = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
     rows.forEach(row => { 
-        const gridId = row + '-grid';
-        if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
+        try {
+            const gridId = row + '-grid';
+            if (document.getElementById(gridId)) load(row, { elementId: gridId }); 
+        } catch (e) { console.error("Row fail: " + row, e); }
     });
 
     // Category Page (v17.0 Infinite Scroll Integration)
