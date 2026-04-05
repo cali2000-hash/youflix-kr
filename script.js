@@ -299,15 +299,9 @@ function renderMyList(targetGridId = 'mylist-grid') {
     });
 }
 
-// 9. Init & Listeners
-auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    if (user) await syncFavorites();
-    updateAuthUI(user);
-    renderMyList('mylist-grid');
-});
 
-document.addEventListener('DOMContentLoaded', async () => {
+// 9. Init & Listeners
+async function initApp() {
     trackPV();
     
     // Main Page Rows
@@ -377,4 +371,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
     }
+}
+
+auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+    if (user) await syncFavorites();
+    updateAuthUI(user);
+    renderMyList('mylist-grid');
 });
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
