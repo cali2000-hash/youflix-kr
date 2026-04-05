@@ -81,17 +81,22 @@
         .info-icon:hover { background: var(--admin-primary); }
 
         /* v9.9 모바일 와이드 레이아웃 (오타 수정 및 강제 적용) */
+        /* v17.0 모바일 2x2 강제 그리드 엔진 */
         @media screen and (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; padding: 15px !important; gap: 15px !important; margin: 10px 15px !important; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; padding: 15px !important; gap: 12px !important; margin: 10px 15px !important; }
             .main-dashboard { grid-template-columns: 1fr !important; gap: 20px !important; margin: 0 15px 30px 15px !important; }
-            .right-sidebar { flex-direction: row !important; flex-wrap: wrap !important; gap: 15px !important; }
-            .stat-card { padding: 15px !important; }
-            .right-sidebar .stat-card { flex: 1; min-width: 300px; }
+            .right-sidebar { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
+            .stat-card { padding: 12px !important; }
+            .right-sidebar .stat-card { min-width: 0 !important; }
+            .quick-actions-btns { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            .quick-actions-btns button { font-size: 0.75rem !important; padding: 12px 5px !important; width: 100% !important; margin: 0 !important; }
         }
-        @media screen and (max-width: 600px) {
-            .stats-grid { grid-template-columns: 1fr !important; }
-            .admin-header h1 { font-size: 1.1rem; }
-            .btn-home { font-size: 0.8rem; padding: 6px 12px; }
+        @media screen and (max-width: 480px) {
+            .admin-header h1 { font-size: 1rem; }
+            .stats-grid { gap: 10px !important; margin: 5px 10px !important; }
+            .stat-value { font-size: 1.2rem !important; }
+            .stat-label { font-size: 0.65rem !important; }
+            .right-sidebar { grid-template-columns: 1fr !important; } /* 아주 작은 폰에선 다시 1열 */
         }
         @media (max-width: 768px) {
             header.admin-header { flex-direction: column !important; gap: 15px !important; text-align: center !important; margin-bottom: 25px !important; }
@@ -301,7 +306,7 @@
     <div style="padding: 0 4% 30px 4%;">
         <div style="background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333;">
             <h3 style="margin-bottom:25px; font-size:1.1rem;">⚡ 관리자 빠른 작업</h3>
-            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+            <div class="quick-actions-btns" style="display:flex; gap:15px; flex-wrap:wrap;">
                 <button onclick="triggerSync()" class="btn-home" style="background:#007bff; color:#fff; border:none; cursor:pointer;">🔄 전체 채널 동기화</button>
                 <button onclick="clearSystemCache()" class="btn-home" style="background:#555; color:#fff; border:none; cursor:pointer;">🧹 시스템 캐시 비우기</button>
                 <button onclick="generateBackup()" class="btn-home" style="background:#28a745; color:#fff; border:none; cursor:pointer;">💾 DB 전체 백업 생성</button>
