@@ -81,22 +81,18 @@
         .info-icon:hover { background: var(--admin-primary); }
 
         /* v9.9 모바일 와이드 레이아웃 (오타 수정 및 강제 적용) */
-        /* v17.0 모바일 2x2 강제 그리드 엔진 */
-        @media screen and (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; padding: 15px !important; gap: 12px !important; margin: 10px 15px !important; }
+        /* v17.1 레이아웃 오리지널 복원 및 모바일 격리 */
+        @media screen and (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr !important; gap: 12px !important; margin: 15px !important; }
             .main-dashboard { grid-template-columns: 1fr !important; gap: 20px !important; margin: 0 15px 30px 15px !important; }
-            .right-sidebar { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
-            .stat-card { padding: 12px !important; }
-            .right-sidebar .stat-card { min-width: 0 !important; }
+            .right-sidebar { display: flex !important; flex-direction: column !important; gap: 20px !important; }
+            .stat-card { padding: 15px !important; }
             .quick-actions-btns { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
             .quick-actions-btns button { font-size: 0.75rem !important; padding: 12px 5px !important; width: 100% !important; margin: 0 !important; }
         }
         @media screen and (max-width: 480px) {
-            .admin-header h1 { font-size: 1rem; }
-            .stats-grid { gap: 10px !important; margin: 5px 10px !important; }
-            .stat-value { font-size: 1.2rem !important; }
-            .stat-label { font-size: 0.65rem !important; }
-            .right-sidebar { grid-template-columns: 1fr !important; } /* 아주 작은 폰에선 다시 1열 */
+            .admin-header h1 { font-size: 1.1rem; }
+            .stat-value { font-size: 1.25rem !important; }
         }
         @media (max-width: 768px) {
             header.admin-header { flex-direction: column !important; gap: 15px !important; text-align: center !important; margin-bottom: 25px !important; }
@@ -166,8 +162,8 @@
         <a href="index.html" class="btn-home">🏠 홈으로 가기</a>
     </header>
 
-    <!-- 중앙 보조 지표 섹션 (v16.9 정밀 레이아웃) -->
-    <div class="stats-grid" id="main-stats-grid" style="margin: 20px 30px; display: grid; gap: 20px;">
+    <!-- 중앙 보조 지표 섹션 (v17.1 오리지널 복원) -->
+    <div class="stats-grid" id="main-stats-grid" style="margin: 20px 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
         <div class="stat-card">
             <p class="stat-label">Google Analytics <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
             <p class="stat-value" id="pv-count" style="font-size:1.45rem;">0 PV</p>
