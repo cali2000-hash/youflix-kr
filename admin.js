@@ -134,26 +134,37 @@ function addLog(msg, type = 'info') {
 }
 
 // v9.6 루미의 프리미엄 모달 시스템 (완전 한글 가이드)
-function showEngineInfo() {
+// v14.0 지표별 개별 가이드 시스템
+function showInfo(type) {
     const modal = document.getElementById('infoModal');
+    const title = document.getElementById('modalTitle');
     const body = document.getElementById('modalBody');
-    
-    body.innerHTML = 
-          "<strong style='color:#fff;'>1. 데이터베이스 실시간 모니터링</strong><br>" +
-          "파이어베이스와 운영 센터 간의 연결 상태를 초 단위로 감시하여, 우주님의 소중한 명작들이 안전하게 보관되고 있는지 확인합니다.<br><br>" +
-          "<strong style='color:#fff;'>2. 통합 보안 관제</strong><br>" +
-          "아카이브의 모든 영상과 데이터에 대한 허가되지 않은 접근을 원천적으로 차단하고, 무결성을 유지하는 자가 방어 체계입니다.<br><br>" +
-          "<strong style='color:#fff;'>3. 과부하 및 리소스 관리</strong><br>" +
-          "유튜브 API 및 데이터 트래픽의 급격한 폭주를 감지하여, 플랫폼이 중단 없이 부드럽게 운영되도록 자원을 지능적으로 분배합니다.<br><br>" +
-          "<strong style='color:#fff;'>🔗 예상 데이터 트래픽 (Bandwidth) 상세 가이드</strong><br>" +
-          "사용자들이 유플릭스를 탐색할 때 발생하는 <span style='color:#ffd700;'>이미지, 스크립트, 데이터 전송량의 합산</span>을 의미합니다.<br><br>" +
-          "<strong style='color:#fff;'>📍 월간 100GB 제한 (Vercel Hobby Plan)</strong><br>" +
-          "매달 결제 주기(가입일 기준 30일)마다 **사용량이 0GB로 자동 초기화**됩니다. 개인 아카이브 용도로는 수만 명의 방문자가 발생해도 다 쓰기 어려울 만큼 넉넉한 공간입니다.<br><br>" +
-          "<strong style='color:#fff;'>🚀 최적화 설계</strong><br>" +
-          "유플릭스는 고화질 썸네일을 유튜브 서버에서 직접 불러오도록 설계되어 있어, 우주님의 리소스 소모를 최소화하고 있습니다. 현재 상태는 **'극도로 안정적'**입니다.<br><br>" +
-          "<span style='color:#e50914; font-weight:bold;'>루미는 우주님의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨</span>";
-    
-    modal.style.display = 'flex';
+    if (!modal || !title || !body) return;
+
+    const info = {
+        'ga': {
+            title: "📊 구글 분석 데이터 가이드",
+            body: "<strong style='color:#fff;'>실시간 방문 추적</strong><br>구글 분석기(GA4)를 통해 수집되는 실제 사용자 방문 데이터입니다.<br><br>• <strong>누적 방문</strong>: 사이트 오픈 이후 발생한 총 페이지뷰(PV)입니다.<br>• <strong>지연 시간</strong>: 구글 서버 특성상 실제 발생 후 약 1~5분의 집계 지연이 있을 수 있습니다."
+        },
+        'archive': {
+            title: "📦 아카이브 자산 및 사용자 정보",
+            body: "<strong style='color:#fff;'>보관된 영상 자산</strong><br>데이터베이스(Firestore)에 안전하게 인덱싱된 유튜브 명작 영상의 총계입니다.<br><br><strong style='color:#fff;'>실시간 활성 사용자</strong><br>최근 2분 내에 유플릭스를 탐색 중인 '진짜' 사용자 수입니다. (유플릭스 자체 존재 엔진 가동 중)"
+        },
+        'engine': {
+            title: "🚀 시스템 통합 관제 가이드",
+            body: "<strong style='color:#fff;'>시스템 운영 레벨 (Phase 5)</strong><br>YouTube API, Firestore, Vercel, Security의 상태를 실시간 체크하여 최적의 상태(<span style='color:#00ff00;'>Optimal</span>)를 유지하고 있음을 의미합니다.<br><br>• <strong>자가 방어</strong>: 비정상적인 접근을 자동으로 차단합니다."
+        },
+        'resource': {
+            title: "🔋 리소스 및 트래픽 상세 가이드",
+            body: "<strong style='color:#fff;'>예상 데이터 트래픽 (Bandwidth)</strong><br>월 100GB 리밋(Vercel 기준) 내에서 사용되는 대역폭 추산치입니다.<br><br>• <strong>초기화</strong>: 매달 결제 주기(30일)마다 0GB로 리셋됩니다.<br>• <strong>안정성</strong>: 현재 최적화 설계로 운영 중이므로 초과 위험이 매우 낮습니다."
+        }
+    };
+
+    if (info[type]) {
+        title.innerText = info[type].title;
+        body.innerHTML = info[type].body + "<br><br><span style='color:#e50914; font-weight:bold;'>루미는 우주님의 안녕을 위해 불철주야 엔진을 정비하고 있습니다! 😊✨</span>";
+        modal.style.display = 'flex';
+    }
 }
 
 function closeModal() {

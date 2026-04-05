@@ -154,52 +154,39 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <p class="stat-label">Google Analytics</p>
-            <p class="stat-value" id="ga-status">실시간 추적 중</p>
+            <p class="stat-label">Google Analytics <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('ga')">ⓘ</span></p>
+            <p class="stat-value">실시간 추적 중</p>
             <p class="stat-change">누적 방문: <span id="pv-count" style="color:#ffd700; font-weight:bold;">0</span> PV</p>
             <button onclick="window.open('https://analytics.google.com/')" class="btn-sm" style="margin-top:10px; background: #4285F4; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">GA 대시보드 열기</button>
         </div>
         <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
             <div style="padding-bottom:15px; border-bottom:1px solid #333;">
-                <p class="stat-label" style="margin-bottom:10px;">보관된 영상 자산</p>
+                <p class="stat-label" style="margin-bottom:10px;">보관된 영상 자산 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('archive')">ⓘ</span></p>
                 <p class="stat-value" id="asset-count" style="font-size:1.6rem; margin:0;">0</p>
                 <div style="font-size:0.65rem; color:#666; margin-top:5px;">아카이브 총계</div>
             </div>
             <div>
                 <p class="stat-label" style="margin-bottom:10px;">실시간 활성 사용자</p>
-                <p class="stat-value" id="active-users" style="font-size:1.6rem; margin:0;">24</p>
+                <p class="stat-value" id="active-users" style="font-size:1.6rem; margin:0;">0</p>
                 <div style="font-size:0.65rem; color:#00ff00; margin-top:5px;">● 현재 접속 중</div>
             </div>
         </div>
         <div class="stat-card" style="text-align: left; position: relative;">
-            <p class="stat-label">시스템 운영 레벨 (Phase 5)</p>
-            <div style="display:flex; align-items:center; gap:10px; margin: 15px 0 20px 0;">
-                <div class="status-pulse"></div>
-                <p class="stat-value" id="sys-status" style="margin:0; font-size:1.4rem;">최상 (Optimal)</p>
+            <p class="stat-label">시스템 운영 레벨 (Phase 5) <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('engine')">ⓘ</span></p>
+            <div style="margin-top:15px; display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+                <div class="engine-indicator"><span class="dot active"></span> YouTube API</div>
+                <div class="engine-indicator"><span class="dot active"></span> Firestore DB</div>
+                <div class="engine-indicator"><span class="dot active"></span> Vercel Network</div>
+                <div class="engine-indicator"><span class="dot active"></span> Security Layer</div>
             </div>
-            
-            <ul style="list-style:none; padding:12px; margin:0; border-top:1px solid #333; padding-top:14px; display:flex; flex-direction:column; gap:10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                    <span style="color:#888;">● YouTube API v3</span>
-                    <span style="color:#00ff00; font-weight:bold;">CONNECTED</span>
-                </li>
-                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                    <span style="color:#888;">● Google Firestore</span>
-                    <span style="color:#00ff00; font-weight:bold;">STABLE</span>
-                </li>
-                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                    <span style="color:#888;">● Vercel Edge Server</span>
-                    <span style="color:#00ff00; font-weight:bold;">ACTIVE</span>
-                </li>
-                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                    <span style="color:#888;">● Encryption Shield</span>
-                    <span style="color:#00ff00; font-weight:bold;">PROTECTED</span>
-                </li>
-            </ul>
+            <div style="margin-top:15px; background:rgba(0,255,0,0.1); padding:10px; border-radius:6px; border:1px solid rgba(0,255,0,0.2);">
+                <p style="font-size:0.65rem; color:#00ff00; margin:0;">Status: <strong>OPTIMAL</strong></p>
+                <p style="font-size:0.55rem; color:#aaa; margin:0; margin-top:2px;">All subsystems are performing within expected parameters.</p>
+            </div>
         </div>
         <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
             <div style="padding-bottom:15px; border-bottom:1px solid #333;">
-                <p class="stat-label" style="margin-bottom:10px;">예상 데이터 트래픽 <span style="font-size:0.7rem; cursor:help;" onclick="showEngineInfo()" title="상세 설명 보기">ⓘ</span></p>
+                <p class="stat-label" style="margin-bottom:10px;">예상 데이터 트래픽 <span style="font-size:0.75rem; cursor:help; color:var(--admin-primary);" onclick="showInfo('resource')">ⓘ</span></p>
                 <p class="stat-value" id="traffic-est" style="font-size:1.6rem; margin:0;">0GB</p>
                 <div style="font-size:0.65rem; color:#666; margin-top:5px;">방문자 이미지·데이터 전송량 추산</div>
             </div>
