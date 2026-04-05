@@ -38,7 +38,17 @@
         .usage-fill { height: 100%; background: var(--admin-primary); width: 0%; transition: width 1s; }
         .usage-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; color: #aaa; }
 
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; background: #00ff00; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #00ff00; display: inline-block; margin-right: 8px; box-shadow: 0 0 10px #00ff00; }
+        .status-pulse { 
+            width: 14px; height: 14px; border-radius: 50%; background: #00ff00; 
+            box-shadow: 0 0 15px #00ff00; position: relative; 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
         
         .admin-controls { display: grid; grid-template-columns: 350px 1fr; gap: 40px; padding: 40px 4%; }
         .add-card { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
@@ -157,10 +167,31 @@
             <p class="stat-value" id="active-users">24</p>
             <div style="font-size:0.7rem; color:#00ff00;">● 현재 접속 중</div>
         </div>
-        <div class="stat-card">
-            <p class="stat-label">시스템 엔진 상태 <span class="info-icon" onclick="showEngineInfo()">?</span></p>
-            <div style="margin:20px 0;"><span class="status-dot"></span> <span id="sys-status">최상 (Excellent)</span></div>
-            <div style="font-size:0.7rem; color:#aaa;">모든 서버 정상 작동</div>
+        <div class="stat-card" style="text-align: left; position: relative;">
+            <p class="stat-label">시스템 운영 레벨 (Phase 5)</p>
+            <div style="display:flex; align-items:center; gap:10px; margin: 15px 0 20px 0;">
+                <div class="status-pulse"></div>
+                <p class="stat-value" id="sys-status" style="margin:0; font-size:1.4rem;">최상 (Optimal)</p>
+            </div>
+            
+            <ul style="list-style:none; padding:12px; margin:0; border-top:1px solid #333; padding-top:14px; display:flex; flex-direction:column; gap:10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● YouTube API v3</span>
+                    <span style="color:#00ff00; font-weight:bold;">CONNECTED</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Google Firestore</span>
+                    <span style="color:#00ff00; font-weight:bold;">STABLE</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Vercel Edge Server</span>
+                    <span style="color:#00ff00; font-weight:bold;">ACTIVE</span>
+                </li>
+                <li style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                    <span style="color:#888;">● Encryption Shield</span>
+                    <span style="color:#00ff00; font-weight:bold;">PROTECTED</span>
+                </li>
+            </ul>
         </div>
         <div class="stat-card">
             <p class="stat-label">예상 데이터 트래픽</p>
