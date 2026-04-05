@@ -93,10 +93,11 @@ body {
 
 /* Row & Grid */
 .row { padding: 80px var(--gutter) 20px var(--gutter); width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }
-.row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 6px solid var(--netflix-red); padding-left: 20px; }
-.row-title { font-size: 20px; font-weight: 900; letter-spacing: -1px; }
+.row-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 30px; border-left: 6px solid var(--netflix-red); padding-left: 20px; }
+.row-title { font-size: 20px; font-weight: 900; letter-spacing: -1px; width: 100%; }
 
-.view-all-link { color: #fff; text-decoration: none; font-size: 12px; font-weight: 900; background: rgba(255,255,255,0.1); padding: 9px 24px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); }
+.view-all-link { color: #fff; text-decoration: none; font-size: 12px; font-weight: 900; background: rgba(255,255,255,0.1); padding: 7px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+.view-all-link:hover { background: var(--netflix-red); }
 
 .video-grid { display: flex; overflow-x: auto; overflow-y: hidden; gap: 20px; padding: 15px 0 50px 0; scroll-behavior: smooth; }
 .video-grid::-webkit-scrollbar { height: 4px; }
@@ -210,6 +211,10 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
     .hero-content h1 { font-size: 2.8rem; letter-spacing: -1px; }
     .hero-content p { font-size: 1rem; }
     .category-header h1 { font-size: 2.5rem; }
+
+    /* Fix row header for mobile */
+    .row-header { padding-left: 15px; margin-bottom: 20px; }
+    .row-title { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%; }
 }
 
 @media screen and (min-width: 769px) {
