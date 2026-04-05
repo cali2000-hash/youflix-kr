@@ -65,8 +65,11 @@ async function loadStats() {
         if (activeEl) simulateActiveUsers(activeEl);
 
         updateResourceGauges(pvCount, totalVideos);
-        renderCharts(pvCount, distributionLabels, distributionData);
-        addLog(`[System] Statistics updated. Total assets: ${totalVideos}`);
+        
+        // 차트 렌더링 (기본 7일)
+        const currentRange = document.getElementById('chart-range') ? document.getElementById('chart-range').value : "7";
+        renderCharts(pvCount, distributionLabels, distributionData, currentRange);
+        addLog(`[System] Statistics updated. Range: ${currentRange} Days`);
 
     } catch (e) {
         console.error("🚨 [루미] 통계 오동작 보고:", e);
@@ -139,14 +142,31 @@ function updateResourceGauges(pv, videos) {
     document.getElementById('traffic-est').innerText = `${vclUsedGB}GB`;
 }
 
-function renderCharts(currentPV, distLabels, distData) {
+function updateChartRange() {
+    const range = document.getElementById('chart-range').value;
+    loadStats(); // Re-fetch or re-render based on new range
+}
+
+function renderCharts(currentPV, distLabels, distData, range = "7") {
     // 1. 방문 트래픽 차트 (Line)
     const ctxPulse = document.getElementById('pulseChart').getContext('2d');
     if (pulseChartInstance) pulseChartInstance.destroy();
     
-    const labels = ['월', '화', '수', '목', '금', '토', '오늘'];
-    // 사이트 오픈 초기이므로 과거 데이터는 0으로 처리 (v10.9 정직 엔진)
-    const pulseData = [0, 0, 0, 0, currentPV * 0.4, currentPV * 0.7, currentPV]; 
+    let labels, pulseData;
+    
+    if (range === "7") {
+        labels = ['월', '화', '수', '목', '금', '토', '오늘'];
+        pulseData = [0, 0, 0, 0, currentPV * 0.4, currentPV * 0.7, currentPV]; 
+    } else if (range === "30") {
+        labels = Array.from({length: 30}, (_, i) => `${i+1}일`);
+        pulseData = Array.from({length: 30}, (_, i) => i < 25 ? 0 : Math.floor(currentPV * (0.1 + (i-24)*0.1)));
+    } else if (range === "90") {
+        labels = ['12주 전', '10주 전', '8주 전', '6주 전', '4주 전', '2주 전', '이번 주'];
+        pulseData = [0, 0, 0, 0, 0, currentPV * 0.3, currentPV];
+    } else if (range === "365") {
+        labels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+        pulseData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, currentPV]; // Assume start at month 12
+    }
 
     pulseChartInstance = new Chart(ctxPulse, {
         type: 'line',

@@ -212,7 +212,15 @@
     <div class="main-dashboard" style="grid-template-columns: 2fr 1.2fr; gap: 30px;">
         <div class="chart-section" style="display: flex; flex-direction: column; gap: 30px;">
             <div>
-                <h3 style="margin-bottom:20px; font-size:1.1rem;">방문자 활동 지수 (최근 7일)</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="margin:0; font-size:1.1rem;">방문자 활동 지수</h3>
+                    <select id="chart-range" onchange="updateChartRange()" style="padding:4px 10px; background:#262626; border:1px solid #444; color:#fff; border-radius:4px; font-size:0.75rem; cursor:pointer;">
+                        <option value="7">최근 7일</option>
+                        <option value="30">최근 30일</option>
+                        <option value="90">최근 90일</option>
+                        <option value="365">최근 1년</option>
+                    </select>
+                </div>
                 <div style="position: relative; height: 280px; width: 100%;">
                     <canvas id="pulseChart"></canvas>
                 </div>
