@@ -64,12 +64,15 @@ async function loadStats() {
         if (assetEl) assetEl.innerText = totalVideos.toLocaleString();
         if (activeEl) simulateActiveUsers(activeEl);
 
+        // 3. 일일 데이터 스냅샷 자동 기록 (진짜 데이터 축적 엔진)
+        await recordDailySnapshot(pvCount);
+
         updateResourceGauges(pvCount, totalVideos);
-        
-        // 차트 렌더링 (기본 7일)
+
+        // 4. 진짜 히스토리 데이터 로드 및 차트 렌더링
         const currentRange = document.getElementById('chart-range') ? document.getElementById('chart-range').value : "7";
-        renderCharts(pvCount, distributionLabels, distributionData, currentRange);
-        addLog(`[System] Statistics updated. Range: ${currentRange} Days`);
+        await renderRealCharts(pvCount, distributionLabels, distributionData, currentRange);
+        addLog(`[System] Real-data Engine Active. Range: ${currentRange} Days`);
 
     } catch (e) {
         console.error("🚨 [루미] 통계 오동작 보고:", e);
@@ -147,26 +150,62 @@ function updateChartRange() {
     loadStats(); // Re-fetch or re-render based on new range
 }
 
-function renderCharts(currentPV, distLabels, distData, range = "7") {
-    // 1. 방문 트래픽 차트 (Line)
+// v11.0 진짜 데이터 기록 엔진 (Real-Snapshot)
+async function recordDailySnapshot(currentPV) {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const docRef = db.collection('daily_history').doc(today);
+    const snap = await docRef.get();
+    
+    if (!snap.exists) {
+        await docRef.set({
+            date: today,
+            pv: currentPV,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        addLog(`[System] Daily snapshot created for ${today}`, "success");
+    }
+}
+
+async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
     const ctxPulse = document.getElementById('pulseChart').getContext('2d');
     if (pulseChartInstance) pulseChartInstance.destroy();
-    
-    let labels, pulseData;
-    
-    if (range === "7") {
-        labels = ['월', '화', '수', '목', '금', '토', '오늘'];
-        pulseData = [0, 0, 0, 0, currentPV * 0.4, currentPV * 0.7, currentPV]; 
-    } else if (range === "30") {
-        labels = Array.from({length: 30}, (_, i) => `${i+1}일`);
-        pulseData = Array.from({length: 30}, (_, i) => i < 25 ? 0 : Math.floor(currentPV * (0.1 + (i-24)*0.1)));
-    } else if (range === "90") {
-        labels = ['12주 전', '10주 전', '8주 전', '6주 전', '4주 전', '2주 전', '이번 주'];
-        pulseData = [0, 0, 0, 0, 0, currentPV * 0.3, currentPV];
-    } else if (range === "365") {
-        labels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-        pulseData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, currentPV]; // Assume start at month 12
+
+    // DB에서 실제 히스토리 가져오기
+    const daysToFit = parseInt(range);
+    const historySnap = await db.collection('daily_history')
+        .orderBy('date', 'desc')
+        .limit(daysToFit)
+        .get();
+
+    let historyMap = {};
+    historySnap.forEach(doc => {
+        const d = doc.data();
+        historyMap[d.date] = d.pv;
+    });
+
+    let labels = [];
+    let pulseData = [];
+    const now = new Date();
+
+    for (let i = daysToFit - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(now.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        // 라벨 포맷팅
+        if (range === "7") {
+            const days = ['일','월','화','수','목','금','토'];
+            labels.push(days[d.getDay()]);
+        } else {
+            labels.push(dateStr.substring(5)); // MM-DD
+        }
+
+        // 실제 데이터가 있으면 사용, 없으면 0 (진실 모드)
+        pulseData.push(historyMap[dateStr] || 0);
     }
+
+    // 오늘 실시간 데이터는 현재 PV로 갱신
+    pulseData[pulseData.length - 1] = currentPV;
 
     pulseChartInstance = new Chart(ctxPulse, {
         type: 'line',
