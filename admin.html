@@ -25,7 +25,7 @@
         .admin-header h1 { margin: 0; font-size: 1.8rem; font-weight: 900; color: var(--admin-primary); }
         .btn-home { background: #fff; color: #000; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 0.8rem; transition: 0.3s; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
         .stat-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; }
         .stat-card:hover { border-color: var(--admin-primary); }
         .stat-value { font-size: 1.8rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
@@ -193,15 +193,17 @@
                 </li>
             </ul>
         </div>
-        <div class="stat-card">
-            <p class="stat-label">예상 데이터 트래픽</p>
-            <p class="stat-value" id="traffic-est">0GB</p>
-            <div style="font-size:0.7rem; color:#aaa;">이번 달 사용량 추산</div>
-        </div>
-        <div class="stat-card">
-            <p class="stat-label">DB 저장 용량</p>
-            <p class="stat-value" id="db-storage">14.2MB</p>
-            <div style="font-size:0.7rem; color:#aaa;">Firestore 총 용량</div>
+        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
+            <div style="padding-bottom:15px; border-bottom:1px solid #333;">
+                <p class="stat-label" style="margin-bottom:10px;">예상 데이터 트래픽</p>
+                <p class="stat-value" id="traffic-est" style="font-size:1.6rem; margin:0;">0GB</p>
+                <div style="font-size:0.65rem; color:#666; margin-top:5px;">이번 달 사용량 추산</div>
+            </div>
+            <div>
+                <p class="stat-label" style="margin-bottom:10px;">DB 저장 용량</p>
+                <p class="stat-value" id="db-storage" style="font-size:1.6rem; margin:0;">14.2MB</p>
+                <div style="font-size:0.65rem; color:#666; margin-top:5px;">Firestore 총 용량</div>
+            </div>
         </div>
     </div>
 
