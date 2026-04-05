@@ -206,6 +206,10 @@ function showInfo(type) {
         'resource': {
             title: "🔋 리소스 및 트래픽 상세 가이드",
             body: "<strong style='color:#fff;'>예상 데이터 트래픽 (Bandwidth)</strong><br>월 100GB 리밋(Vercel 기준) 내에서 사용되는 대역폭 추산치입니다.<br><br>• <strong>초기화</strong>: 매달 결제 주기(30일)마다 0GB로 리셋됩니다.<br>• <strong>안정성</strong>: 현재 최적화 설계로 운영 중이므로 초과 위험이 매우 낮습니다."
+        },
+        'db': {
+            title: "💾 데이터베이스 저장 공간 정보",
+            body: "<strong style='color:#fff;'>Firestore 저장 용량</strong><br>현재 서버에 저장된 텍스트 데이터의 총 크기입니다.<br><br>• <strong>무료 한도</strong>: 구글 파이어베이스는 약 1GB의 무료 공간을 제공합니다.<br>• <strong>현재 상태</strong>: 약 15MB를 사용 중이며, 한도의 1.5% 수준으로 매우 안전합니다."
         }
     };
 
