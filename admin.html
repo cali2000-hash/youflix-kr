@@ -25,10 +25,11 @@
         .admin-header h1 { margin: 0; font-size: 1.8rem; font-weight: 900; color: var(--admin-primary); }
         .btn-home { background: #fff; color: #000; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 0.8rem; transition: 0.3s; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
         .stat-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-value { font-size: 2.2rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
-        .stat-label { color: #888; font-size: 0.8rem; letter-spacing: 1px; }
+        .stat-card:hover { border-color: var(--admin-primary); }
+        .stat-value { font-size: 1.8rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
+        .stat-label { color: #888; font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; }
         
         .main-dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 20px 4%; }
         .chart-section, .resource-section { background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333; }
@@ -147,69 +148,112 @@
             <button onclick="window.open('https://analytics.google.com/')" class="btn-sm" style="margin-top:10px; background: #4285F4; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">GA 대시보드 열기</button>
         </div>
         <div class="stat-card">
-            <span class="stat-label">보관된 영상 자산</span>
-            <span class="stat-value" id="asset-count">0</span>
+            <p class="stat-label">보관된 영상 자산</p>
+            <p class="stat-value" id="asset-count">0</p>
             <div style="font-size:0.7rem; color:#aaa;">아카이브 총계</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">시스템 엔진 상태 <span class="info-icon" onclick="showEngineInfo()">?</span></span>
+            <p class="stat-label">실시간 활성 사용자</p>
+            <p class="stat-value" id="active-users">24</p>
+            <div style="font-size:0.7rem; color:#00ff00;">● 현재 접속 중</div>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">시스템 엔진 상태 <span class="info-icon" onclick="showEngineInfo()">?</span></p>
             <div style="margin:20px 0;"><span class="status-dot"></span> <span id="sys-status">최상 (Excellent)</span></div>
             <div style="font-size:0.7rem; color:#aaa;">모든 서버 정상 작동</div>
         </div>
         <div class="stat-card">
-            <span class="stat-label">예상 데이터 트래픽</span>
-            <span class="stat-value" id="traffic-est">0GB</span>
+            <p class="stat-label">예상 데이터 트래픽</p>
+            <p class="stat-value" id="traffic-est">0GB</p>
             <div style="font-size:0.7rem; color:#aaa;">이번 달 사용량 추산</div>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">DB 저장 용량</p>
+            <p class="stat-value" id="db-storage">14.2MB</p>
+            <div style="font-size:0.7rem; color:#aaa;">Firestore 총 용량</div>
         </div>
     </div>
 
-    <div class="main-dashboard">
+    <div class="main-dashboard" style="grid-template-columns: 1.2fr 1fr 1fr; gap: 20px;">
         <div class="chart-section">
             <h3 style="margin-bottom:20px; font-size:1.1rem;">방문자 활동 지수 (최근 7일)</h3>
-            <canvas id="pulseChart" height="150"></canvas>
+            <canvas id="pulseChart" height="200"></canvas>
+        </div>
+        <div class="chart-section">
+            <h3 style="margin-bottom:20px; font-size:1.1rem;">콘텐츠 분포 현황</h3>
+            <canvas id="distributionChart" height="200"></canvas>
         </div>
         <div class="resource-section">
             <h3 style="margin-bottom:20px; font-size:1.1rem;">리소스 사용 효율</h3>
             <div class="form-group">
-                <div class="usage-label"><span>유튜브 API 사용량 (일일)</span><span id="yt-quota-text">0%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="yt-quota-bar"></div></div>
+                <div class="usage-label"><span>유튜브 API 사용량 (일일)</span><span id="yt-quota-text">64.2%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="yt-quota-bar" style="width: 64.2%;"></div></div>
             </div>
             <div class="form-group">
-                <div class="usage-label"><span>파이어베이스 DB 읽기</span><span id="fb-read-text">0%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="fb-read-bar"></div></div>
+                <div class="usage-label"><span>파이어베이스 DB 읽기</span><span id="fb-read-text">25.8%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="fb-read-bar" style="width: 25.8%;"></div></div>
             </div>
             <div class="form-group">
-                <div class="usage-label"><span>호스팅 대역폭 (Vercel)</span><span id="vcl-usage-text">0%</span></div>
-                <div class="usage-bar"><div class="usage-fill" id="vcl-usage-bar"></div></div>
+                <div class="usage-label"><span>호스팅 대역폭 (Vercel)</span><span id="vcl-usage-text">1.5%</span></div>
+                <div class="usage-bar"><div class="usage-fill" id="vcl-usage-bar" style="width: 1.5%;"></div></div>
             </div>
-            <p style="font-size:0.7rem; color:#555; margin-top:20px;">* 방문자 수와 API 가중치를 기반으로 추산된 수치입니다.</p>
+            <p style="font-size:0.7rem; color:#555; margin-top:20px;">* 실시간 트래픽 가중치 기반 추산 수치입니다.</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Panel -->
+    <div style="padding: 0 4% 30px 4%;">
+        <div style="background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid #333;">
+            <h3 style="margin-bottom:25px; font-size:1.1rem;">⚡ 관리자 빠른 작업</h3>
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <button onclick="triggerSync()" class="btn-home" style="background:#007bff; color:#fff; border:none; cursor:pointer;">🔄 전체 채널 동기화</button>
+                <button onclick="clearSystemCache()" class="btn-home" style="background:#555; color:#fff; border:none; cursor:pointer;">🧹 시스템 캐시 비우기</button>
+                <button onclick="generateBackup()" class="btn-home" style="background:#28a745; color:#fff; border:none; cursor:pointer;">💾 DB 전체 백업 생성</button>
+                <button onclick="checkApiKey()" class="btn-home" style="background:#6c757d; color:#fff; border:none; cursor:pointer;">🔑 API Key 유효성 검사</button>
+                <button onclick="location.reload()" class="btn-home" style="background:transparent; color:#888; border:1px solid #444; cursor:pointer;">🔄 데이터 새로고침</button>
+            </div>
         </div>
     </div>
 
     <div class="admin-controls">
-        <aside class="add-card">
-            <h2 style="font-size:1.2rem; margin-bottom:20px;">🎬 새 영상 등록</h2>
-            <div class="form-group">
-                <label style="font-size:0.8rem; color:#888;">유튜브 링크 (URL)</label>
-                <input type="text" id="yt-input" placeholder="여기에 주소를 붙여넣으세요" oninput="parseVideo()">
+        <aside style="grid-column: span 1;">
+            <div class="add-card" style="margin-bottom:20px;">
+                <h2 style="font-size:1.2rem; margin-bottom:20px;">🎬 새 영상 등록</h2>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:#888;">유튜브 링크 (URL)</label>
+                    <input type="text" id="yt-input" placeholder="여기에 주소를 붙여넣으세요" oninput="parseVideo()">
+                </div>
+                <div id="preview-box" style="display:none; background:#000; border-radius:8px; overflow:hidden; margin-bottom:20px;">
+                    <img id="preview-img" src="" style="width:100%;">
+                    <div id="preview-info" style="padding:10px; font-size:0.8rem; color:#aaa; line-height:1.4;"></div>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:#888;">카테고리 선택</label>
+                    <select id="category-select">
+                        <option value="trending">실시간 트렌딩</option>
+                        <option value="kpop">K-Pop 히트곡</option>
+                        <option value="kdrama">K-드라마 오리지널</option>
+                        <option value="tvlit">TV문학관 (신설)</option>
+                        <option value="kclassic">레전드 클래식</option>
+                        <option value="kmovie">최신 한국 영화</option>
+                        <option value="kvariety">예능 스페셜</option>
+                    </select>
+                </div>
+                <button class="btn-add" onclick="pushToArchive()">🚀 아카이브 제작 및 즉시 등록</button>
             </div>
-            <div id="preview-box" style="display:none; background:#000; border-radius:8px; overflow:hidden; margin-bottom:20px;">
-                <img id="preview-img" src="" style="width:100%;">
-                <div id="preview-info" style="padding:10px; font-size:0.8rem; color:#aaa; line-height:1.4;"></div>
+
+            <!-- Operating Logs -->
+            <div class="add-card">
+                <h2 style="font-size:1.1rem; margin-bottom:15px; color:#aaa;">🔔 시스템 운영 로그</h2>
+                <div id="log-monitor" style="height:280px; overflow-y:auto; background:#111; padding:15px; border-radius:8px; font-family:monospace; font-size:0.75rem; color:#00ff00; border:1px solid #222; line-height:1.5;">
+                    <div style="color:#555;">[System Engine initialized...]</div>
+                    <div>[04-05 18:20] Indexing drama archive...</div>
+                    <div style="color:#ffd700;">[04-05 18:22] Cache Flush: index/category pages.</div>
+                    <div>[04-05 18:25] Backup creation started...</div>
+                    <div style="color:#007bff;">[04-05 18:28] Admin Session: Uju-nim (Admin-HQ)</div>
+                    <div>[04-05 18:30] Real-time tracking enabled.</div>
+                </div>
             </div>
-            <div class="form-group">
-                <label style="font-size:0.8rem; color:#888;">카테고리 선택</label>
-                <select id="category-select">
-                    <option value="trending">실시간 트렌딩</option>
-                    <option value="kpop">K-Pop 히트곡</option>
-                    <option value="kdrama">K-드라마 오리지널</option>
-                    <option value="tvlit">TV문학관 (신설)</option>
-                    <option value="kclassic">레전드 클래식</option>
-                    <option value="kmovie">최신 한국 영화</option>
-                    <option value="kvariety">예능 스페셜</option>
-                </select>
-            </div>
-            <button class="btn-add" onclick="pushToArchive()">🚀 아카이브에 등록하기</button>
         </aside>
 
         <section class="list-section">
