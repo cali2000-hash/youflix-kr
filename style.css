@@ -94,7 +94,7 @@ body {
 /* Row & Grid */
 .row { padding: 80px var(--gutter) 20px var(--gutter); width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }
 .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 6px solid var(--netflix-red); padding-left: 20px; }
-.row-title { font-size: 1.9rem; font-weight: 900; letter-spacing: -1px; }
+.row-title { font-size: 20pt; font-weight: 900; letter-spacing: -1px; }
 
 .view-all-link { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 900; background: rgba(255,255,255,0.1); padding: 9px 24px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); }
 
