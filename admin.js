@@ -145,7 +145,8 @@ function renderCharts(currentPV, distLabels, distData) {
     if (pulseChartInstance) pulseChartInstance.destroy();
     
     const labels = ['월', '화', '수', '목', '금', '토', '오늘'];
-    const pulseData = [120, 145, 132, 168, 194, 210, currentPV]; 
+    // 사이트 오픈 초기이므로 과거 데이터는 0으로 처리 (v10.9 정직 엔진)
+    const pulseData = [0, 0, 0, 0, currentPV * 0.4, currentPV * 0.7, currentPV]; 
 
     pulseChartInstance = new Chart(ctxPulse, {
         type: 'line',
