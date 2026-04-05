@@ -22,6 +22,8 @@ const db = firebase.firestore();
 localStorage.setItem('youflix_admin', 'true');
 
 let cachedVideo = null;
+let pulseChartInstance = null;
+let distChartInstance = null;
 
 // 통계 데이터 로드 (v10.5 루미 확장 엔진)
 async function loadStats() {
@@ -140,10 +142,12 @@ function updateResourceGauges(pv, videos) {
 function renderCharts(currentPV, distLabels, distData) {
     // 1. 방문 트래픽 차트 (Line)
     const ctxPulse = document.getElementById('pulseChart').getContext('2d');
+    if (pulseChartInstance) pulseChartInstance.destroy();
+    
     const labels = ['월', '화', '수', '목', '금', '토', '오늘'];
     const pulseData = [120, 145, 132, 168, 194, 210, currentPV]; 
 
-    new Chart(ctxPulse, {
+    pulseChartInstance = new Chart(ctxPulse, {
         type: 'line',
         data: {
             labels: labels,
@@ -172,7 +176,9 @@ function renderCharts(currentPV, distLabels, distData) {
 
     // 2. 콘텐츠 분포 차트 (Doughnut)
     const ctxDist = document.getElementById('distributionChart').getContext('2d');
-    new Chart(ctxDist, {
+    if (distChartInstance) distChartInstance.destroy();
+
+    distChartInstance = new Chart(ctxDist, {
         type: 'doughnut',
         data: {
             labels: distLabels,

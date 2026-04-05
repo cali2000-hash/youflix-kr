@@ -174,14 +174,16 @@
         </div>
     </div>
 
-    <div class="main-dashboard" style="grid-template-columns: 1.2fr 1fr 1fr; gap: 20px;">
-        <div class="chart-section">
-            <h3 style="margin-bottom:20px; font-size:1.1rem;">방문자 활동 지수 (최근 7일)</h3>
-            <canvas id="pulseChart" height="200"></canvas>
-        </div>
-        <div class="chart-section">
-            <h3 style="margin-bottom:20px; font-size:1.1rem;">콘텐츠 분포 현황</h3>
-            <canvas id="distributionChart" height="200"></canvas>
+    <div class="main-dashboard" style="grid-template-columns: 2fr 1.2fr; gap: 30px;">
+        <div class="chart-section" style="display: flex; flex-direction: column; gap: 40px;">
+            <div>
+                <h3 style="margin-bottom:20px; font-size:1.1rem;">방문자 활동 지수 (최근 7일)</h3>
+                <canvas id="pulseChart" height="220"></canvas>
+            </div>
+            <div>
+                <h3 style="margin-bottom:20px; font-size:1.1rem;">콘텐츠 분포 현황</h3>
+                <canvas id="distributionChart" height="220"></canvas>
+            </div>
         </div>
         <div class="resource-section">
             <h3 style="margin-bottom:20px; font-size:1.1rem;">리소스 사용 효율</h3>
