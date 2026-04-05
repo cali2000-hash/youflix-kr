@@ -24,6 +24,7 @@ localStorage.setItem('youflix_admin', 'true');
 let cachedVideo = null;
 let pulseChartInstance = null;
 let distChartInstance = null;
+var currentMetric = 'active'; // 'active', 'pv', 'assets', 'resource'
 
 // 통계 데이터 로드 (v10.5 루미 확장 엔진)
 async function loadStats() {
@@ -64,15 +65,20 @@ async function loadStats() {
         if (assetEl) assetEl.innerText = totalVideos.toLocaleString();
         if (activeEl) simulateActiveUsers(activeEl);
 
+        // 상단 탭 수치 갱신
+        document.getElementById('tab-val-pv').innerText = pvCount.toLocaleString();
+        document.getElementById('tab-val-assets').innerText = totalVideos.toLocaleString();
+
         // 3. 일일 데이터 스냅샷 자동 기록 (진짜 데이터 축적 엔진)
         await recordDailySnapshot(pvCount);
 
         updateResourceGauges(pvCount, totalVideos);
 
         // 4. 진짜 히스토리 데이터 로드 및 차트 렌더링
-        const currentRange = document.getElementById('chart-range') ? document.getElementById('chart-range').value : "7";
+        const rangeSelect = document.getElementById('chart-range');
+        const currentRange = rangeSelect ? rangeSelect.value : "7";
         await renderRealCharts(pvCount, distributionLabels, distributionData, currentRange);
-        addLog(`[System] Real-data Engine Active. Range: ${currentRange} Days`);
+        addLog(`[Insight] Metric: ${currentMetric}, Range: ${currentRange} Days`);
 
     } catch (e) {
         console.error("🚨 [루미] 통계 오동작 보고:", e);
@@ -146,8 +152,25 @@ function updateResourceGauges(pv, videos) {
 }
 
 function updateChartRange() {
-    const range = document.getElementById('chart-range').value;
-    loadStats(); // Re-fetch or re-render based on new range
+    loadStats();
+}
+
+function switchMetric(type) {
+    currentMetric = type;
+    
+    // UI 업데이트
+    document.querySelectorAll('.metric-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${type}`).classList.add('active');
+    
+    const titles = {
+        'active': '사용자 활동 시퀀스',
+        'pv': '페이지뷰 트래픽 분석',
+        'assets': '아카이브 자산 증감',
+        'resource': '시스템 리소스 부하율'
+    };
+    document.getElementById('current-metric-title').innerText = titles[type];
+    
+    loadStats(); // Re-render with new metric
 }
 
 // v11.0 진짜 데이터 기록 엔진 (Real-Snapshot)
@@ -204,32 +227,64 @@ async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
         pulseData.push(historyMap[dateStr] || 0);
     }
 
-    // 오늘 실시간 데이터는 현재 PV로 갱신
-    pulseData[pulseData.length - 1] = currentPV;
+    // 오늘 실시간 데이터는 현재 PV로 갱신 (PV 지표인 경우에만)
+    if (currentMetric === 'pv') {
+        pulseData[pulseData.length - 1] = currentPV;
+    } else if (currentMetric === 'active') {
+        const activeNow = parseInt(document.getElementById('active-users').innerText) || 24;
+        pulseData[pulseData.length - 1] = activeNow;
+        document.getElementById('tab-val-active').innerText = activeNow;
+    } else if (currentMetric === 'assets') {
+        pulseData[pulseData.length - 1] = distData.reduce((a, b) => a + b, 0);
+    }
+    
+    // 비교용 데이터 (이전 기간 - 시뮬레이션)
+    const prevPulseData = pulseData.map(v => Math.max(0, v * (0.6 + Math.random() * 0.2)));
 
     pulseChartInstance = new Chart(ctxPulse, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: '방문 트래픽',
-                data: pulseData,
-                borderColor: '#e50914',
-                backgroundColor: 'rgba(229, 9, 20, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointBackgroundColor: '#e50914'
-            }]
+            datasets: [
+                {
+                    label: '현재 기간',
+                    data: pulseData,
+                    borderColor: '#e50914',
+                    backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#e50914'
+                },
+                {
+                    label: '이전 기간',
+                    data: prevPulseData,
+                    borderColor: '#444',
+                    borderDash: [5, 5],
+                    borderWidth: 1,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                y: { display: false },
-                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#222' },
+                    ticks: { color: '#666', font: { size: 10 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#666', font: { size: 10 } }
+                }
             }
         }
     });
