@@ -165,9 +165,51 @@ async function updatePagePopularity() {
     }).join('');
 }
 
+// v16.0 실시간 접속자 지역확인
+async function updateVisitorLocations() {
+    const list = document.getElementById('visitor-geo-list');
+    if (!list) return;
+
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+    const presenceSnap = await db.collection('presence')
+                                 .where('last_active', '>=', twoMinutesAgo)
+                                 .get();
+    
+    const geoStats = {};
+    presenceSnap.forEach(doc => {
+        const loc = doc.data().location || 'Unknown Location';
+        geoStats[loc] = (geoStats[loc] || 0) + 1;
+    });
+
+    const total = presenceSnap.size || 1;
+    const sorted = Object.entries(geoStats).sort((a, b) => b[1] - a[1]);
+
+    if (sorted.length === 0) {
+        list.innerHTML = `<div style="color:#666; font-size:0.7rem; text-align:center; padding:10px;">현재 접속 중인 위치가 없습니다.</div>`;
+        return;
+    }
+
+    list.innerHTML = sorted.slice(0, 5).map(([loc, count]) => {
+        const pct = Math.round((count / total) * 100);
+        return `
+            <div class="geo-row" style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:3px;">
+                    <span style="color:#ddd; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px;">${loc}</span>
+                    <span style="color:#00ff00; font-weight:bold;">${count}</span>
+                </div>
+                <div style="height:3px; background:#222; border-radius:1.5px; overflow:hidden;">
+                    <div style="width:${pct}%; height:100%; background:#00ff00; transition:width 1s ease;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 updateRealTimePresence();
 updatePagePopularity();
+updateVisitorLocations();
 setInterval(updatePagePopularity, 30000);
+setInterval(updateVisitorLocations, 30000);
 
 function addLog(msg, type = 'info') {
     const monitor = document.getElementById('log-monitor');
@@ -214,6 +256,10 @@ function showInfo(type) {
         'db': {
             title: "💾 데이터베이스 저장 공간 정보",
             body: "<strong style='color:#fff;'>Firestore 저장 용량</strong><br>현재 서버에 저장된 텍스트 데이터의 총 크기입니다.<br><br>• <strong>무료 한도</strong>: 구글 파이어베이스는 약 1GB의 무료 공간을 제공합니다.<br>• <strong>현재 상태</strong>: 약 15MB를 사용 중이며, 한도의 1.5% 수준으로 매우 안전합니다."
+        },
+        'geo': {
+            title: "🌎 실시간 접속자 지역 가이드",
+            body: "<strong style='color:#fff;'>글로벌 위치 추적 엔진</strong><br>IP 주소를 기반으로 사용자가 접속한 도시와 국가를 실시간으로 판별합니다.<br><br>• <strong>정확도</strong>: ISP(인터넷 서비스 제공업체) 위치를 기준으로 하므로 미세한 오차가 있을 수 있습니다.<br>• <strong>데이터</strong>: 전 세계 어디에서 우주님의 아카이브를 찾아오는지 지표로 활용됩니다."
         }
     };
 
@@ -519,24 +565,36 @@ async function deleteVideo(cat, id, title) {
 }
 
 // v13.0 유플릭스 실시간 존재 엔진 (Fire-Presence)
-async function updatePresence() {
+(function() {
     if (!db) return;
     const sessionId = sessionStorage.getItem('yfx_session') || 
                      (sessionStorage.setItem('yfx_session', Math.random().toString(36).substr(2, 9)), sessionStorage.getItem('yfx_session'));
     
-    try {
-        await db.collection('presence').doc(sessionId).set({
-            last_active: firebase.firestore.FieldValue.serverTimestamp(),
-            page: window.location.pathname
-        });
-    } catch (e) { console.warn("Presence sync fail."); }
-}
+    // v16.0 실시간 위치 수집 (세션당 1회)
+    let userLoc = "Unknown";
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            userLoc = `${data.city}, ${data.country_code}`;
+            updatePresence();
+        })
+        .catch(() => updatePresence());
 
-// 30초마다 존재 신호 발신
-if (typeof firebase !== 'undefined') {
-    updatePresence();
+    async function updatePresence() {
+        try {
+            await db.collection('presence').doc(sessionId).set({
+                last_active: firebase.firestore.FieldValue.serverTimestamp(),
+                page: window.location.pathname,
+                search: window.location.search,
+                location: userLoc,
+                ua: navigator.userAgent
+            });
+        } catch (e) { console.warn("Presence sync fail."); }
+    }
+
+    // 30초마다 생존 신호 발신
     setInterval(updatePresence, 30000);
-}
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
