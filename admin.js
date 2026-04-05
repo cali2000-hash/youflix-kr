@@ -338,7 +338,7 @@ async function recordDailySnapshot(currentPV) {
 }
 
 async function renderRealCharts(currentPV, distLabels, distData, range = "7") {
-    const ctxPulse = document.getElementById('pulseChart').getContext('2d');
+    const ctxPulse = document.getElementById('adminChart').getContext('2d');
     if (pulseChartInstance) pulseChartInstance.destroy();
 
     // DB에서 실제 히스토리 가져오기
