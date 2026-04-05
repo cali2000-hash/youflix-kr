@@ -25,7 +25,7 @@
         .admin-header h1 { margin: 0; font-size: 1.8rem; font-weight: 900; color: var(--admin-primary); }
         .btn-home { background: #fff; color: #000; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 0.8rem; transition: 0.3s; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px 4%; margin-top: -20px; }
         .stat-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; text-align: center; }
         .stat-card:hover { border-color: var(--admin-primary); }
         .stat-value { font-size: 1.8rem; font-weight: 900; color: #fff; display: block; margin: 10px 0; }
@@ -157,15 +157,17 @@
             <p class="stat-change">누적 방문: <span id="pv-count" style="color:#ffd700; font-weight:bold;">0</span> PV</p>
             <button onclick="window.open('https://analytics.google.com/')" class="btn-sm" style="margin-top:10px; background: #4285F4; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">GA 대시보드 열기</button>
         </div>
-        <div class="stat-card">
-            <p class="stat-label">보관된 영상 자산</p>
-            <p class="stat-value" id="asset-count">0</p>
-            <div style="font-size:0.7rem; color:#aaa;">아카이브 총계</div>
-        </div>
-        <div class="stat-card">
-            <p class="stat-label">실시간 활성 사용자</p>
-            <p class="stat-value" id="active-users">24</p>
-            <div style="font-size:0.7rem; color:#00ff00;">● 현재 접속 중</div>
+        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
+            <div style="padding-bottom:15px; border-bottom:1px solid #333;">
+                <p class="stat-label" style="margin-bottom:10px;">보관된 영상 자산</p>
+                <p class="stat-value" id="asset-count" style="font-size:1.6rem; margin:0;">0</p>
+                <div style="font-size:0.65rem; color:#666; margin-top:5px;">아카이브 총계</div>
+            </div>
+            <div>
+                <p class="stat-label" style="margin-bottom:10px;">실시간 활성 사용자</p>
+                <p class="stat-value" id="active-users" style="font-size:1.6rem; margin:0;">24</p>
+                <div style="font-size:0.65rem; color:#00ff00; margin-top:5px;">● 현재 접속 중</div>
+            </div>
         </div>
         <div class="stat-card" style="text-align: left; position: relative;">
             <p class="stat-label">시스템 운영 레벨 (Phase 5)</p>
