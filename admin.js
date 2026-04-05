@@ -118,7 +118,56 @@ function updateRealTimePresence() {
 }
 
 // 초기화 시 실시간 감시 시작
+async function updatePagePopularity() {
+    const list = document.getElementById('page-popularity-list');
+    if (!list) return;
+
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+    const presenceSnap = await db.collection('presence')
+                                 .where('last_active', '>=', twoMinutesAgo)
+                                 .get();
+    
+    const stats = {};
+    presenceSnap.forEach(doc => {
+        let p = doc.data().page || '/';
+        // 가독성을 위한 매핑
+        if (p === '/' || p.includes('index')) p = "Main Archive Index";
+        else if (p.includes('admin')) p = "Admin Control Center";
+        else if (p.includes('category')) {
+            const urlParams = new URLSearchParams(doc.data().search || '');
+            const c = urlParams.get('c') || 'Archive';
+            p = `Category | ${c.toUpperCase()}`;
+        }
+        stats[p] = (stats[p] || 0) + 1;
+    });
+
+    const total = presenceSnap.size || 1;
+    const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+    if (sorted.length === 0) {
+        list.innerHTML = `<div style="color:#666; font-size:0.75rem; text-align:center; padding:10px;">현재 활성 사용자가 없습니다.</div>`;
+        return;
+    }
+
+    list.innerHTML = sorted.slice(0, 4).map(([name, count]) => {
+        const pct = Math.round((count / total) * 100);
+        return `
+            <div class="page-row">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                    <span style="color:#ddd; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">${name}</span>
+                    <span style="color:var(--admin-primary); font-weight:bold;">${count}</span>
+                </div>
+                <div style="height:4px; background:#262626; border-radius:2px; overflow:hidden;">
+                    <div style="width:${pct}%; height:100%; background:var(--admin-primary); transition:width 1s ease;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 updateRealTimePresence();
+updatePagePopularity();
+setInterval(updatePagePopularity, 30000);
 
 function addLog(msg, type = 'info') {
     const monitor = document.getElementById('log-monitor');
