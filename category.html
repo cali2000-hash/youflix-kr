@@ -6,7 +6,7 @@
     <title>Category | YOUFLIX.KR Archive</title>
     <meta name="description" content="Explore your favorite category in depth on YOUFLIX.KR. The ultimate premium YouTube archive.">
     
-    <link rel="stylesheet" href="style.css?v=18.9">
+    <link rel="stylesheet" href="style.css?v=19.0">
     
     <!-- Firebase SDK (v18.0 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -28,46 +28,50 @@
 </head>
 <body class="category-page-bg">
     <header id="main-header" class="navbar">
-        <a href="index.html" class="logo">YOUFLIX.KR</a>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="category.html?c=kpop">K-Pop</a></li>
-                <li class="has-dropdown">
-                    <a href="#">Drama ▾</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="category.html?c=kdrama">All Dramas</a></li>
-                        <li><a href="category.html?c=tvlit">TV Literature Hall</a></li>
-                        <li><a href="category.html?c=dramagame">Drama Game</a></li>
-                    </ul>
-                </li>
-                <li><a href="category.html?c=kclassic">Classic</a></li>
-                <li><a href="category.html?c=kvariety">Variety</a></li>
-                <li><a href="category.html?c=trending">Trending</a></li>
-                <li><a href="category.html?c=fav" style="color: var(--netflix-red);">❤ My List</a></li>
-            </ul>
-        </nav>
-        <div class="user-nav">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search archive...">
-            </div>
-            <div class="menu-toggle" id="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
+        <div class="container navbar-container">
+            <a href="index.html" class="logo">YOUFLIX.KR</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="category.html?c=kpop">K-Pop</a></li>
+                    <li class="has-dropdown">
+                        <a href="#">Drama ▾</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="category.html?c=kdrama">All Dramas</a></li>
+                            <li><a href="category.html?c=tvlit">TV Literature Hall</a></li>
+                            <li><a href="category.html?c=dramagame">Drama Game</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="category.html?c=kclassic">Classic</a></li>
+                    <li><a href="category.html?c=kvariety">Variety</a></li>
+                    <li><a href="category.html?c=trending">Trending</a></li>
+                    <li><a href="category.html?c=fav" style="color: var(--netflix-red);">❤ My List</a></li>
+                </ul>
+            </nav>
+            <div class="user-nav">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search archive...">
+                </div>
+                <div class="menu-toggle" id="mobile-menu-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="category-page" style="padding-top: 180px !important;">
-        <div class="category-header">
-            <h1 id="category-title" class="row-title">Archive Explorer</h1>
-            <p id="category-description">Premium curation of high-quality Korean contents.</p>
-        </div>
+        <div class="container">
+            <div class="category-header">
+                <h1 id="category-title" class="row-title">Archive Explorer</h1>
+                <p id="category-description">Premium curation of high-quality Korean contents.</p>
+            </div>
 
-        <div class="video-grid animate-in" id="category-grid">
-            <!-- Videos will be injected here via script.js -->
-            <p class="loading-msg">Searching the national archives...</p>
+            <div class="video-grid animate-in" id="category-grid">
+                <!-- Videos will be injected here via script.js -->
+                <p class="loading-msg">Searching the national archives...</p>
+            </div>
         </div>
 
         <div id="scroll-sentinel">
@@ -99,7 +103,7 @@
             <a href="contact.html">Contact Us</a>
             <a href="admin.html" id="admin-link" style="display: none; opacity: 0.5;">Admin</a>
         </div>
-        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v18.9.5</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
+        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v19.0.6</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
     </footer>
 
     <!-- Fixed script tag with versioning -->

@@ -11,11 +11,17 @@ except ImportError:
 
 class YouflixEngine:
     def __init__(self):
-        # 1. YouTube API 초기화
-        self.youtube = build('youtube', 'v3', developerKey=CONFIG['youtube_api_key'])
+        # 1. 유튜브 API 초기화 (v4.7 로테이션 시스템)
+        self.api_keys = CONFIG.get('youtube_api_keys', [])
+        if not self.api_keys:
+            # 하위 호환성 유지
+            single_key = CONFIG.get('youtube_api_key')
+            self.api_keys = [single_key] if single_key else []
+            
+        self.current_key_index = 0
+        self._init_youtube_client()
         
         # 2. Firebase/Firestore 초기화
-        # 스크립트 위치 기준 또는 현재 디렉토리 기준 탐색
         base_dir = os.path.dirname(os.path.abspath(__file__))
         cred_path = os.path.join(base_dir, 'service-account.json')
         
@@ -23,19 +29,38 @@ class YouflixEngine:
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
         else:
-            # 환경 변수 기반 초기화 (GitHub Actions용)
             env_cred = os.environ.get('FIREBASE_CREDENTIALS')
             if env_cred:
                 cred_info = json.loads(env_cred)
                 cred = credentials.Certificate(cred_info)
                 firebase_admin.initialize_app(cred)
             else:
-                print("🚨 Firebase 자격 증명이 없습니다. 'service-account.json' 파일이나 'FIREBASE_CREDENTIALS' 환경 변수가 필요합니다.")
                 self.db = None
                 return
         
         self.db = firestore.client()
         print("✅ 유플릭스 엔진 활성화 완료 (Firestore 연결됨)")
+
+    def _init_youtube_client(self):
+        """현재 인덱스의 API 키로 유튜브 클라이언트 초기화"""
+        if not self.api_keys:
+            print("🚨 사용 가능한 유튜브 API 키가 없습니다.")
+            self.youtube = None
+            return
+        
+        current_key = self.api_keys[self.current_key_index]
+        self.youtube = build('youtube', 'v3', developerKey=current_key)
+        print(f"📡 유튜브 API 클라이언트 초기화 (Key Index: {self.current_key_index})")
+
+    def _rotate_key(self):
+        """쿼터 소진 시 다음 키로 로테이트"""
+        if len(self.api_keys) > self.current_key_index + 1:
+            self.current_key_index += 1
+            self._init_youtube_client()
+            print(f"🔄 API 키 교체 완료: Index {self.current_key_index}로 재시도합니다.")
+            return True
+        print("🚨 모든 유튜브 API 키의 쿼터가 소진되었습니다.")
+        return False
 
     def fetch_trending(self, limit=10):
         """인기 급상승 영상 수집"""
@@ -49,6 +74,9 @@ class YouflixEngine:
             response = request.execute()
             return self._parse_items(response.get('items', []), 'trending')
         except Exception as e:
+            if "quota" in str(e).lower() or "forbidden" in str(e).lower() or "403" in str(e):
+                if self._rotate_key():
+                    return self.fetch_trending(limit)
             print(f"❌ Trending 수집 실패: {e}")
             return []
 
@@ -83,6 +111,10 @@ class YouflixEngine:
                     next_page_token = response.get('nextPageToken')
                     if not next_page_token or not items: break
                 except Exception as e:
+                    if "quota" in str(e).lower() or "forbidden" in str(e).lower() or "403" in str(e):
+                        if self._rotate_key():
+                            # 키 교체 후 바로 루프의 다음 시도에서 새 키 사용
+                            continue
                     print(f"❌ '{kw}' 검색 실패: {e}")
                     break
             results.extend(kw_results)
@@ -109,6 +141,9 @@ class YouflixEngine:
                     next_page_token = response.get('nextPageToken')
                     if not next_page_token: break
                 except Exception as e:
+                    if "quota" in str(e).lower() or "forbidden" in str(e).lower() or "403" in str(e):
+                        if self._rotate_key():
+                            continue
                     print(f"❌ 재생목록 '{pid}' 수집 실패: {e}")
                     break
         print(f"✅ [{category}] 총 {len(results)}개 영상 수집 완료.")
@@ -174,16 +209,12 @@ class YouflixEngine:
         count = 0
         for video in videos:
             doc_ref = self.db.collection(category).document(video['id'])
-            # 이미 존재하는지 확인 후 업서트
-            doc = doc_ref.get()
-            if not doc.exists:
-                doc_ref.set(video)
-                count += 1
-                print(f"✨ New: {video['title']}")
-            else:
-                # 기존 항목의 썸네일 새로고침 (v17.2)
-                doc_ref.update({'thumbnail': video['thumbnail']})
-        print(f"📦 [{category}] {count}개 신규 등록 완료.")
+            # 💡 읽기(Read) 없이 바로 업서트(Upsert) 수행하여 할당량 절약
+            # 존재하면 썸네일 등만 업데이트, 없으면 신규 생성
+            doc_ref.set(video, merge=True)
+            count += 1
+            # print(f"✨ Syncing: {video['title'][:40]}...") # 로그 폭주 방지
+        print(f"📦 [{category}] {count}개 항목 동기화 완료 (Read: 0회).")
 
     def run_daily_update(self):
         if not self.db: return
