@@ -16,10 +16,15 @@ def preview_kpop():
     print(f"🔍 검색 키워드: {setting['keywords']}")
     
     results = []
-    official_keywords = [
-        'official', 'mnet', 'sbs', 'kbs', 'jyp', 'smtown', 'hybe', 'yg', 
-        'stone', 'starship', 'woollim', 'tv', 'radio', 'entertainment', 
-        'labels', 'music', 'artist', 'kpop', 'mbc', 'jtbc'
+    # kpop 프리미엄 필터링 로직 (v5.0)
+    whitelist = [
+        'hybe labels', 'smtown', 'jyp entertainment', 'yg entertainment', 
+        'starship tv', 'woolliment', 'cjenm music', 'mnet k-pop', 'sbs kpop', 
+        'kbs world', 'mbckpop', '1thek', 'stone music', 'official'
+    ]
+    blacklist = [
+        'reaction', '리액션', 'cover', '커버', 'fanmade', '팬메이드', 
+        'fake', 'lyrics', '가사', 'parody', 'review', '리뷰'
     ]
 
     for kw in setting['keywords']:
@@ -40,9 +45,13 @@ def preview_kpop():
                 channel_title = snippet['channelTitle']
                 video_title = snippet['title']
                 
-                is_official = any(okw in channel_title.lower() for okw in official_keywords)
+                # 정밀 필터링 로직 적용
+                has_whitelist_channel = any(okw in channel_title.lower() for okw in whitelist)
+                has_blacklist_title = any(bkw in video_title.lower() for bkw in blacklist)
                 
-                status = "✅ PASS (Official)" if is_official else "🚫 SKIP (Personal/Other)"
+                is_official = has_whitelist_channel and not has_blacklist_title
+                
+                status = "✅ PASS (Official)" if is_official else "🚫 SKIP (Filtered)"
                 print(f"   [{status}] {channel_title} | {video_title[:40]}...")
                 
                 if is_official:

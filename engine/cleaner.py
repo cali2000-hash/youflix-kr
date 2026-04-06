@@ -10,7 +10,19 @@ except ImportError:
 
 class YouflixCleaner:
     def __init__(self):
-        self.youtube = build('youtube', 'v3', developerKey=CONFIG['youtube_api_key'])
+        # 1. 유튜브 API 초기화 (v4.7 로테이션 시스템 대응)
+        self.api_keys = CONFIG.get('youtube_api_keys', [])
+        if not self.api_keys:
+            single_key = CONFIG.get('youtube_api_key')
+            self.api_keys = [single_key] if single_key else []
+            
+        if not self.api_keys:
+            print("🚨 사용 가능한 유튜브 API 키가 없습니다.")
+            self.youtube = None
+        else:
+            self.youtube = build('youtube', 'v3', developerKey=self.api_keys[0])
+            print(f"📡 유튜브 API 클라이언트 초기화 완료 (Key Index 0)")
+
         base_dir = os.path.dirname(os.path.abspath(__file__))
         cred_path = os.path.join(base_dir, 'service-account.json')
         
@@ -61,14 +73,26 @@ class YouflixCleaner:
                     channel_id = item['snippet']['channelId']
                     
                     is_official = False
+                    video_title = item['snippet']['title'].lower()
+                    
                     if category == 'kpop':
-                        # kpop은 키워드 기반 공식 여부 판단 (v4.5)
-                        official_keywords = [
-                            'official', 'mnet', 'sbs', 'kbs', 'jyp', 'smtown', 'hybe', 'yg', 
-                            'stone', 'starship', 'woollim', 'tv', 'radio', 'entertainment', 
-                            'labels', 'music', 'artist', 'kpop', 'mbc', 'jtbc'
+                        # kpop은 엄격한 기획사/방송사 화이트리스트 + 블랙워드 필터링 (v5.0)
+                        whitelist = [
+                            'hybe labels', 'smtown', 'jyp entertainment', 'yg entertainment', 
+                            'starship tv', 'woolliment', 'cjenm music', 'mnet k-pop', 'sbs kpop', 
+                            'kbs world', 'mbckpop', '1thek', 'stone music', 'official'
                         ]
-                        if any(okw in channel_title.lower() for okw in official_keywords):
+                        blacklist = [
+                            'reaction', '리액션', 'cover', '커버', 'fanmade', '팬메이드', 
+                            'fake', 'lyrics', '가사', 'parody', 'review', '리뷰'
+                        ]
+                        
+                        # 1. 화이트리스트 채널 확인
+                        has_whitelist_channel = any(okw in channel_title.lower() for okw in whitelist)
+                        # 2. 제목 내 블랙리스트 단어 확인
+                        has_blacklist_title = any(bkw in video_title for bkw in blacklist)
+                        
+                        if has_whitelist_channel and not has_blacklist_title:
                             is_official = True
                     elif channel_id == official_id:
                         is_official = True

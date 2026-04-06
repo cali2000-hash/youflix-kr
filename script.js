@@ -14,9 +14,6 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
-let currentUser = null;
-let cloudFavs = [];
 
 // 💎 Quota Optimization State (v18.0)
 const lastDocMap = {};
@@ -26,7 +23,7 @@ const CACHE_TTL = 60 * 60 * 1000; // 60분 간 유효
 
 // --- [Utility] Smart Caching Engine ---
 function getCache(key) {
-    const isAdmin = currentUser && currentUser.email === 'cali20000@gmail.com';
+    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
     if (isAdmin) return null; // 관리자는 항상 실시간
 
     const cached = localStorage.getItem(`yfx_cache_${key}`);
@@ -76,8 +73,7 @@ function setCache(key, data) {
 })();
 
 function trackPV() {
-    const isAdmin = localStorage.getItem('youflix_admin') === 'true' || 
-                   (currentUser && currentUser.email === 'cali20000@gmail.com');
+    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
     if (isAdmin) return;
     db.collection('statistics').doc('daily_pv').set({ 
         count: firebase.firestore.FieldValue.increment(1), 
@@ -88,22 +84,15 @@ function trackPV() {
 // --- [Core] Data Rendering Engine ---
 function renderVideos(grid, vList) {
     vList.forEach(v => {
-        const isFav = checkFav(v.id);
         const card = document.createElement('div');
         card.className = 'video-card animate-in';
         card.innerHTML = `
             <div class="thumbnail-container">
                 <img src="${v.thumbnail}" alt="${v.title}">
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${v.id}">❤</div>
                 <div class="play-overlay"><span class="play-icon">▶</span></div>
             </div>
             <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
         `;
-        card.querySelector('.fav-icon').onclick = async (e) => {
-            e.stopPropagation();
-            const res = await toggleFav(v);
-            e.currentTarget.classList.toggle('active', res);
-        };
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
         grid.appendChild(card);
     });
@@ -206,62 +195,15 @@ function setupInfiniteScroll(key) {
     observer.observe(sentinel);
 }
 
-// --- [UI] Modal & Auth ---
-async function login() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try { await auth.signInWithPopup(provider); } catch (e) { alert("Login Error: " + e.message); }
-}
-
-async function logout() { await auth.signOut(); location.reload(); }
-
-function updateAuthUI(user) {
-    document.querySelectorAll('.user-nav').forEach(nav => {
-        let authZone = nav.querySelector('.auth-zone') || document.createElement('div');
-        authZone.className = 'auth-zone'; nav.appendChild(authZone);
-        if (user) {
-            const photo = user.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
-            authZone.innerHTML = `<img src="${photo}" alt="Profile" class="profile-img" onclick="logout()" title="Logout (${user.displayName})">`;
-        } else {
-            authZone.innerHTML = `<button class="btn btn-login" onclick="login()">SIGN IN</button>`;
-        }
-    });
-    const adminLink = document.getElementById('admin-link');
-    if (adminLink) adminLink.style.display = (user && user.email === 'cali20000@gmail.com') ? 'inline-block' : 'none';
-}
-
-function getFavs() { return currentUser ? cloudFavs : JSON.parse(localStorage.getItem('youflix_favs') || '[]'); }
-function checkFav(id) { return getFavs().some(f => f.id === id); }
-
-async function toggleFav(v) {
-    if (!currentUser) { if (confirm("로그인이 필요합니다. 로그인하시겠습니까?")) login(); return false; }
-    let favs = [...getFavs()];
-    const idx = favs.findIndex(f => f.id === v.id);
-    let result = false;
-    if (idx > -1) { favs.splice(idx, 1); result = false; }
-    else { favs.unshift(v); result = true; }
-    cloudFavs = favs;
-    await db.collection('users').doc(currentUser.uid).set({ favs: cloudFavs }, { merge: true });
-    renderMyList('mylist-grid');
-    return result;
-}
-
+// --- [UI] Modal ---
 function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
     if (!modal || !player) return;
-    const isFav = checkFav(v.id);
     document.getElementById('modal-title').innerText = v.title;
     document.getElementById('modal-desc').innerText = v.description || 'Premium curation from Korea’s legendary cultural archive.';
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    const controls = document.getElementById('modal-controls');
-    if (controls) {
-        controls.innerHTML = `<button class="btn btn-fav ${isFav ? 'active' : ''}" id="modal-fav-btn">${isFav ? '❤ In My List' : '🤍 Add to My List'}</button>`;
-        document.getElementById('modal-fav-btn').onclick = async (e) => {
-            const res = await toggleFav(v);
-            e.currentTarget.classList.toggle('active', res);
-            e.currentTarget.innerText = res ? '❤ In My List' : '🤍 Add to My List';
-        };
-    }
+    
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
 }
 
@@ -271,26 +213,91 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-function renderMyList(targetGridId = 'mylist-grid') {
-    const grid = document.getElementById(targetGridId);
-    if (!grid) return;
-    const favs = getFavs();
-    if (favs.length === 0) return;
-    grid.innerHTML = '';
-    favs.forEach(v => {
-        const card = document.createElement('div');
-        card.className = 'video-card animate-in';
-        card.innerHTML = `<div class="thumbnail-container"><img src="${v.thumbnail}" alt="${v.title}"><div class="fav-icon active">❤</div><div class="play-overlay"><span class="play-icon">▶</span></div></div><div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel}</p></div>`;
-        card.querySelector('.fav-icon').onclick = async (e) => { e.stopPropagation(); await toggleFav(v); };
-        card.querySelector('.thumbnail-container').onclick = () => openModal(v);
-        grid.appendChild(card);
-    });
+// --- [Feature] Search Engine (v19.0) ---
+async function handleSearch(query) {
+    if (!query || query.trim().length < 2) return;
+    
+    const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
+    const grid = resultsContainer.querySelector('.video-grid');
+    grid.innerHTML = '<p class="loading-msg">Searching across all archives...</p>';
+    resultsContainer.style.display = 'block';
+
+    // Hide original rows on main page
+    const mainContent = document.querySelector('.category-grid-container');
+    if (mainContent) {
+        Array.from(mainContent.children).forEach(child => {
+            if (child !== resultsContainer) child.style.display = 'none';
+        });
+    }
+
+    const categories = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+    let allResults = [];
+
+    try {
+        const promises = categories.map(async (cat) => {
+            // Firestore prefix search
+            const q1 = db.collection(cat).where('title', '>=', query).where('title', '<=', query + '\uf8ff').limit(10).get();
+            // Try with common prefixes like [TV문학관]
+            const q2 = (cat === 'tvlit') ? db.collection(cat).where('title', '>=', '[TV문학관] ' + query).where('title', '<=', '[TV문학관] ' + query + '\uf8ff').limit(10).get() : Promise.resolve({empty: true});
+            
+            const [s1, s2] = await Promise.all([q1, q2]);
+            const results = [];
+            [s1, s2].forEach(snap => {
+                if (!snap.empty) {
+                    snap.forEach(doc => {
+                        const data = doc.data(); data.category = cat; data.id = doc.id;
+                        if (!results.find(v => v.id === data.id)) results.push(data);
+                    });
+                }
+            });
+            return results;
+        });
+
+        const nestedResults = await Promise.all(promises);
+        allResults = nestedResults.flat();
+
+        grid.innerHTML = '';
+        if (allResults.length === 0) {
+            grid.innerHTML = `<p class="loading-msg">No results found for "${query}". Try different terms.</p>`;
+        } else {
+            renderVideos(grid, allResults);
+        }
+    } catch (e) {
+        grid.innerHTML = '<p class="loading-msg">Search unavailable right now. Please try again later.</p>';
+        console.error("Search Error: ", e);
+    }
+}
+
+function createSearchResultsSection() {
+    const section = document.createElement('div');
+    section.id = 'search-results-section';
+    section.className = 'row';
+    section.innerHTML = `
+        <div class="container">
+            <div class="row-header" style="border-left: 6px solid #fff;">
+                <h2 class="row-title">Search Results</h2>
+                <button class="view-all-link" onclick="window.location.reload()" style="cursor:pointer; border: none; background: #333;">Close Search</button>
+            </div>
+            <div class="video-grid" style="flex-wrap: wrap; overflow-x: hidden;"></div>
+        </div>
+    `;
+    const mainContent = document.querySelector('.category-grid-container');
+    if (mainContent) mainContent.prepend(section);
+    return section;
 }
 
 // --- [Init] App Entry Point ---
 async function initApp() {
     try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
+    // (v19.0) Search Listener
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch(e.target.value);
+        });
+    }
+
     // (v18.0) Lazy Load Main Page Rows
     setupRowLazyLoading();
 
@@ -302,30 +309,15 @@ async function initApp() {
             'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
             'dramagame': 'Drama Game Archive', 'kclassic': 'Eternal Cinema', 
             'kmovie': 'Cinema Masterpieces', 'kvariety': 'Variety Show Stars', 
-            'trending': 'Trending Now', 'fav': 'My Secret List' 
+            'trending': 'Trending Now'
         };
         const titleEl = document.getElementById('category-title');
         if (titleEl) titleEl.innerText = titles[cat] || cat;
         
-        if (cat === 'fav') {
-            renderMyList('category-grid');
-        } else {
-            load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
-        }
+        load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
     }
     
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 }
-
-auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    if (user) {
-        const userRef = db.collection('users').doc(user.uid);
-        const doc = await userRef.get();
-        if (doc.exists) cloudFavs = doc.data().favs || [];
-    }
-    updateAuthUI(user);
-    renderMyList('mylist-grid');
-});
 
 document.addEventListener('DOMContentLoaded', initApp);

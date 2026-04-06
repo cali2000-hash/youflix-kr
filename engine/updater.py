@@ -172,16 +172,26 @@ class YouflixEngine:
                         snippet.get('thumbnails', {}).get('default', {}).get('url', 
                         f"https://i.ytimg.com/vi/{vid_id}/hqdefault.jpg"))
 
-            # kpop 카테고리: 공식 채널 전용 필터링 (v4.5)
+            # kpop 카테고리: 프리미엄 공식 채널 전용 필터링 (v5.0)
             if category == 'kpop':
                 channel_name = snippet['channelTitle'].lower()
-                official_keywords = [
-                    'official', 'mnet', 'sbs', 'kbs', 'jyp', 'smtown', 'hybe', 'yg', 
-                    'stone', 'starship', 'woollim', 'tv', 'radio', 'entertainment', 
-                    'labels', 'music', 'artist', 'kpop', 'mbc', 'jtbc'
+                video_title_lc = snippet['title'].lower()
+                
+                whitelist = [
+                    'hybe labels', 'smtown', 'jyp entertainment', 'yg entertainment', 
+                    'starship tv', 'woolliment', 'cjenm music', 'mnet k-pop', 'sbs kpop', 
+                    'kbs world', 'mbckpop', '1thek', 'stone music', 'official'
                 ]
-                if not any(okw in channel_name for okw in official_keywords):
-                    print(f"🚫 Filtering non-official channel: {snippet['channelTitle']}")
+                blacklist = [
+                    'reaction', '리액션', 'cover', '커버', 'fanmade', '팬메이드', 
+                    'fake', 'lyrics', '가사', 'parody', 'review', '리뷰'
+                ]
+                
+                has_whitelist_channel = any(okw in channel_name for okw in whitelist)
+                has_blacklist_title = any(bkw in video_title_lc for bkw in blacklist)
+                
+                if not has_whitelist_channel or has_blacklist_title:
+                    print(f"🚫 Filtering non-official or reaction: {snippet['channelTitle']} | {snippet['title'][:30]}")
                     continue
 
             video_data = {

@@ -85,7 +85,6 @@ body {
 .btn-primary:hover { background-color: #ff0c1b; transform: scale(1.05); }
 .btn-secondary { background-color: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
 .btn-secondary:hover { background-color: rgba(255,255,255,0.4); transform: scale(1.05); }
-.btn-login { background: var(--netflix-red); color: #fff; padding: 8px 24px; font-size: 0.9rem; font-weight: 800; }
 
 /* Hero Section (v16.0 Layout) */
 .hero {
@@ -120,13 +119,6 @@ body {
 .thumbnail-container { position: relative; aspect-ratio: 16/9; overflow: hidden; }
 .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Icons (Fixed v16.0) */
-.fav-icon {
-    position: absolute; top: 12px; right: 12px; font-size: 1.4rem; color: rgba(255,255,255,0.5);
-    z-index: 10; transition: all 0.3s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-}
-.fav-icon.active { color: var(--netflix-red); transform: scale(1.2); }
-.fav-icon:hover { transform: scale(1.3); color: #fff; }
 
 .play-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -249,3 +241,14 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
     color: #222; font-size: 0.8rem; letter-spacing: 1px;
 }
 
+
+/* Search Results Page (v19.0 Override) */
+#search-results-section { background: #0b0b0b; padding-bottom: 80px; }
+#search-results-section .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px 25px;
+    padding: 30px 0;
+}
+#search-results-section .row-header { border-left-color: #fff !important; }
+#search-results-section .loading-msg { padding: 100px 0; font-size: 1.5rem; color: #555; }
