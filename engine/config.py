@@ -13,7 +13,12 @@ CONFIG = {
         },
         "kpop": {
             "strategy": "search",
-            "keywords": ["SBS KPOP Official", "Mnet K-POP Stage", "KBS WORLD TV Music", "HYBE LABELS Official", "SMTOWN Music", "JYP Entertainment Official", "Stone Music Entertainment"],
+            "keywords": [
+                "SBS KPOP Official", "Mnet K-POP Stage", "KBS WORLD TV Music", 
+                "HYBE LABELS Official", "SMTOWN Music", "JYP Entertainment Official", 
+                "Stone Music Entertainment", "1theK World", "Genie Music Official",
+                "M2 Official Video", "it's Live Music Video", "CJENM_KPOP"
+            ],
             "regionCode": "KR",
             "maxResults": 100
         },

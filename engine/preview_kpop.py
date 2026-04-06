@@ -20,7 +20,9 @@ def preview_kpop():
     whitelist = [
         'hybe labels', 'smtown', 'jyp entertainment', 'yg entertainment', 
         'starship tv', 'woolliment', 'cjenm music', 'mnet k-pop', 'sbs kpop', 
-        'kbs world', 'mbckpop', '1thek', 'stone music', 'official'
+        'kbs world', 'mbckpop', '1thek', 'stone music', 'official',
+        'genie music', 'warner music korea', 'sony music korea', 
+        'universal music korea', 'm2', 'it\'s live'
     ]
     blacklist = [
         'reaction', '리액션', 'cover', '커버', 'fanmade', '팬메이드', 

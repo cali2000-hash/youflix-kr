@@ -21,6 +21,19 @@ const loadingMap = {};
 const reachedEndMap = {};
 const CACHE_TTL = 60 * 60 * 1000; // 60분 간 유효
 
+const ARTIST_ALIASES = {
+    "에스파": "aespa", "aespa": "에스파",
+    "뉴진스": "NewJeans", "newjeans": "뉴진스",
+    "아이브": "IVE", "ive": "아이브",
+    "르세라핌": "LE SSERAFIM", "lesserafim": "르세라핌",
+    "방탄소년단": "BTS", "bts": "방탄소년단",
+    "블랙핑크": "BLACKPINK", "blackpink": "블랙핑크",
+    "트와이스": "TWICE", "twice": "트와이스",
+    "스테이씨": "STAYC", "stayc": "스테이씨",
+    "세븐틴": "SEVENTEEN", "seventeen": "세븐틴",
+    "스트레이키즈": "Stray Kids", "straykids": "스트레이키즈"
+};
+
 // --- [Utility] Smart Caching Engine ---
 function getCache(key) {
     const isAdmin = localStorage.getItem('youflix_admin') === 'true';
@@ -213,16 +226,16 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// --- [Feature] Search Engine (v19.0) ---
+// --- [Feature] Search Engine (v19.1 - Multi-Alias Mapping) ---
 async function handleSearch(query) {
     if (!query || query.trim().length < 2) return;
     
     const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
     const grid = resultsContainer.querySelector('.video-grid');
-    grid.innerHTML = '<p class="loading-msg">Searching across all archives...</p>';
+    grid.innerHTML = '<div class="loading-state" style="padding: 40px; text-align: center; width: 100%;"><p style="color: #888;">Searching across all archives...</p></div>';
     resultsContainer.style.display = 'block';
 
-    // Hide original rows on main page
+    // Hide original rows
     const mainContent = document.querySelector('.category-grid-container');
     if (mainContent) {
         Array.from(mainContent.children).forEach(child => {
@@ -231,18 +244,26 @@ async function handleSearch(query) {
     }
 
     const categories = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
-    let allResults = [];
+    
+    // Check for alias (e.g. '에스파' -> 'aespa')
+    const queryTrim = query.trim();
+    const alias = ARTIST_ALIASES[queryTrim.toLowerCase()] || ARTIST_ALIASES[queryTrim];
+    const searchTerms = [queryTrim];
+    if (alias) searchTerms.push(alias);
 
     try {
         const promises = categories.map(async (cat) => {
-            // Firestore prefix search
-            const q1 = db.collection(cat).where('title', '>=', query).where('title', '<=', query + '\uf8ff').limit(10).get();
-            // Try with common prefixes like [TV문학관]
-            const q2 = (cat === 'tvlit') ? db.collection(cat).where('title', '>=', '[TV문학관] ' + query).where('title', '<=', '[TV문학관] ' + query + '\uf8ff').limit(10).get() : Promise.resolve({empty: true});
-            
-            const [s1, s2] = await Promise.all([q1, q2]);
+            const termPromises = [];
+            searchTerms.forEach(term => {
+                termPromises.push(db.collection(cat).where('title', '>=', term).where('title', '<=', term + '\uf8ff').limit(15).get());
+                if (cat === 'tvlit') {
+                    termPromises.push(db.collection(cat).where('title', '>=', '[TV문학관] ' + term).where('title', '<=', '[TV문학관] ' + term + '\uf8ff').limit(15).get());
+                }
+            });
+
+            const snaps = await Promise.all(termPromises);
             const results = [];
-            [s1, s2].forEach(snap => {
+            snaps.forEach(snap => {
                 if (!snap.empty) {
                     snap.forEach(doc => {
                         const data = doc.data(); data.category = cat; data.id = doc.id;
@@ -254,16 +275,26 @@ async function handleSearch(query) {
         });
 
         const nestedResults = await Promise.all(promises);
-        allResults = nestedResults.flat();
+        const allResults = nestedResults.flat();
 
         grid.innerHTML = '';
         if (allResults.length === 0) {
-            grid.innerHTML = `<p class="loading-msg">No results found for "${query}". Try different terms.</p>`;
+            grid.innerHTML = `
+                <div class="no-results" style="padding: 60px 20px; text-align: center; color: #888; width: 100%;">
+                    <h3 style="color: #fff; margin-bottom: 10px;">No results found for "${query}"</h3>
+                    <p style="margin-bottom: 25px;">Try different terms or browse our categories:</p>
+                    <div class="suggestion-chips" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <span onclick="document.getElementById('search-input').value='K-Pop'; handleSearch('K-Pop')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop</span>
+                        <span onclick="document.getElementById('search-input').value='Drama'; handleSearch('Drama')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Drama</span>
+                        <span onclick="document.getElementById('search-input').value='Classic'; handleSearch('Classic')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Classic</span>
+                        <span onclick="document.getElementById('search-input').value='Movie'; handleSearch('Movie')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Movie</span>
+                    </div>
+                </div>`;
         } else {
             renderVideos(grid, allResults);
         }
     } catch (e) {
-        grid.innerHTML = '<p class="loading-msg">Search unavailable right now. Please try again later.</p>';
+        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">Search unavailable right now. Please try again later.</p></div>';
         console.error("Search Error: ", e);
     }
 }
