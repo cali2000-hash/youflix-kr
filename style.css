@@ -87,18 +87,79 @@ body {
 .btn-secondary:hover { background-color: rgba(255,255,255,0.4); transform: scale(1.05); }
 
 /* Hero Section (v16.0 Layout) */
-.hero {
+/* 🎢 Category Roller Hero Slider (v19.19) */
+.hero-slider {
+    position: relative;
     height: 90vh;
-    background: linear-gradient(to right, #000 15%, transparent 65%), linear-gradient(to top, #000 5%, transparent 35%),
-                url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000');
-    background-size: cover; background-position: center;
-    display: flex; flex-direction: column; justify-content: center;
+    width: 100%;
+    background: #000;
+    overflow: hidden;
 }
+
+.hero-slide {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; justify-content: center;
+    opacity: 0;
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background-size: cover;
+    background-position: center;
+    visibility: hidden;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
+/* Gradient Overlays for Readability */
+.hero-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #000 15%, transparent 65%), 
+                linear-gradient(to top, #000 5%, transparent 35%);
+    z-index: -1;
+}
+
+.hero-content {
+    max-width: 800px;
+    padding: 0 var(--gutter);
+}
+
 .hero-tag { color: var(--netflix-red); font-weight: 900; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 15px; }
 .hero-content h1 { font-size: 5.5rem; font-weight: 950; margin-bottom: 25px; letter-spacing: -3px; line-height: 1.05; }
-.category-header p { font-size: 12px; color: #ccc; max-width: 800px; line-height: 1.6; }
 .hero-content p { font-size: 1.4rem; color: #ccc; margin-bottom: 45px; line-height: 1.6; max-width: 680px; }
 .hero-actions { display: flex; gap: 15px; }
+
+/* Indicators (Dots) */
+.hero-indicators {
+    position: absolute;
+    bottom: 40px;
+    left: var(--gutter);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+    background: var(--netflix-red);
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+}
+
+.category-header p { font-size: 12px; color: #ccc; max-width: 800px; line-height: 1.6; }
 
 /* Row & Grid */
 .row { padding: 80px 0 20px 0; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }

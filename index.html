@@ -72,17 +72,62 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-tag" data-i18n="hero_tag">KOFA CLASSIC CINEMA LIVE</div>
-                <h1 data-i18n="hero_title">K-CINEMA: FULL MASTERPIECES</h1>
-                <p data-i18n="hero_desc">Explore the deep history of South Korea's cinematic gold. We meticulously curate full-length classics provided by the Korean Movie Archive.</p>
+    <!-- 🎢 Category Roller Hero Slider (v19.19) -->
+    <section class="hero-slider">
+        <!-- Slide 1: K-Pop -->
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1619983081563-430f63602796?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_1_tag">OFFICIAL K-POP MV</span>
+                <h1 data-i18n="hero_slide_1_title">MUSIC IN YOUR HANDS</h1>
+                <p data-i18n="hero_slide_1_desc">From the latest trending idols to legendary artists, enjoy high-definition MVs provided by official channels.</p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="alert('Join the archive today!')">Watch Full Movie</button>
-                    <button class="btn btn-secondary" data-i18n="hero_btn_explore" onclick="window.open('https://www.youtube.com/@KoreanFilm', '_blank')">Explore KOFA</button>
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kpop'">Watch Now</button>
                 </div>
             </div>
+        </div>
+
+        <!-- Slide 2: K-Drama -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_2_tag">K-DRAMA MASTERPIECE</span>
+                <h1 data-i18n="hero_slide_2_title">MEET YOUR LIFE DRAMA</h1>
+                <p data-i18n="hero_slide_2_desc">Relive the emotions of masterpieces like TV Literature Hall that moved the hearts of Korea.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kdrama'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: K-Movies -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_3_tag">K-CLASSIC MOVIE ARCHIVE</span>
+                <h1 data-i18n="hero_slide_3_title">ETERNAL CINEMA</h1>
+                <p data-i18n="hero_slide_3_desc">A special experience to watch 60s-80s classic masterpieces restored by the Korean Movie Archive for free.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kmovie'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: K-Variety -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_4_tag">K-VARIETY HIGHLIGHTS</span>
+                <h1 data-i18n="hero_slide_4_title">EVERYDAY FUN YOUFLIX</h1>
+                <p data-i18n="hero_slide_4_desc">Enjoy the essence of Korean variety shows like Running Man that captured the world.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kvariety'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Indicators -->
+        <div class="hero-indicators">
+            <div class="indicator-dot active" data-slide="0"></div>
+            <div class="indicator-dot" data-slide="1"></div>
+            <div class="indicator-dot" data-slide="2"></div>
+            <div class="indicator-dot" data-slide="3"></div>
         </div>
     </section>
 

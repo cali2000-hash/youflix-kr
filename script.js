@@ -413,7 +413,57 @@ async function initApp() {
         load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
     }
     
+    // (v19.19) Initialize Hero Slider
+    initHeroSlider();
+
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
+}
+
+// 🎢 Hero Slider Engine (v19.19)
+function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.indicator-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (slideInterval) clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            startAutoPlay(); // Reset timer on manual click
+        });
+    });
+
+    // Pause on hover
+    slider.addEventListener('mouseenter', stopAutoPlay);
+    slider.addEventListener('mouseleave', startAutoPlay);
+
+    startAutoPlay();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
