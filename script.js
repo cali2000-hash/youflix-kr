@@ -286,7 +286,7 @@ async function handleSearch(query) {
                     <div class="suggestion-chips" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                         <span onclick="document.getElementById('search-input').value='K-Pop'; handleSearch('K-Pop')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop</span>
                         <span onclick="document.getElementById('search-input').value='Drama'; handleSearch('Drama')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Drama</span>
-                        <span onclick="document.getElementById('search-input').value='Classic Movies'; handleSearch('Classic Movies')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Classic Movies</span>
+                        <span onclick="document.getElementById('search-input').value='Eternal Cinema'; handleSearch('Eternal Cinema')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Eternal Cinema</span>
                         <span onclick="document.getElementById('search-input').value='Movie'; handleSearch('Movie')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Movie</span>
                     </div>
                 </div>`;
