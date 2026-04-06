@@ -284,7 +284,7 @@ async function handleSearch(query) {
                     <h3 style="color: #fff; margin-bottom: 10px;">No results found for "${query}"</h3>
                     <p style="margin-bottom: 25px;">Try different terms or browse our categories:</p>
                     <div class="suggestion-chips" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <span onclick="document.getElementById('search-input').value='K-Pop'; handleSearch('K-Pop')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop</span>
+                        <span onclick="document.getElementById('search-input').value='K-Pop M/V'; handleSearch('K-Pop M/V')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop M/V</span>
                         <span onclick="document.getElementById('search-input').value='Drama'; handleSearch('Drama')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Drama</span>
                         <span onclick="document.getElementById('search-input').value='Eternal Cinema'; handleSearch('Eternal Cinema')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Eternal Cinema</span>
                         <span onclick="document.getElementById('search-input').value='Movie'; handleSearch('Movie')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Movie</span>
@@ -337,7 +337,7 @@ async function initApp() {
     const cat = params.get('c');
     if (cat && document.getElementById('category-grid')) {
         const titles = { 
-            'kpop': 'K-Pop Universe', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
+            'kpop': 'K-Pop M/V & Performance', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
             'dramagame': 'Drama Game Archive', 'kclassic': 'Eternal Cinema', 
             'kmovie': 'Cinema Masterpieces', 'kvariety': 'Variety Show Stars', 
             'trending': 'Trending Now'
