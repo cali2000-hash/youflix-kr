@@ -236,7 +236,7 @@ async function handleSearch(query) {
     resultsContainer.style.display = 'block';
 
     // Hide original rows
-    const mainContent = document.querySelector('.category-grid-container');
+    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
     if (mainContent) {
         Array.from(mainContent.children).forEach(child => {
             if (child !== resultsContainer) child.style.display = 'none';
@@ -312,7 +312,7 @@ function createSearchResultsSection() {
             <div class="video-grid" style="flex-wrap: wrap; overflow-x: hidden;"></div>
         </div>
     `;
-    const mainContent = document.querySelector('.category-grid-container');
+    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
     if (mainContent) mainContent.prepend(section);
     return section;
 }
