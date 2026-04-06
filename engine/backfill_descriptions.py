@@ -10,9 +10,11 @@ from dotenv import load_dotenv
 try:
     from config import CONFIG
     from gemini_rotator import call_gemini_with_retry
+    from google.genai import types # (v19.18) 추가
 except ImportError:
     from engine.config import CONFIG
     from engine.gemini_rotator import call_gemini_with_retry
+    from google.genai import types # (v19.18) 추가
 
 # 로컬 .env 로드
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -61,43 +63,56 @@ class YouflixAIBackfiller:
         return False
 
     def generate_ai_description(self, client, title, category):
-        """Gemini를 사용하여 고품질 영상 설명을 생성합니다."""
+        """Gemini를 사용하여 고품질 한/영 이중 영상 설명을 생성합니다. (v19.18)"""
         cat_labels = {
-            'kpop': 'K-POP 전설의 무대',
-            'kdrama': '명작 드라마 하이라이트',
-            'tvlit': 'KBS TV 문학관 (한국 문학 아카이브)',
-            'kclassic': '한국 고전 영화 컬렉션',
-            'kmovie': '최신 한국 영화 예고편 및 정보',
-            'kvariety': '추억의 전설적 예능 명장면',
-            'trending': '현재 대한민국 인기 트렌드 영상',
-            'dramagame': 'KBS 드라마게임 (인생 드라마)'
+            'kpop': 'K-POP Legends',
+            'kdrama': 'K-Drama Masterpieces',
+            'tvlit': 'TV Literature Hall (Anthology)',
+            'kclassic': 'Korean Classic Cinema',
+            'kmovie': 'Korean Movie Trailers',
+            'kvariety': 'K-Variety Show Classics',
+            'trending': 'Trending Now in Korea',
+            'dramagame': 'Drama Game (Life Theatre)'
         }
         
         cat_name = cat_labels.get(category, category)
         
+        # JSON 응답을 강제하기 위한 프롬프트 (v19.18)
         prompt = f"""
-당신은 대한민국 영상 아카이브 전문 큐레이터입니다. 아래 영상에 대해 시니어(5070)분들이나 고전 애호가들에게 가치 있는 **프리미엄 설명글**을 작성해 주세요.
-
-[영상 정보]
-- 제목: {title}
-- 카테고리: {cat_name}
-
-[작성 지침]
-1. 단순한 설명이 아니라, 해당 작품이나 출연진의 배경, 가치, 시청 포인트 등을 전문적이고 따뜻한 어조로 작성하세요.
-2. 첫 문장은 독자의 호기심을 자극하며 시작하고, 중간에 작품의 역사적/문화적 의의를 곁들여 주세요.
-3. 500자 내외로 풍성하게 작성하세요. (최소 300자 이상)
-4. 줄바꿈을 적절히 사용하여 가독성을 높이세요.
-5. '유플릭스(YOUFLIX)'에서 제공하는 특별한 자료임을 은근히 강조해도 좋습니다.
-
-내용만 바로 출력하세요:
-"""
-        model_name = os.getenv("GEMINI_MODEL", "models/gemini-2.0-flash")
+        Role: Premium Curator for YOUFLIX.KR official archive.
+        Task: Write high-quality, professional video descriptions in both Korean and English.
         
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt
-        )
-        return response.text.strip()
+        Video Title: {title}
+        Category: {cat_name}
+        
+        [Instructions]
+        1. Write a premium description for people who love classic culture.
+        2. 'ko': Professional and warm tone in Korean (approx 400-500 chars).
+        3. 'en': Elegant and informative tone in English (approx 300-400 chars).
+        4. Include historical/cultural significance of the work or artists.
+        5. Return ONLY a valid JSON object.
+        
+        [Response Format]
+        {{
+            "ko": "Korean description here...",
+            "en": "English description here..."
+        }}
+        """
+        
+        model_name = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash") # v19.18: 1.5-flash is reliable for JSON
+        
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            return json.loads(response.text.strip())
+        except Exception as e:
+            logger.error(f"⚠️ JSON 생성 오류: {e}")
+            return None
 
     def backfill_all_categories(self, limit_per_cat=10, overwrite=False):
         if not self.db: return
@@ -114,28 +129,29 @@ class YouflixAIBackfiller:
                     
                     data = doc.to_dict()
                     title = data.get('title', '')
-                    existing_desc = data.get('description', '')
-
-                    # 덮어쓰기 모드거나, 기존 설명이 너무 짧은 경우(100자 미만)만 처리
-                    if not overwrite and len(existing_desc) > 150:
+                    
+                    # (v19.18) 다국어 필드 존재 여부 확인
+                    if not overwrite and data.get('description_ko') and data.get('description_en'):
                         continue
 
-                    logger.info(f"✍️ [{cat}] 설명 생성 중: {title[:30]}...")
+                    logger.info(f"✍️ [{cat}] 이중 언어(KR/EN) 설명 생성 중: {title[:30]}...")
                     
                     try:
                         # Gemini 호출 (로테이션 적용)
-                        ai_desc = call_gemini_with_retry(self.generate_ai_description, title, cat)
+                        ai_data = call_gemini_with_retry(self.generate_ai_description, title, cat)
                         
-                        if ai_desc:
+                        if ai_data and isinstance(ai_data, dict):
                             doc.reference.update({
-                                'description': ai_desc,
+                                'description_ko': ai_data.get('ko', ''),
+                                'description_en': ai_data.get('en', ''),
+                                'description': ai_data.get('ko', ''), # 하위 호환용
                                 'ai_generated': True,
                                 'last_updated': firestore.SERVER_TIMESTAMP
                             })
                             count += 1
-                            logger.info(f"✅ [{cat}] {count}/{limit_per_cat} 완료")
-                            # API 속도 조절 (무료 티어는 60초당 전송량 제한이 있으므로 10초 대기 권장)
-                            time.sleep(10)
+                            logger.info(f"✅ [{cat}] {count}/{limit_per_cat} 완료 (KR/EN)")
+                            # API 속도 조절
+                            time.sleep(5)
                             
                     except Exception as ge:
                         logger.error(f"❌ Gemini 실패: {ge}")

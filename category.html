@@ -11,6 +11,7 @@
     <!-- Firebase SDK (v18.0 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="translations.js?v=19.18"></script>
 
 
     <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
@@ -31,24 +32,30 @@
             <a href="index.html" class="logo">YOUFLIX.KR</a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="category.html?c=kpop">K-Pop M/V</a></li>
+                    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                    <li><a href="category.html?c=kpop" data-i18n="nav_kpop">K-Pop M/V</a></li>
                     <li class="has-dropdown">
-                        <a href="#">Drama ▾</a>
+                        <a href="#" data-i18n="nav_drama">Drama ▾</a>
                         <ul class="dropdown-menu">
-                            <li><a href="category.html?c=kdrama">All Dramas</a></li>
-                            <li><a href="category.html?c=tvlit">TV Literature Hall</a></li>
-                            <li><a href="category.html?c=dramagame">Drama Game</a></li>
+                            <li><a href="category.html?c=kdrama" data-i18n="nav_all_drama">All Dramas</a></li>
+                            <li><a href="category.html?c=tvlit" data-i18n="nav_tvlit">TV Literature Hall</a></li>
+                            <li><a href="category.html?c=dramagame" data-i18n="nav_dramagame">Drama Game</a></li>
                         </ul>
                     </li>
-                    <li><a href="category.html?c=kclassic">Eternal Cinema</a></li>
-                    <li><a href="category.html?c=kvariety">Variety</a></li>
-                    <li><a href="category.html?c=trending">Trending</a></li>
+                    <li><a href="category.html?c=kclassic" data-i18n="nav_classic">Eternal Cinema</a></li>
+                    <li><a href="category.html?c=kvariety" data-i18n="nav_variety">Variety</a></li>
+                    <li><a href="category.html?c=trending" data-i18n="nav_trending">Trending</a></li>
                 </ul>
             </nav>
             <div class="user-nav">
+                <div class="lang-toggle">
+                    <span style="font-size: 1.2rem; margin-right: 5px; opacity: 0.8;">🌐</span>
+                    <button class="lang-btn" data-lang="ko">KR</button>
+                    <span class="sep">|</span>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                </div>
                 <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search archive...">
+                    <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="Search archive...">
                 </div>
                 <div class="menu-toggle" id="mobile-menu-btn">
                     <span></span>
@@ -96,12 +103,12 @@
 
     <footer>
         <div class="footer-links">
-            <a href="about.html">About</a>
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="contact.html">Contact Us</a>
-            <a href="admin.html" id="admin-link" style="display: none; opacity: 0.5;">Admin</a>
+            <a href="about.html" data-i18n="footer_about">About</a>
+            <a href="privacy.html" data-i18n="footer_privacy">Privacy Policy</a>
+            <a href="contact.html" data-i18n="footer_contact">Contact Us</a>
+            <a href="admin.html" id="admin-link" style="display: none; opacity: 0.5;" data-i18n="footer_admin">Admin</a>
         </div>
-        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v19.0.6</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
+        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v19.18</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
     </footer>
 
     <!-- Fixed script tag with versioning -->

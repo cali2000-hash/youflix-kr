@@ -262,3 +262,45 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
 @media screen and (max-width: 480px) { #search-results-section .video-grid { grid-template-columns: 1fr; } }
 #search-results-section .row-header { border-left-color: #fff !important; }
 #search-results-section .loading-msg { padding: 100px 0; font-size: 1.5rem; color: #555; }
+
+/* 🌎 i18n Language Toggle (v19.18-Visibility) */
+.lang-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 25px;
+    background: rgba(255, 255, 255, 0.15); /* More visible background */
+    padding: 6px 16px;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.lang-btn {
+    background: none;
+    border: none;
+    color: #ccc; /* Brighter inactive color */
+    cursor: pointer;
+    font-size: 1rem; /* Bigger font */
+    font-weight: 800; /* Bolder font */
+    padding: 4px 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 1px;
+}
+
+.lang-btn:hover {
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.lang-btn.active {
+    color: #fff;
+    background: var(--netflix-red);
+    border-radius: 12px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.sep {
+    color: rgba(255,255,255,0.2);
+    font-size: 0.9rem;
+}

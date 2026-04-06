@@ -34,23 +34,58 @@ const ARTIST_ALIASES = {
     "스트레이키즈": "Stray Kids", "straykids": "스트레이키즈"
 };
 
+// 🌎 i18n Language Manager (v19.18)
+const currentLang = (function() {
+    const saved = localStorage.getItem('yfx_lang');
+    if (saved) return saved;
+    const browserLang = navigator.language.split('-')[0];
+    return (browserLang === 'ko') ? 'ko' : 'en';
+})();
+
+function setLanguage(lang) {
+    localStorage.setItem('yfx_lang', lang);
+    window.location.reload();
+}
+
+function t(key) {
+    if (!window.TRANSLATIONS) return key;
+    return window.TRANSLATIONS[currentLang][key] || window.TRANSLATIONS['en'][key] || key;
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translated = t(key);
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = translated;
+        } else {
+            el.innerText = translated;
+        }
+    });
+
+    // 언어 토글 버튼 활성화 상태 표시
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+}
+
 // --- [Utility] Smart Caching Engine ---
 function getCache(key) {
     const isAdmin = localStorage.getItem('youflix_admin') === 'true';
-    if (isAdmin) return null; // 관리자는 항상 실시간
+    if (isAdmin) return null;
 
-    const cached = localStorage.getItem(`yfx_cache_${key}`);
+    const cached = localStorage.getItem(`yfx_cache_${key}_${currentLang}`);
     if (!cached) return null;
     const { timestamp, data } = JSON.parse(cached);
     if (Date.now() - timestamp > CACHE_TTL) {
-        localStorage.removeItem(`yfx_cache_${key}`);
+        localStorage.removeItem(`yfx_cache_${key}_${currentLang}`);
         return null;
     }
     return data;
 }
 
 function setCache(key, data) {
-    localStorage.setItem(`yfx_cache_${key}`, JSON.stringify({
+    localStorage.setItem(`yfx_cache_${key}_${currentLang}`, JSON.stringify({
         timestamp: Date.now(),
         data: data
     }));
@@ -149,13 +184,14 @@ async function load(key, config = {}, isAppend = false) {
         const snap = await query.get();
         
         if (snap.empty) {
-            if (!isAppend) grid.innerHTML = '<p class="loading-msg">현재 준비된 영상이 없습니다.</p>';
+            if (!isAppend) grid.innerHTML = `<p class="loading-msg">${t('loading_empty')}</p>`;
             reachedEndMap[key] = true;
         } else {
             lastDocMap[key] = snap.docs[snap.docs.length - 1];
             const batchData = [];
             snap.forEach(doc => {
                 const v = doc.data(); v.category = key;
+                v.id = doc.id; // ID 명시적 할당
                 batchData.push(v);
             });
             
@@ -213,8 +249,14 @@ function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
     if (!modal || !player) return;
+    
+    // (v19.18) 다국어 해설 선택 루틴
+    const desc = (currentLang === 'ko') 
+        ? (v.description_ko || v.description) 
+        : (v.description_en || v.description);
+
     document.getElementById('modal-title').innerText = v.title;
-    document.getElementById('modal-desc').innerText = v.description || 'Premium curation from Korea’s legendary cultural archive.';
+    document.getElementById('modal-desc').innerText = desc || t('modal_curation_msg');
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
@@ -319,8 +361,27 @@ function createSearchResultsSection() {
 
 // --- [Init] App Entry Point ---
 async function initApp() {
+    console.log("🌐 Initializing App Language:", currentLang);
+
+    // translations.js가 로드된 후 실행되도록 보장 (window 객체 명시적 확인)
+    if (!window.TRANSLATIONS) {
+        console.warn("⚠️ Translations not loaded yet. Retrying in 100ms...");
+        setTimeout(initApp, 100);
+        return;
+    }
+
+    applyTranslations();
     try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
+    // (v19.18) 언어 토글 리스너 설치
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const lang = e.target.dataset.lang;
+            console.log("🔄 Switching Language to:", lang);
+            setLanguage(lang);
+        });
+    });
+
     // (v19.0) Search Listener
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
@@ -337,10 +398,14 @@ async function initApp() {
     const cat = params.get('c');
     if (cat && document.getElementById('category-grid')) {
         const titles = { 
-            'kpop': 'K-Pop M/V & Performance', 'kdrama': 'Drama World', 'tvlit': 'TV Literature Hall', 
-            'dramagame': 'Drama Game Archive', 'kclassic': 'Eternal Cinema', 
-            'kmovie': 'Cinema Masterpieces', 'kvariety': 'Variety Show Stars', 
-            'trending': 'Trending Now'
+            'kpop': t('row_kpop_title'), 
+            'kdrama': t('row_kdrama_title'), 
+            'tvlit': t('row_tvlit_title'), 
+            'dramagame': t('row_dramagame_title'), 
+            'kclassic': t('row_classic_title'), 
+            'kmovie': t('nav_classic'), 
+            'kvariety': t('nav_variety'), 
+            'trending': t('nav_trending')
         };
         const titleEl = document.getElementById('category-title');
         if (titleEl) titleEl.innerText = titles[cat] || cat;

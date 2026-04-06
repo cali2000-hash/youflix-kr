@@ -182,7 +182,22 @@ class YouflixEngine:
                     'starship tv', 'woolliment', 'cjenm music', 'mnet k-pop', 'sbs kpop', 
                     'kbs world', 'mbckpop', '1thek', 'stone music', 'official',
                     'genie music', 'warner music korea', 'sony music korea', 
-                    'universal music korea', 'm2', 'it\'s live'
+                    'universal music korea', 'm2', 'it\'s live', 'studio choom', 'dingo music',
+                    'cube entertainment', 'fnc entertainment', 'rbw', 'kq entertainment',
+                    'ist entertainment', 'wm entertainment', 'dreamcatcher official', 'p nation',
+                    'jellyfish entertainment', 'wakeone', 'edam entertainment', 'antenna',
+                    'top media', 'brave entertainment', 'maroo entertainment', 'dsp media',
+                    'fantagio', 'brand new music', 'mystic story', 'around us entertainment',
+                    'c9 entertainment', 'yuehua entertainment', 'oui entertainment', 'rain company',
+                    'konnect entertainment', 'bpm entertainment', 'abyss company', 'more vision',
+                    'at area', 'mirrorball music', 'fluxus music', 'interpark music', 'chrome entertainment',
+                    'kakao entertainment', 'hello82', 'glance tv', 'sbs kpop zoom', 'kbs kpop',
+                    'mbckpop live', 'all the k-pop', 'arirang k-pop', 'ador', 'belift lab',
+                    'source music', 'pledis entertainment', 'koz entertainment', 'sm station',
+                    'studio j', 'eighteen official', 'the mukorea', 'bts', 'blackpink', 'twice',
+                    'stray kids', 'seventeen', 'newjeans', 'ive', 'le sserafim', 'aespa', 'itzy',
+                    '(g)i-dle', 'red velvet', 'nct', 'ateez', 'txt', 'enhypen', 'treasure',
+                    'babymonster', 'nmixx', 'stayc', 'kep1er', 'zerobaseone', 'riize', 'tws', 'illit'
                 ]
                 blacklist = [
                     'reaction', '리액션', 'cover', '커버', 'fanmade', '팬메이드', 
@@ -194,6 +209,46 @@ class YouflixEngine:
                 
                 if not has_whitelist_channel or has_blacklist_title:
                     print(f"🚫 Filtering non-official or reaction: {snippet['channelTitle']} | {snippet['title'][:30]}")
+                    continue
+
+            elif category == 'kvariety':
+                channel_name = snippet['channelTitle'].lower()
+                video_title_lc = snippet['title'].lower()
+                
+                whitelist = [
+                    'sbs entertainment', 'kbs entertain', 'mbcentertainment', 'tvn', 'jtbc entertainment',
+                    'mnet tv', 'channel a', 'tvchosun joy', 'e채널', 'kbs n', '채널십오야', '뜬뜬 ddeunddeun',
+                    '문명특급 mmtg', '워크맨 workman', '살롱드립 teo', '노빠꾸탁재훈', '짠한형 신동엽',
+                    '짐종국 gym jong kook', '비보티비 vivo tv', '할명수', '조현아의 목요일 밤', '흥마늘 스튜디오',
+                    '디글 diggle', '사피엔스 스튜디오', '스튜디오 와플', '테오 teo', '어바웃트리', 'ootb studio',
+                    '런닝맨 running man', '무학도전 infinite challenge', '1박 2일 2 days 1 night',
+                    '나 혼자 산다 i live alone', '놀면 뭐하니 hangout with yoo', '전지적 참견 시점',
+                    '아는 형님 knowing bros', '유 퀴즈 온 더 블럭', '딩고 뮤직 dingo music', 'it\'s live',
+                    '1thek originals', '스튜디오 룰루랄라', '픽프 studio', 'm2 youtube', '스튜디오 훕훕',
+                    '고독한 미식가', '맛있는 녀석들', '코미디빅리그', '신서유기', '삼시세끼', '윤식당', '환승연애', 'official'
+                ]
+                blacklist = ['reaction', '리액션', 'parody', '패러디', 'cover', '커버', 'fake']
+                
+                has_whitelist_channel = any(okw in channel_name for okw in whitelist)
+                has_blacklist_title = any(bkw in video_title_lc for bkw in blacklist)
+                
+                if not has_whitelist_channel or has_blacklist_title:
+                    print(f"🚫 Filtering non-official variety: {snippet['channelTitle']} | {snippet['title'][:30]}")
+                    continue
+
+            elif category == 'trending':
+                channel_name = snippet['channelTitle'].lower()
+                # KPOP + Variety 통합 공식 화이트리스트 (v19.16)
+                total_whitelist = [
+                    'hybe labels', 'smtown', 'jyp entertainment', 'yg entertainment', 'starship tv', 
+                    'sbs kpop', 'mbckpop', 'kbs kpop', 'mnet k-pop', 'stone music', '1thek', 'official',
+                    'sbs entertainment', 'kbs entertain', 'mbcentertainment', 'tvn', 'jtbc entertainment',
+                    '채널십오야', '뜬뜬 ddeunddeun', '문명특급 mmtg', '워크맨 workman', '살롱드립 teo', 'dingo music'
+                ]
+                
+                has_whitelist_channel = any(okw in channel_name for okw in total_whitelist)
+                if not has_whitelist_channel:
+                    print(f"🚫 Filtering non-official trending: {snippet['channelTitle']} | {snippet['title'][:30]}")
                     continue
 
             video_data = {
