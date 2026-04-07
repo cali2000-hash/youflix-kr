@@ -268,17 +268,26 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// --- [Feature] Search Engine (v19.1 - Multi-Alias Mapping) ---
+// --- [Feature] Search Engine (v19.2 - Layout Alignment) ---
 async function handleSearch(query) {
     if (!query || query.trim().length < 2) return;
     
+    // Hide Hero Slider for focused search
+    const hero = document.querySelector('.hero-slider');
+    if (hero) hero.style.display = 'none';
+
     const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
     const grid = resultsContainer.querySelector('.video-grid');
-    grid.innerHTML = '<div class="loading-state" style="padding: 40px; text-align: center; width: 100%;"><p style="color: #888;">Searching across all archives...</p></div>';
+    const queryDisplay = document.getElementById('search-query-display');
+    
+    if (queryDisplay) queryDisplay.innerText = t('search_showing_results') + ' "' + query + '"';
+    
+    // Ensure dynamic elements (title, button) are translated
+    applyTranslations();
     resultsContainer.style.display = 'block';
 
     // Hide original rows
-    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    const mainContent = document.querySelector('.category-grid-container');
     if (mainContent) {
         Array.from(mainContent.children).forEach(child => {
             if (child !== resultsContainer) child.style.display = 'none';
@@ -336,27 +345,49 @@ async function handleSearch(query) {
             renderVideos(grid, allResults);
         }
     } catch (e) {
-        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">Search unavailable right now. Please try again later.</p></div>';
+        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">' + t('search_error') + '</p></div>';
         console.error("Search Error: ", e);
     }
 }
 
 function createSearchResultsSection() {
-    const section = document.createElement('div');
+    const section = document.createElement('section');
     section.id = 'search-results-section';
-    section.className = 'row';
+    section.className = 'category-page';
+    section.style.paddingTop = '150px';
     section.innerHTML = `
         <div class="container">
-            <div class="row-header" style="border-left: 6px solid #fff;">
-                <h2 class="row-title">Search Results</h2>
-                <button class="view-all-link" onclick="window.location.reload()" style="cursor:pointer; border: none; background: #333;">Close Search</button>
+            <div class="category-header">
+                <h1 class="row-title" data-i18n="search_results_title">Search Results</h1>
+                <p id="search-query-display" style="color: #888; font-size: 1.1rem;"></p>
             </div>
-            <div class="video-grid" style="flex-wrap: wrap; overflow-x: hidden;"></div>
+            <div class="video-grid animate-in" id="search-grid"></div>
+            <div class="search-footer" style="padding: 60px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 50px;">
+                <button class="btn btn-secondary" onclick="closeSearch()" data-i18n="search_close">Close Search</button>
+            </div>
         </div>
     `;
-    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    const mainContent = document.querySelector('.category-grid-container');
     if (mainContent) mainContent.prepend(section);
     return section;
+}
+
+function closeSearch() {
+    const resultsContainer = document.getElementById('search-results-section');
+    if (resultsContainer) resultsContainer.remove();
+
+    const hero = document.querySelector('.hero-slider');
+    if (hero) hero.style.display = 'block';
+
+    const mainContent = document.querySelector('.category-grid-container');
+    if (mainContent) {
+        Array.from(mainContent.children).forEach(child => {
+            child.style.display = 'block';
+        });
+    }
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
 }
 
 // --- [Init] App Entry Point ---

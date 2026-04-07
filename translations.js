@@ -48,6 +48,7 @@ const TRANSLATIONS = {
         "search_close": "검색 닫기",
         "search_no_results": "결과를 찾을 수 없습니다",
         "search_suggestion": "다른 단어를 입력하거나 카테고리를 확인해보세요:",
+        "search_showing_results": "결과 표시 중: ",
         "search_error": "현재 검색 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
     },
     en: {
@@ -99,6 +100,7 @@ const TRANSLATIONS = {
         "search_close": "Close Search",
         "search_no_results": "No results found",
         "search_suggestion": "Try different terms or browse our categories:",
+        "search_showing_results": "Showing results for: ",
         "search_error": "Search unavailable right now. Please try again later."
     }
 };

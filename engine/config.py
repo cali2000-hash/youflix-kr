@@ -89,6 +89,8 @@ CONFIG = {
     },
     # 유투브 API 키 로테이션 (두 개를 번갈아 사용)
     "youtube_api_keys": [
+        "AIzaSyDPkUB8teNoguWc9dpV44iTpBhkjtwAk2c",
+        "AIzaSyBRWy0NMZ07JywxxBEXtAJavhyvl9-ESPU",
         "AIzaSyD0sN7skLFkm__ZCYQoTGKfjtKnaXxbvKU",
         "AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14"
     ],

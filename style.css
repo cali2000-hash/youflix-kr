@@ -125,13 +125,20 @@ body {
 }
 
 .hero-content {
-    max-width: 800px;
+    max-width: 1100px;
     padding: 0 var(--gutter);
 }
 
 .hero-tag { color: var(--netflix-red); font-weight: 900; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 15px; }
-.hero-content h1 { font-size: 5.5rem; font-weight: 950; margin-bottom: 25px; letter-spacing: -3px; line-height: 1.05; }
-.hero-content p { font-size: 1.4rem; color: #ccc; margin-bottom: 45px; line-height: 1.6; max-width: 680px; }
+.hero-content h1 { 
+    font-size: 5.5rem; 
+    font-weight: 950; 
+    margin-bottom: 25px; 
+    letter-spacing: -3px; 
+    line-height: 1.05; 
+    white-space: nowrap;
+}
+.hero-content p { font-size: 1.4rem; color: #ccc; margin-bottom: 45px; line-height: 1.6; max-width: 800px; }
 .hero-actions { display: flex; gap: 15px; }
 
 /* Indicators (Dots) */
@@ -281,6 +288,24 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
     .hero-content h1 { font-size: 2.8rem; letter-spacing: -1px; }
     .hero-content p { font-size: 12px; }
     .category-header h1 { font-size: 24px; letter-spacing: -1px; }
+
+    /* Modal Close Button Top-Right Fix (v19.22) */
+    #video-modal { padding: 40px 15px; }
+    .close-modal {
+        position: fixed;
+        top: 10px;
+        right: 15px;
+        z-index: 100001;
+        font-size: 2.8rem;
+        background: rgba(0,0,0,0.5);
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        line-height: 1;
+    }
 
     /* Fix row header for mobile */
     .row-header { padding-left: 15px; margin-bottom: 20px; }
