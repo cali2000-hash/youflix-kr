@@ -14,32 +14,31 @@
         /* Cinema Page Specific Styles */
         body { background-color: #000; color: #fff; }
         
-        .video-page-hero {
-            width: 100%;
-            background: #000;
-            aspect-ratio: 16/9;
-            max-height: 85vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-top: 70px; /* navbar height */
+        .video-detail-section {
+            padding-top: 100px; /* navbar height + buffer */
         }
 
-        .video-page-hero iframe {
+        .video-player-wrapper {
+            width: 100%;
+            background: #000;
+            margin-bottom: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            aspect-ratio: 16/9;
+        }
+
+        .video-player-wrapper iframe {
             width: 100%;
             height: 100%;
             border: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .video-page-content {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 24px;
             display: grid;
             grid-template-columns: 2.2fr 1fr;
             gap: 48px;
+            margin-bottom: 80px;
         }
 
         .video-main-info h1 {
@@ -115,9 +114,10 @@
         }
 
         @media (max-width: 900px) {
-            .video-page-content { grid-template-columns: 1fr; }
-            .video-page-hero { margin-top: 60px; }
+            .video-page-content { grid-template-columns: 1fr; gap: 30px; }
+            .video-detail-section { padding-top: 80px; }
             .video-main-info h1 { font-size: 2rem; }
+            .video-player-wrapper { border-radius: 0; margin-left: -4%; width: 108%; } /* Full width on mobile */
         }
     </style>
 </head>
@@ -162,55 +162,62 @@
         </div>
     </header>
 
-    <!-- Cinema Hero Section -->
-    <section class="video-page-hero">
-        <iframe src="https://www.youtube.com/embed/p1-dQw4w9Wg?autoplay=1" allowfullscreen></iframe>
-    </section>
-
-    <!-- Content Section -->
-    <main class="video-page-content">
-        <div class="video-main-info">
-            <span class="video-episode-tag">109화</span>
-            <h1>시골여인숙</h1>
-            <p class="video-description">
-                1983년 11월 5일에 방영된 TV문학관의 명작입니다. O. 헨리의 동명 소설을 한국적 정서로 재해석하여, 각박한 세상 속에서도 따뜻한 인간미를 잃지 않는 사람들의 이야기를 그려냈습니다. 김영철, 정해창 등 명품 배우들의 열연이 돋보이는 작품으로, 당시 한국 사회의 소박한 정취를 느낄 수 있습니다.
-            </p>
-
-            <div class="related-section">
-                <h3 class="section-title">관련 영상</h3>
-                <div style="color: #666; padding: 20px; background: #0a0a0a; border-radius: 8px;">추천 영상을 불러오는 중입니다...</div>
+    <!-- Cinema Detail Section -->
+    <section class="video-detail-section">
+        <div class="container">
+            <!-- Video Player -->
+            <div class="video-player-row">
+                <div class="video-player-wrapper animate-in">
+                    <iframe src="https://www.youtube.com/embed/p1-dQw4w9Wg?autoplay=1" allowfullscreen></iframe>
+                </div>
             </div>
+
+            <!-- Meta Content Grid -->
+            <main class="video-page-content">
+                <div class="video-main-info animate-in">
+                    <span class="video-episode-tag">109화</span>
+                    <h1>시골여인숙</h1>
+                    <p class="video-description">
+                        1983년 11월 5일에 방영된 TV문학관의 명작입니다. O. 헨리의 동명 소설을 한국적 정서로 재해석하여, 각박한 세상 속에서도 따뜻한 인간미를 잃지 않는 사람들의 이야기를 그려냈습니다. 김영철, 정해창 등 명품 배우들의 열연이 돋보이는 작품으로, 당시 한국 사회의 소박한 정취를 느낄 수 있습니다.
+                    </p>
+
+                    <div class="related-section">
+                        <h3 class="section-title">관련 영상</h3>
+                        <div style="color: #666; padding: 20px; background: #0a0a0a; border-radius: 8px;">추천 영상을 불러오는 중입니다...</div>
+                    </div>
+                </div>
+
+                <aside class="video-meta-sidebar animate-in">
+                    <div class="video-meta-card">
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">방송일</span>
+                            <span class="video-meta-value">1983년 11월 5일</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">원작</span>
+                            <span class="video-meta-value">O. 헨리 「시골여인숙」</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">극본</span>
+                            <span class="video-meta-value">이석영</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">연출</span>
+                            <span class="video-meta-value">김홍종</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">출연진</span>
+                            <span class="video-meta-value">정해창, 김영철, 선우은숙, 박주아, 최주봉</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <span class="video-meta-label">카테고리</span>
+                            <span class="video-meta-value">TV문학관 / 시대극</span>
+                        </div>
+                    </div>
+                </aside>
+            </main>
         </div>
-
-        <aside class="video-meta-sidebar">
-            <div class="video-meta-card">
-                <div class="video-meta-item">
-                    <span class="video-meta-label">방송일</span>
-                    <span class="video-meta-value">1983년 11월 5일</span>
-                </div>
-                <div class="video-meta-item">
-                    <span class="video-meta-label">원작</span>
-                    <span class="video-meta-value">O. 헨리 「시골여인숙」</span>
-                </div>
-                <div class="video-meta-item">
-                    <span class="video-meta-label">극본</span>
-                    <span class="video-meta-value">이석영</span>
-                </div>
-                <div class="video-meta-item">
-                    <span class="video-meta-label">연출</span>
-                    <span class="video-meta-value">김홍종</span>
-                </div>
-                <div class="video-meta-item">
-                    <span class="video-meta-label">출연진</span>
-                    <span class="video-meta-value">정해창, 김영철, 선우은숙, 박주아, 최주봉</span>
-                </div>
-                <div class="video-meta-item">
-                    <span class="video-meta-label">카테고리</span>
-                    <span class="video-meta-value">TV문학관 / 시대극</span>
-                </div>
-            </div>
-        </aside>
-    </main>
+    </section>
 
     <!-- Shared Footer -->
     <footer>
