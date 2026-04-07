@@ -1,5 +1,5 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v22.0 - Official Stitch Restoration) 🚀
+ * YOUFLIX.KR Core Engine (v22.0 PURE - Stitch Restoration) 🚀
  * Official Stitch 'Editorial Cinematic' Implementation.
  */
 
@@ -15,12 +15,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 💎 Quota Optimization State
-const lastDocMap = {};
-const loadingMap = {};
-const reachedEndMap = {};
-
-// 🌎 i18n Language Manager
+// 🌎 Language Manager
 const currentLang = (function() {
     const saved = localStorage.getItem('yfx_lang');
     if (saved) return saved;
@@ -55,28 +50,24 @@ function applyTranslations() {
 }
 
 // --- [Core] Stitch Rendering Engine (v22.0) ---
-function renderStitchCards(container, vList, type = 'standard') {
+function renderStitchCards(container, vList, mode = 'standard') {
     vList.forEach((v) => {
         const card = document.createElement('div');
-        
         let cardClass = 'card animate-in';
-        if (type === 'large') cardClass += ' card-large';
-        if (type === 'square') cardClass += ' card-square';
-        if (type === 'shelf') cardClass += ' shelf-item';
-        if (type === 'standard') cardClass += ' video-card';
+        if (mode === 'large') cardClass += ' card-large';
+        if (mode === 'square') cardClass += ' card-square';
+        if (mode === 'shelf') cardClass += ' shelf-item';
         
         card.className = cardClass;
-        
-        let subtitle = (v.channel || 'Official Archive') + ' • ' + (v.date || 'Restored');
         
         card.innerHTML = `
             <img src="${v.thumbnail}" class="card-img" alt="${v.title}">
             <div class="card-content">
-                <span style="color: var(--primary); font-weight: 900; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">
+                <span style="color:var(--primary); font-weight:900; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase;">
                     ${v.category === 'kpop' ? 'K-POP' : 'CINEMATIC'}
                 </span>
                 <h3 class="card-title">${v.title}</h3>
-                <p class="card-subtitle">${subtitle}</p>
+                <p class="card-subtitle">${v.channel || 'Official Archive'} • ${v.date || 'Restored'}</p>
             </div>
         `;
         
@@ -87,56 +78,38 @@ function renderStitchCards(container, vList, type = 'standard') {
 
 // --- [Core] Asymmetric Grid Population ---
 async function setupStitchGrids() {
-    // 1. Trending Asymmetric (Featured + Square + Shelf)
     const featuredCon = document.getElementById('trending-featured');
     const squareCon = document.getElementById('trending-square');
-    const shelfCon = document.getElementById('trending-sidebar-list');
+    const shelfCon = document.getElementById('trending-shelf');
 
-    if (featuredCon) {
-        try {
-            // Hot K-Pop and Drama
-            const snap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(5).get();
-            if (!snap.empty) {
-                const docs = snap.docs;
-                featuredCon.innerHTML = '';
-                squareCon.innerHTML = '';
-                shelfCon.innerHTML = '';
-                
-                // 1. Large Focus (9:16)
-                const vLarge = docs[0].data(); vLarge.id = docs[0].id; vLarge.category = 'kpop';
-                renderStitchCards(featuredCon, [vLarge], 'large');
-                
-                // 2. Square Context (1:1)
-                const vSq = docs[1].data(); vSq.id = docs[1].id; vSq.category = 'kpop';
-                renderStitchCards(squareCon, [vSq], 'square');
-                
-                // 3. Horizontal Shelf (Rest of items)
-                const vShelf = docs.slice(2).map(d => {
-                    const v = d.data(); v.id = d.id; v.category = 'kpop';
-                    return v;
-                });
-                renderStitchCards(shelfCon, vShelf, 'shelf');
-            }
-        } catch (e) {
-            featuredCon.innerHTML = '<p class="error-msg">Curator deferred.</p>';
-        }
-    }
+    if (!featuredCon) return;
 
-    // 2. New Releases (Standard Grid)
-    const newGrid = document.getElementById('new-releases-grid');
-    if (newGrid) {
-        try {
-            const dramaSnap = await db.collection('kdrama').orderBy('timestamp', 'desc').limit(8).get();
-            const dramas = [];
-            dramaSnap.forEach(doc => {
-                const v = doc.data(); v.id = doc.id; v.category = 'kdrama';
-                dramas.push(v);
+    try {
+        const kpopSnap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(6).get();
+        if (!kpopSnap.empty) {
+            const docs = kpopSnap.docs;
+            featuredCon.innerHTML = '';
+            squareCon.innerHTML = '';
+            shelfCon.innerHTML = '';
+
+            // 1. Large Feature Card
+            const vL = docs[0].data(); vL.id = docs[0].id; vL.category = 'kpop';
+            renderStitchCards(featuredCon, [vL], 'large');
+
+            // 2. Square Context Card
+            const vS = docs[1].data(); vS.id = docs[1].id; vS.category = 'kpop';
+            renderStitchCards(squareCon, [vS], 'square');
+
+            // 3. Horizontal Shelf Cards
+            const shelfList = docs.slice(2).map(d => {
+                const v = d.data(); v.id = d.id; v.category = 'kpop';
+                return v;
             });
-            newGrid.innerHTML = '';
-            renderStitchCards(newGrid, dramas, 'standard');
-        } catch (e) {
-            console.warn("New releases load failed.");
+            renderStitchCards(shelfCon, shelfList, 'shelf');
         }
+    } catch (e) {
+        console.error("Grid curation deferred.", e);
+        featuredCon.innerText = "Curator deferred.";
     }
 }
 
@@ -159,10 +132,10 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// --- [Init] App Entry Point ---
+// --- [Init] Entry Point ---
 async function initApp() {
     if (!window.TRANSLATIONS) {
-        setTimeout(initApp, 100);
+        setTimeout(initApp, 150);
         return;
     }
 
@@ -176,7 +149,7 @@ async function initApp() {
     // Navbar Scrolled Effect
     window.onscroll = () => {
         const nav = document.getElementById('main-nav');
-        if (window.pageYOffset > 50) nav.classList.add('scrolled');
+        if (window.pageYOffset > 55) nav.classList.add('scrolled');
         else nav.classList.remove('scrolled');
     };
 
