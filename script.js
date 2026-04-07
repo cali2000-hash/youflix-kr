@@ -1,6 +1,6 @@
 /**
- * YOUFLIX.KR Premium Archive Engine (v18.0 - Quota Optimizer Edition) 🚀
- * Features: LocalStorage Caching, Row-level Lazy Loading, and Firestore Optimization
+ * YOUFLIX.KR Premium Archive Engine (v22.0 - Official Stitch Restoration) 🚀
+ * Official Stitch 'Editorial Cinematic' Implementation.
  */
 
 const firebaseConfig = {
@@ -15,26 +15,12 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 💎 Quota Optimization State (v18.0)
+// 💎 Quota Optimization State
 const lastDocMap = {};
 const loadingMap = {};
 const reachedEndMap = {};
-const CACHE_TTL = 60 * 60 * 1000; // 60분 간 유효
 
-const ARTIST_ALIASES = {
-    "에스파": "aespa", "aespa": "에스파",
-    "뉴진스": "NewJeans", "newjeans": "뉴진스",
-    "아이브": "IVE", "ive": "아이브",
-    "르세라핌": "LE SSERAFIM", "lesserafim": "르세라핌",
-    "방탄소년단": "BTS", "bts": "방탄소년단",
-    "블랙핑크": "BLACKPINK", "blackpink": "블랙핑크",
-    "트와이스": "TWICE", "twice": "트와이스",
-    "스테이씨": "STAYC", "stayc": "스테이씨",
-    "세븐틴": "SEVENTEEN", "seventeen": "세븐틴",
-    "스트레이키즈": "Stray Kids", "straykids": "스트레이키즈"
-};
-
-// 🌎 i18n Language Manager (v19.18)
+// 🌎 i18n Language Manager
 const currentLang = (function() {
     const saved = localStorage.getItem('yfx_lang');
     if (saved) return saved;
@@ -63,231 +49,105 @@ function applyTranslations() {
         }
     });
 
-    // 언어 토글 버튼 활성화 상태 표시
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 }
 
-// --- [Utility] Smart Caching Engine ---
-function getCache(key) {
-    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
-    if (isAdmin) return null;
-
-    const cached = localStorage.getItem(`yfx_cache_${key}_${currentLang}`);
-    if (!cached) return null;
-    const { timestamp, data } = JSON.parse(cached);
-    if (Date.now() - timestamp > CACHE_TTL) {
-        localStorage.removeItem(`yfx_cache_${key}_${currentLang}`);
-        return null;
-    }
-    return data;
-}
-
-function setCache(key, data) {
-    localStorage.setItem(`yfx_cache_${key}_${currentLang}`, JSON.stringify({
-        timestamp: Date.now(),
-        data: data
-    }));
-}
-
-// --- [Feature] Presence & Access Control ---
-(function() {
-    const sessionId = sessionStorage.getItem('yfx_session') || 
-                     (sessionStorage.setItem('yfx_session', Math.random().toString(36).substr(2, 9)), sessionStorage.getItem('yfx_session'));
-    
-    let userLoc = "Unknown";
-    fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-            userLoc = `${data.city}, ${data.country_code}`;
-            updatePresence();
-        })
-        .catch(() => updatePresence());
-
-    async function updatePresence() {
-        if (typeof db === 'undefined') return;
-        try {
-            await db.collection('presence').doc(sessionId).set({
-                last_active: firebase.firestore.FieldValue.serverTimestamp(),
-                page: window.location.pathname,
-                search: window.location.search,
-                location: userLoc,
-                ua: navigator.userAgent
-            }, { merge: true });
-        } catch (e) { console.warn("Presence sync fail."); }
-    }
-    setInterval(updatePresence, 60000); // 주기 연장 (30s -> 60s)
-})();
-
-function trackPV() {
-    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
-    if (isAdmin) return;
-    db.collection('statistics').doc('daily_pv').set({ 
-        count: firebase.firestore.FieldValue.increment(1), 
-        lastUpdate: new Date().toLocaleDateString() 
-    }, { merge: true });
-}
-
-// --- [Core] Data Rendering Engine ---
-function renderVideos(grid, vList) {
-    vList.forEach((v, idx) => {
+// --- [Core] Stitch Rendering Engine (v22.0) ---
+function renderStitchCards(container, vList, type = 'standard') {
+    vList.forEach((v) => {
         const card = document.createElement('div');
-        card.className = 'video-card animate-in';
         
-        // 🏷️ Badge Logic (v20.0)
-        let badgeHTML = '';
-        if (idx % 3 === 0) badgeHTML = '<span class="badge badge-4k">4K HDR</span>';
-        if (v.category === 'tvlit' || v.category === 'kclassic') badgeHTML = '<span class="badge badge-premium">PREMIUM</span>';
-
+        let cardClass = 'card animate-in';
+        if (type === 'large') cardClass += ' card-large';
+        if (type === 'square') cardClass += ' card-square';
+        if (type === 'shelf') cardClass += ' shelf-item';
+        if (type === 'standard') cardClass += ' video-card';
+        
+        card.className = cardClass;
+        
+        let subtitle = (v.channel || 'Official Archive') + ' • ' + (v.date || 'Restored');
+        
         card.innerHTML = `
-            <div class="thumbnail-container">
-                <img src="${v.thumbnail}" alt="${v.title}">
-                ${badgeHTML}
-                <div class="play-overlay"><span class="play-icon">▶</span></div>
-            </div>
-            <div class="video-info">
-                <h4>${v.title}</h4>
-                <p class="video-meta">${v.channel} • ${v.date}</p>
+            <img src="${v.thumbnail}" class="card-img" alt="${v.title}">
+            <div class="card-content">
+                <span style="color: var(--primary); font-weight: 900; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">
+                    ${v.category === 'kpop' ? 'K-POP' : 'CINEMATIC'}
+                </span>
+                <h3 class="card-title">${v.title}</h3>
+                <p class="card-subtitle">${subtitle}</p>
             </div>
         `;
-        card.querySelector('.thumbnail-container').onclick = () => openModal(v);
-        grid.appendChild(card);
+        
+        card.onclick = () => openModal(v);
+        container.appendChild(card);
     });
 }
 
-// --- [Core] Smart Load Engine (Caching & Paging) ---
-async function load(key, config = {}, isAppend = false) {
-    const gridId = config.elementId || 'category-grid';
-    const grid = document.getElementById(gridId);
-    if (!grid) return;
-    if (loadingMap[key] || reachedEndMap[key]) return;
-    
-    // 💎 캐시 확인 (백업 로드 시 제외)
-    if (!isAppend) {
-        const cachedData = getCache(key);
-        if (cachedData) {
-            console.log(`💎 Cache Hit: ${key}`);
-            grid.innerHTML = '';
-            renderVideos(grid, cachedData);
-            return;
-        }
-    }
-
-    loadingMap[key] = true;
-    const sentinel = document.getElementById('scroll-sentinel');
-    if (sentinel && isAppend) sentinel.classList.add('loading');
-
-    try {
-        if (!isAppend) grid.innerHTML = '';
-        
-        let orderField = 'timestamp';
-        let orderDirection = 'desc';
-        if (key === 'tvlit' || key === 'dramagame') {
-            orderField = 'sort_idx';
-            orderDirection = 'asc';
-        }
-        
-        let query = db.collection(key).orderBy(orderField, orderDirection).limit(20);
-        if (isAppend && lastDocMap[key]) query = query.startAfter(lastDocMap[key]);
-
-        const snap = await query.get();
-        
-        if (snap.empty) {
-            if (!isAppend) grid.innerHTML = `<p class="loading-msg">${t('loading_empty')}</p>`;
-            reachedEndMap[key] = true;
-        } else {
-            lastDocMap[key] = snap.docs[snap.docs.length - 1];
-            const batchData = [];
-            snap.forEach(doc => {
-                const v = doc.data(); v.category = key;
-                v.id = doc.id; // ID 명시적 할당
-                batchData.push(v);
-            });
-            
-            renderVideos(grid, batchData);
-            
-            // 캐시 저장 (첫 페이지만)
-            if (!isAppend) setCache(key, batchData);
-            
-            if (snap.docs.length < 20) reachedEndMap[key] = true;
-        }
-    } catch (e) { 
-        console.error("Load Error: " + key, e); 
-    } finally {
-        loadingMap[key] = false;
-        if (sentinel) sentinel.classList.remove('loading');
-    }
-}
-
-// --- [Feature] Row-Level Lazy Loading (IntersectionObserver) ---
-// --- [Feature] True Stitch Grid Population (v20.0) ---
+// --- [Core] Asymmetric Grid Population ---
 async function setupStitchGrids() {
-    // 1. Trending (Asymmetric)
-    const trendingFeatured = document.getElementById('trending-featured');
-    const trendingSidebar = document.getElementById('trending-sidebar-list');
-    
-    if (trendingFeatured) {
-        const kpopSnap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(3).get();
-        if (!kpopSnap.empty) {
-            trendingFeatured.innerHTML = '';
-            trendingSidebar.innerHTML = '';
-            
-            const docs = kpopSnap.docs;
-            // Feature Main
-            const vMain = docs[0].data(); vMain.id = docs[0].id; vMain.category = 'kpop';
-            renderVideos(trendingFeatured, [vMain]);
-            
-            // Sidebar
-            const vSidebar = docs.slice(1).map(d => {
-                const v = d.data(); v.id = d.id; v.category = 'kpop';
-                return v;
-            });
-            renderVideos(trendingSidebar, vSidebar);
+    // 1. Trending Asymmetric (Featured + Square + Shelf)
+    const featuredCon = document.getElementById('trending-featured');
+    const squareCon = document.getElementById('trending-square');
+    const shelfCon = document.getElementById('trending-sidebar-list');
+
+    if (featuredCon) {
+        try {
+            // Hot K-Pop and Drama
+            const snap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(5).get();
+            if (!snap.empty) {
+                const docs = snap.docs;
+                featuredCon.innerHTML = '';
+                squareCon.innerHTML = '';
+                shelfCon.innerHTML = '';
+                
+                // 1. Large Focus (9:16)
+                const vLarge = docs[0].data(); vLarge.id = docs[0].id; vLarge.category = 'kpop';
+                renderStitchCards(featuredCon, [vLarge], 'large');
+                
+                // 2. Square Context (1:1)
+                const vSq = docs[1].data(); vSq.id = docs[1].id; vSq.category = 'kpop';
+                renderStitchCards(squareCon, [vSq], 'square');
+                
+                // 3. Horizontal Shelf (Rest of items)
+                const vShelf = docs.slice(2).map(d => {
+                    const v = d.data(); v.id = d.id; v.category = 'kpop';
+                    return v;
+                });
+                renderStitchCards(shelfCon, vShelf, 'shelf');
+            }
+        } catch (e) {
+            featuredCon.innerHTML = '<p class="error-msg">Curator deferred.</p>';
         }
     }
 
     // 2. New Releases (Standard Grid)
     const newGrid = document.getElementById('new-releases-grid');
     if (newGrid) {
-        const categories = ['kdrama', 'tvlit', 'kclassic'];
-        const allNew = [];
-        for (const cat of categories) {
-            const snap = await db.collection(cat).orderBy(cat === 'tvlit' ? 'sort_idx' : 'timestamp', 'desc').limit(4).get();
-            snap.forEach(doc => {
-                const v = doc.data(); v.id = doc.id; v.category = cat;
-                allNew.push(v);
+        try {
+            const dramaSnap = await db.collection('kdrama').orderBy('timestamp', 'desc').limit(8).get();
+            const dramas = [];
+            dramaSnap.forEach(doc => {
+                const v = doc.data(); v.id = doc.id; v.category = 'kdrama';
+                dramas.push(v);
             });
+            newGrid.innerHTML = '';
+            renderStitchCards(newGrid, dramas, 'standard');
+        } catch (e) {
+            console.warn("New releases load failed.");
         }
-        newGrid.innerHTML = '';
-        renderVideos(newGrid, allNew.sort(() => Math.random() - 0.5));
     }
 }
 
-function setupInfiniteScroll(key) {
-    const sentinel = document.getElementById('scroll-sentinel');
-    if (!sentinel) return;
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !loadingMap[key] && !reachedEndMap[key]) {
-            load(key, { elementId: 'category-grid' }, true);
-        }
-    }, { threshold: 0.01 });
-    observer.observe(sentinel);
-}
-
-// --- [UI] Modal ---
+// --- [UI] Modal (Cinema Mode) ---
 function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
     if (!modal || !player) return;
     
-    // (v19.18) 다국어 해설 선택 루틴
-    const desc = (currentLang === 'ko') 
-        ? (v.description_ko || v.description) 
-        : (v.description_en || v.description);
-
     document.getElementById('modal-title').innerText = v.title;
-    document.getElementById('modal-desc').innerText = desc || t('modal_curation_msg');
+    document.getElementById('modal-desc').innerText = v.description || 'Premium curation from the YOUFLIX official archive.';
     player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
@@ -299,234 +159,31 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// --- [Feature] Search Engine (v19.2 - Layout Alignment) ---
-async function handleSearch(query) {
-    if (!query || query.trim().length < 2) return;
-    
-    // Hide Hero Slider for focused search
-    const hero = document.querySelector('.hero-slider');
-    if (hero) hero.style.display = 'none';
-
-    const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
-    const grid = resultsContainer.querySelector('.video-grid');
-    const queryDisplay = document.getElementById('search-query-display');
-    
-    if (queryDisplay) queryDisplay.innerText = t('search_showing_results') + ' "' + query + '"';
-    
-    // Ensure dynamic elements (title, button) are translated
-    applyTranslations();
-    resultsContainer.style.display = 'block';
-
-    // Hide original rows
-    const mainContent = document.querySelector('.category-grid-container');
-    if (mainContent) {
-        Array.from(mainContent.children).forEach(child => {
-            if (child !== resultsContainer) child.style.display = 'none';
-        });
-    }
-
-    const categories = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
-    
-    // Check for alias (e.g. '에스파' -> 'aespa')
-    const queryTrim = query.trim();
-    const alias = ARTIST_ALIASES[queryTrim.toLowerCase()] || ARTIST_ALIASES[queryTrim];
-    const searchTerms = [queryTrim];
-    if (alias) searchTerms.push(alias);
-
-    try {
-        const promises = categories.map(async (cat) => {
-            const termPromises = [];
-            searchTerms.forEach(term => {
-                termPromises.push(db.collection(cat).where('title', '>=', term).where('title', '<=', term + '\uf8ff').limit(15).get());
-                if (cat === 'tvlit') {
-                    termPromises.push(db.collection(cat).where('title', '>=', '[TV문학관] ' + term).where('title', '<=', '[TV문학관] ' + term + '\uf8ff').limit(15).get());
-                }
-            });
-
-            const snaps = await Promise.all(termPromises);
-            const results = [];
-            snaps.forEach(snap => {
-                if (!snap.empty) {
-                    snap.forEach(doc => {
-                        const data = doc.data(); data.category = cat; data.id = doc.id;
-                        if (!results.find(v => v.id === data.id)) results.push(data);
-                    });
-                }
-            });
-            return results;
-        });
-
-        const nestedResults = await Promise.all(promises);
-        const allResults = nestedResults.flat();
-
-        grid.innerHTML = '';
-        if (allResults.length === 0) {
-            grid.innerHTML = `
-                <div class="no-results" style="padding: 60px 20px; text-align: center; color: #888; width: 100%;">
-                    <h3 style="color: #fff; margin-bottom: 10px;">No results found for "${query}"</h3>
-                    <p style="margin-bottom: 25px;">Try different terms or browse our categories:</p>
-                    <div class="suggestion-chips" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <span onclick="document.getElementById('search-input').value='K-Pop M/V'; handleSearch('K-Pop M/V')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop M/V</span>
-                        <span onclick="document.getElementById('search-input').value='Drama'; handleSearch('Drama')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Drama</span>
-                        <span onclick="document.getElementById('search-input').value='Eternal Cinema'; handleSearch('Eternal Cinema')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Eternal Cinema</span>
-                        <span onclick="document.getElementById('search-input').value='Movie'; handleSearch('Movie')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Movie</span>
-                    </div>
-                </div>`;
-        } else {
-            renderVideos(grid, allResults);
-        }
-    } catch (e) {
-        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">' + t('search_error') + '</p></div>';
-        console.error("Search Error: ", e);
-    }
-}
-
-function createSearchResultsSection() {
-    const section = document.createElement('section');
-    section.id = 'search-results-section';
-    section.className = 'category-page';
-    section.style.paddingTop = '150px';
-    section.innerHTML = `
-        <div class="container">
-            <div class="category-header">
-                <h1 class="row-title" data-i18n="search_results_title">Search Results</h1>
-                <p id="search-query-display" style="color: #888; font-size: 1.1rem;"></p>
-            </div>
-            <div class="video-grid animate-in" id="search-grid"></div>
-            <div class="search-footer" style="padding: 60px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 50px;">
-                <button class="btn btn-secondary" onclick="closeSearch()" data-i18n="search_close">Close Search</button>
-            </div>
-        </div>
-    `;
-    const mainContent = document.querySelector('.category-grid-container');
-    if (mainContent) mainContent.prepend(section);
-    return section;
-}
-
-function closeSearch() {
-    const resultsContainer = document.getElementById('search-results-section');
-    if (resultsContainer) resultsContainer.remove();
-
-    const hero = document.querySelector('.hero-slider');
-    if (hero) hero.style.display = 'block';
-
-    const mainContent = document.querySelector('.category-grid-container');
-    if (mainContent) {
-        Array.from(mainContent.children).forEach(child => {
-            child.style.display = 'block';
-        });
-    }
-    
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) searchInput.value = '';
-}
-
 // --- [Init] App Entry Point ---
 async function initApp() {
-    console.log("🌐 Initializing App Language:", currentLang);
-
-    // translations.js가 로드된 후 실행되도록 보장 (window 객체 명시적 확인)
     if (!window.TRANSLATIONS) {
-        console.warn("⚠️ Translations not loaded yet. Retrying in 100ms...");
         setTimeout(initApp, 100);
         return;
     }
 
     applyTranslations();
-    try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
-    // (v19.18) 언어 토글 리스너 설치
+    // Language Toggle
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const lang = e.target.dataset.lang;
-            console.log("🔄 Switching Language to:", lang);
-            setLanguage(lang);
-        });
+        btn.onclick = (e) => setLanguage(e.target.dataset.lang);
     });
 
-    // (v19.0) Search Listener
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch(e.target.value);
-        });
-    }
+    // Navbar Scrolled Effect
+    window.onscroll = () => {
+        const nav = document.getElementById('main-nav');
+        if (window.pageYOffset > 50) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+    };
 
-    // (v18.0) Lazy Load Main Page Rows
-    // setupRowLazyLoading(); // Replaced by True Stitch setup
+    // Populate Grids
     setupStitchGrids();
 
-    // Category Page
-    const params = new URLSearchParams(window.location.search);
-    const cat = params.get('c');
-    if (cat && document.getElementById('category-grid')) {
-        const titles = { 
-            'kpop': t('row_kpop_title'), 
-            'kdrama': t('row_kdrama_title'), 
-            'tvlit': t('row_tvlit_title'), 
-            'dramagame': t('row_dramagame_title'), 
-            'kclassic': t('row_classic_title'), 
-            'kmovie': t('nav_classic'), 
-            'kvariety': t('nav_variety'), 
-            'trending': t('nav_trending')
-        };
-        const titleEl = document.getElementById('category-title');
-        if (titleEl) titleEl.innerText = titles[cat] || cat;
-        
-        load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
-    }
-    
-    // (v19.19) Initialize Hero Slider
-    initHeroSlider();
-
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
-}
-
-// 🎢 Hero Slider Engine (v19.19)
-function initHeroSlider() {
-    const slider = document.querySelector('.hero-slider');
-    if (!slider) return;
-
-    const slides = slider.querySelectorAll('.hero-slide');
-    const dots = slider.querySelectorAll('.indicator-dot');
-    let currentSlide = 0;
-    let slideInterval;
-
-    function showSlide(index) {
-        slides.forEach(s => s.classList.remove('active'));
-        dots.forEach(d => d.classList.remove('active'));
-
-        slides[index].classList.add('active');
-        dots[index].classList.add('active');
-        currentSlide = index;
-    }
-
-    function nextSlide() {
-        let next = (currentSlide + 1) % slides.length;
-        showSlide(next);
-    }
-
-    function startAutoPlay() {
-        stopAutoPlay();
-        slideInterval = setInterval(nextSlide, 5000);
-    }
-
-    function stopAutoPlay() {
-        if (slideInterval) clearInterval(slideInterval);
-    }
-
-    dots.forEach((dot, idx) => {
-        dot.addEventListener('click', () => {
-            showSlide(idx);
-            startAutoPlay(); // Reset timer on manual click
-        });
-    });
-
-    // Pause on hover
-    slider.addEventListener('mouseenter', stopAutoPlay);
-    slider.addEventListener('mouseleave', startAutoPlay);
-
-    startAutoPlay();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

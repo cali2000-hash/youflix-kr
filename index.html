@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUFLIX.KR | The Cinematic Curator</title>
-    <meta name="description" content="Premium curation of high-quality Korean contents including K-Pop, K-Drama, and variety shows.">
+    <title>YOUFLIX.KR | The Cinematic Curator (v22.0)</title>
+    <meta name="description" content="Premium curation of high-quality Korean contents. Official Stitch Editorial Cinematic Design.">
     <link rel="canonical" href="https://youflix.kr/index.html">
     
     <!-- Open Graph for Social -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://youflix.kr/index.html">
     <meta property="og:title" content="YOUFLIX.KR | The Premium YouTube Archive">
-    <meta property="og:description" content="Classic Korean Full Movies and Official K-Drama Teasers. Korea’s visual history curated.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1542385151-efd9000785a0?auto=format&fit=crop&q=80&w=1200">
 
-    <link rel="stylesheet" href="style.css?v=19.0">
+    <link rel="stylesheet" href="style.css?v=22.0">
     
-    <!-- Firebase SDK (v18.4 Powered) -->
+    <!-- Firebase SDK (v18.0 Powered) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="translations.js?v=19.18"></script>
+    <script src="translations.js?v=22.0"></script>
 
-    <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Inter, Outfit & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@300;600;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VG6LSVY1EW"></script>
@@ -34,52 +34,40 @@
     </script>
 </head>
 <body>
-    <header id="main-header" class="navbar">
+
+    <!-- 🧭 YOUFLIX - Official Stitch Navigation -->
+    <nav class="navbar" id="main-nav">
         <div class="container navbar-container">
             <a href="index.html" class="logo">YOUFLIX</a>
-            <nav id="desktop-nav">
-                <ul class="nav-links">
-                    <li><a href="category.html?c=kpop" data-i18n="nav_kpop">Archive</a></li>
-                    <li class="has-dropdown">
-                        <a href="#" style="color: var(--accent); font-weight: 800;" data-i18n="nav_drama">Masterpieces ▾</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="category.html?c=kdrama" data-i18n="nav_all_drama">All Dramas</a></li>
-                            <li><a href="category.html?c=tvlit" data-i18n="nav_tvlit">TV Literature Hall</a></li>
-                            <li><a href="category.html?c=dramagame" data-i18n="nav_dramagame">Drama Game</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="category.html?c=kclassic" data-i18n="nav_classic">Eternal Cinema</a></li>
-                    <li><a href="category.html?c=kvariety" data-i18n="nav_variety">Variety</a></li>
-                </ul>
-            </nav>
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-i18n="nav_all">HOME</a></li>
+                <li><a href="category.html?c=kdrama" data-i18n="nav_drama">DRAMA</a></li>
+                <li><a href="category.html?c=kpop" data-i18n="nav_kpop">K-POP</a></li>
+                <li><a href="category.html?c=kclassic" data-i18n="nav_classic">CLASSIC</a></li>
+            </ul>
             <div class="user-nav">
                 <div class="lang-toggle">
                     <button class="lang-btn" data-lang="ko">KR</button>
-                    <span class="sep">/</span>
+                    <span style="opacity: 0.3;">/</span>
                     <button class="lang-btn" data-lang="en">EN</button>
                 </div>
                 <div class="search-box">
                     <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="Discover...">
                 </div>
-                <div class="menu-toggle" id="mobile-menu-btn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- 🎭 YOUFLIX - Stitch Editorial Cinematic (v22.0) -->
+    <!-- 🎭 YOUFLIX - Stitch Hero Module (1:1 UI Restoration) -->
     <section class="hero-slider">
-        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1619983081563-430f63602796?auto=format&fit=crop&q=80&w=2000');">
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000');">
             <div class="container hero-content">
                 <span class="hero-tag" data-i18n="hero_slide_1_tag">EDITOR'S CHOICE</span>
                 <h1 data-i18n="hero_slide_1_title">MIDNIGHT<br>IN SEOUL</h1>
                 <p data-i18n="hero_slide_1_desc">A cinematic masterpiece exploring the hidden layers of urban longing and the neon-lit shadows of a city that never sleeps. Experience the definitive K-Noir.</p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary" onclick="location.href='category.html?c=kpop'">
-                        <span style="font-size: 1.2rem; margin-right: 8px;">▶</span> WATCH NOW
+                    <button class="btn btn-primary" onclick="location.href='category.html?c=kdrama'">
+                        <i class="fa-solid fa-play" style="margin-right: 12px;"></i> WATCH NOW
                     </button>
                     <button class="btn btn-secondary">+ MY LIST</button>
                 </div>
@@ -87,82 +75,84 @@
         </div>
     </section>
 
-    <main class="container" style="padding-top: 80px;">
-        <!-- 🧩 Trending Now (Asymmetric Grid) -->
-        <section class="row">
-            <div class="row-header" style="flex-direction: row; justify-content: space-between; align-items: flex-end;">
-                <h2 class="row-title">Trending Now</h2>
-                <a href="#" class="view-all-link" style="background: none; color: var(--primary); padding: 0;">VIEW ALL MASTERPIECES</a>
-            </div>
-            <div class="trending-grid" id="trending-grid">
-                <!-- Trending Main (Featured) -->
-                <div class="trending-main" id="trending-featured">
-                    <div class="loading-msg">Summoning...</div>
-                </div>
-                <!-- Trending Sidebar -->
-                <div class="trending-sidebar" id="trending-sidebar-list">
-                    <div class="sidebar-item loading-msg">...</div>
-                    <div class="sidebar-item loading-msg">...</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 💎 Promo Section (Legacy of Kings) -->
-        <section class="promo-section">
-            <div class="promo-wide" style="background: url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200') center/cover;">
-                <div style="position: absolute; inset: 0; background: linear-gradient(to top, #000 20%, transparent 60%);"></div>
-                <div style="position: absolute; bottom: 40px; left: 40px;">
-                    <span class="badge badge-premium">MUST WATCH</span>
-                    <h2 style="font-size: 3rem; font-weight: 950; letter-spacing: -2px; margin: 10px 0;">LEGACY OF KINGS</h2>
-                    <p style="color: #ccc; max-width: 400px;">The epic historical saga reimagined for the modern screen. Streaming exclusively on YouFlix Premium.</p>
-                </div>
-            </div>
-            <div class="promo-box">
-                <span style="font-size: 2rem; margin-bottom: 20px;">🎬</span>
-                <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px;">GOLD TIER ACCESS</h3>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); line-height: 1.4;">Experience cinema as it was meant to be seen. No ads. 8K Ready.</p>
-            </div>
-        </section>
-
-        <!-- 🎞️ New Releases (Standard Grid) -->
-        <section class="row">
+    <main class="container">
+        
+        <!-- 🧩 Editorial Section: Trending (Asymmetric Grid) -->
+        <section class="section-row">
             <div class="row-header">
-                <h2 class="row-title">New Releases</h2>
+                <h2 class="row-title" data-i18n="row_trending_title">Trending Masterpieces</h2>
+                <a href="category.html?c=trending" class="view-all" data-i18n="view_all">VIEW ALL</a>
             </div>
-            <div id="new-releases-grid" class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
-                <!-- Content via script.js -->
+            
+            <div class="editorial-grid" id="stitch-editorial-grid">
+                <!-- Large Featured Card (Populated by script.js) -->
+                <div class="card card-large animate-in" id="trending-featured">
+                    <div class="loading-msg" style="padding: 100px; text-align: center;">CURATING...</div>
+                </div>
+
+                <!-- Gold Tier Promo Box -->
+                <div class="card card-promo animate-in">
+                    <div class="gold-tier">
+                        <i class="fa-solid fa-crown"></i>
+                        <div>
+                            <h3 data-i18n="gold_tier_title">GOLD TIER<br>ACCESS</h3>
+                            <p data-i18n="gold_tier_desc">Unlock the definitive cinematic vault. No ads, 8K Ultra, and exclusive curator commentary.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Square Card (Populated by script.js) -->
+                <div class="card card-square animate-in" id="trending-square">
+                    <div class="loading-msg" style="padding: 100px; text-align: center;">...</div>
+                </div>
+
+                <!-- Sub-Shelf (Horizontal Shelf Area) -->
+                <div class="sub-shelf animate-in" id="trending-sidebar-list">
+                    <!-- Population handled by script.js -->
+                </div>
             </div>
         </section>
+
+        <!-- 🎞️ Alternative Row: New Releases (Standard Grid) -->
+        <section class="section-row">
+            <div class="row-header">
+                <h2 class="row-title" data-i18n="row_new_releases_title">New Releases</h2>
+                <a href="category.html?c=kdrama" class="view-all" data-i18n="view_all">EXPLORE</a>
+            </div>
+            <div id="new-releases-grid" class="video-grid">
+                <!-- Standard density grid items -->
+            </div>
+        </section>
+
     </main>
 
-    <!-- Global Video Modal -->
+    <!-- 🎬 Global Video Modal (Premium Cinema Mode) -->
     <div id="video-modal" class="modal">
+        <span class="close-modal">&times;</span>
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
             <div class="video-container">
                 <div id="player"></div>
             </div>
             <div class="modal-info">
-                <div class="modal-controls" id="modal-controls" style="margin-bottom: 20px;"></div>
-                <h2 id="modal-title">Video Title</h2>
-                <p id="modal-desc" style="margin-top: 15px; color: #ccc; font-size: 0.9rem; line-height: 1.6;">
-                    Special curation from Korea's National Movie & Music archive.
+                <h2 id="modal-title" style="font-weight: 950; font-size: 2.22rem; letter-spacing: -1.5px;">Video Title</h2>
+                <p id="modal-desc" style="margin-top: 15px; color: var(--on-surface-dim); line-height: 1.6; max-width: 800px;">
+                    Curation from the official archive.
                 </p>
             </div>
         </div>
     </div>
 
     <footer>
-        <div class="footer-links">
-            <a href="about.html" data-i18n="footer_about">About</a>
-            <a href="privacy.html" data-i18n="footer_privacy">Privacy Policy</a>
-            <a href="contact.html" data-i18n="footer_contact">Contact Us</a>
-            <a href="admin.html" id="admin-link" style="display: none; opacity: 0.5;" data-i18n="footer_admin">Admin</a>
+        <div class="container" style="text-align: center;">
+            <p style="color: #444; font-size: 0.9rem;">
+                © 2024 YOUFLIX.KR / <span style="color:var(--primary); font-weight:bold;">v22.0</span> / 
+                Official Stitch Editorial Cinematic <br>
+                CONTACT: <a href="mailto:cali20000@gmail.com" style="color:var(--primary); text-decoration:none;"><b>cali20000@gmail.com</b></a>
+            </p>
         </div>
-        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v22.0</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
     </footer>
 
-    <!-- Fixed script tag with versioning -->
-    <script src="script.js?v=19.1"></script>
+    <!-- Initializer Engine -->
+    <script src="script.js?v=22.0"></script>
 </body>
 </html>
