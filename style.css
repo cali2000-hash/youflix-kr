@@ -1,12 +1,16 @@
-/* YOUFLIX.KR Premium Master Collection (v16.0 - Grand Restoration) */
+/* 🎬 YOUFLIX.KR - Editorial Cinematic Premium (Powered by Stitch) */
 :root {
-    --netflix-red: #e50914;
-    --dark-bg: #141414;
-    --card-bg: #1a1a1a;
-    --text-color: #fff;
-    --accent-color: #0080ff;
-    --font-main: 'Noto Sans KR', 'Outfit', 'Inter', sans-serif;
-    --gutter: 4%;
+    --primary: #e50914; /* Cinema Red */
+    --background: #131313; /* The Foundational Void */
+    --on-background: #e2e2e2;
+    --surface-container-low: #1b1b1b; /* Standard Sectioning */
+    --surface-container-high: #2a2a2a; /* Card Backgrounds */
+    --surface-container-highest: #353535; /* Hover/Active states */
+    --accent: #fecb00; /* Gold Tier */
+    --font-main: 'Inter', 'Noto Sans KR', sans-serif;
+    --glass-bg: rgba(19, 19, 19, 0.7);
+    --glass-blur: 24px;
+    --gutter: 5%;
 }
 
 /* 📐 Unified Layout Engine (v19.0) */
@@ -19,8 +23,8 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    background-color: #000;
-    color: var(--text-color);
+    background-color: var(--background);
+    color: var(--on-background);
     font-family: var(--font-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -31,9 +35,10 @@ body {
     position: fixed;
     top: 0; width: 100%;
     z-index: 9999;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 70%, transparent 100%);
+    background: linear-gradient(to bottom, var(--background) 0%, rgba(19,19,19,0.5) 70%, transparent 100%);
     height: 75px; 
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(var(--glass-blur));
 }
 .navbar-container {
     display: flex;
@@ -41,9 +46,13 @@ body {
     align-items: center;
     height: 100%;
 }
-.navbar.scrolled { background: #000 !important; height: 65px; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+.navbar.scrolled { 
+    background: var(--glass-bg) !important; 
+    height: 65px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8); 
+}
 
-.logo { color: var(--netflix-red); font-size: 1.25rem; font-weight: 950; text-decoration: none; letter-spacing: -1.5px; flex: 0 0 auto; transition: 0.3s; }
+.logo { color: var(--primary); font-size: 1.5rem; font-weight: 950; text-decoration: none; letter-spacing: -2px; flex: 0 0 auto; transition: 0.3s; }
 .logo:hover { opacity: 0.8; }
 
 .nav-links { 
@@ -81,10 +90,13 @@ body {
     padding: 12px 28px; font-size: 1.1rem; font-weight: 800; border-radius: 4px;
     cursor: pointer; transition: all 0.3s; border: none; text-decoration: none;
 }
-.btn-primary { background-color: var(--netflix-red); color: white; }
-.btn-primary:hover { background-color: #ff0c1b; transform: scale(1.05); }
-.btn-secondary { background-color: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
-.btn-secondary:hover { background-color: rgba(255,255,255,0.4); transform: scale(1.05); }
+.btn-primary { 
+    background: linear-gradient(135deg, var(--primary) 0%, #ff5c5c 100%);
+    color: white; 
+}
+.btn-primary:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(229, 9, 20, 0.4); }
+.btn-secondary { background-color: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); border: none; }
+.btn-secondary:hover { background-color: rgba(255,255,255,0.2); transform: scale(1.05); }
 
 /* Hero Section (v16.0 Layout) */
 /* 🎢 Category Roller Hero Slider (v19.19) */
@@ -129,16 +141,35 @@ body {
     padding: 0 var(--gutter);
 }
 
-.hero-tag { color: var(--netflix-red); font-weight: 900; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 15px; }
-.hero-content h1 { 
-    font-size: 5.5rem; 
-    font-weight: 950; 
-    margin-bottom: 25px; 
-    letter-spacing: -3px; 
-    line-height: 1.05; 
-    white-space: nowrap;
+.hero-tag { 
+    color: var(--primary); 
+    font-weight: 800; 
+    font-size: 0.8rem; 
+    text-transform: uppercase;
+    letter-spacing: 4px; 
+    margin-bottom: 20px; 
+    display: block;
+    opacity: 0.8;
 }
-.hero-content p { font-size: 1.4rem; color: #ccc; margin-bottom: 45px; line-height: 1.6; max-width: 800px; }
+
+.hero-content h1 { 
+    font-size: 6.5rem; 
+    font-weight: 950; 
+    margin-bottom: 30px; 
+    letter-spacing: -4px; 
+    line-height: 0.95; 
+    text-transform: uppercase;
+    max-width: 900px;
+}
+
+.hero-content p { 
+    font-size: 1.25rem; 
+    color: #aaa; 
+    margin-bottom: 50px; 
+    line-height: 1.7; 
+    max-width: 650px; 
+    font-weight: 400;
+}
 .hero-actions { display: flex; gap: 15px; }
 
 /* Indicators (Dots) */
@@ -168,21 +199,35 @@ body {
 
 .category-header p { font-size: 12px; color: #ccc; max-width: 800px; line-height: 1.6; }
 
-/* Row & Grid */
-.row { padding: 80px 0 20px 0; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }
-.row-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 30px; border-left: 6px solid var(--netflix-red); padding-left: 20px; }
-.row-title { font-size: 20px; font-weight: 900; letter-spacing: -1px; width: 100%; }
+/* Row & Grid (No-Line Rule) */
+.row { padding: 80px 0 20px 0; width: 100%; border-top: none; }
+.row-header { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 30px; border-left: none; padding-left: 0; }
+.row-title { font-size: 32px; font-weight: 950; letter-spacing: -1px; width: 100%; opacity: 0.9; }
 
-.view-all-link { color: #fff; text-decoration: none; font-size: 12px; font-weight: 900; background: rgba(255,255,255,0.1); padding: 7px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
-.view-all-link:hover { background: var(--netflix-red); }
+.view-all-link { color: #fff; text-decoration: none; font-size: 13px; font-weight: 800; background: var(--surface-container-high); padding: 8px 22px; border-radius: 4px; transition: 0.3s; }
+.view-all-link:hover { background: var(--primary); }
 
 .video-grid { display: flex; overflow-x: auto; overflow-y: hidden; gap: 20px; padding: 15px 0 50px 0; scroll-behavior: smooth; }
 .video-grid::-webkit-scrollbar { height: 4px; }
 .video-grid::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 
-/* Premium Card (Icon Mastery v16.0) */
-.video-card { flex: 0 0 320px; background: #000; border-radius: 6px; overflow: hidden; transition: transform 0.4s; cursor: pointer; position: relative; }
-.video-card:hover { transform: scale(1.06); z-index: 100; box-shadow: 0 20px 50px rgba(0,0,0,1); }
+/* Premium Card (Stitch XL Rounded Rules) */
+.video-card { 
+    flex: 0 0 340px; 
+    background: var(--surface-container-low); 
+    border-radius: 12px; /* 0.75rem / xl */
+    overflow: hidden; 
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+    cursor: pointer; 
+    position: relative;
+    border: none;
+}
+.video-card:hover { 
+    transform: translateY(-8px) scale(1.02); 
+    z-index: 100; 
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    background: var(--surface-container-high);
+}
 
 .thumbnail-container { position: relative; aspect-ratio: 16/9; overflow: hidden; }
 .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
@@ -196,9 +241,18 @@ body {
 .thumbnail-container:hover .play-overlay { opacity: 1; }
 .play-icon { font-size: 3.5rem; color: #fff; filter: drop-shadow(0 0 20px rgba(0,0,0,0.9)); }
 
-.video-info { padding: 18px 5px; }
-.video-info h4 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.video-meta { font-size: 0.95rem; color: #999; }
+.video-info { padding: 20px 10px; }
+.video-info h4 { 
+    font-size: 1.1rem; 
+    font-weight: 700; 
+    color: #fff; 
+    margin-bottom: 6px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    letter-spacing: -0.5px;
+}
+.video-meta { font-size: 0.85rem; color: #777; font-weight: 500; }
 
 /* Category Archive Page (v16.0 Layout) */
 .category-page { padding: 180px 0 100px 0 !important; min-height: 100vh; }
