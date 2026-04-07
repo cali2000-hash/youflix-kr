@@ -131,15 +131,25 @@ function trackPV() {
 
 // --- [Core] Data Rendering Engine ---
 function renderVideos(grid, vList) {
-    vList.forEach(v => {
+    vList.forEach((v, idx) => {
         const card = document.createElement('div');
         card.className = 'video-card animate-in';
+        
+        // 🏷️ Badge Logic (v20.0)
+        let badgeHTML = '';
+        if (idx % 3 === 0) badgeHTML = '<span class="badge badge-4k">4K HDR</span>';
+        if (v.category === 'tvlit' || v.category === 'kclassic') badgeHTML = '<span class="badge badge-premium">PREMIUM</span>';
+
         card.innerHTML = `
             <div class="thumbnail-container">
                 <img src="${v.thumbnail}" alt="${v.title}">
+                ${badgeHTML}
                 <div class="play-overlay"><span class="play-icon">▶</span></div>
             </div>
-            <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
+            <div class="video-info">
+                <h4>${v.title}</h4>
+                <p class="video-meta">${v.channel} • ${v.date}</p>
+            </div>
         `;
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
         grid.appendChild(card);
@@ -211,26 +221,47 @@ async function load(key, config = {}, isAppend = false) {
 }
 
 // --- [Feature] Row-Level Lazy Loading (IntersectionObserver) ---
-function setupRowLazyLoading() {
-    const rows = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
-    const rowObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const rowKey = entry.target.dataset.row;
-                const gridId = rowKey + '-grid';
-                if (document.getElementById(gridId)) load(rowKey, { elementId: gridId });
-                rowObserver.unobserve(entry.target); // 한 번 로드 후 감시 종료
-            }
-        });
-    }, { threshold: 0.1 });
-
-    rows.forEach(row => {
-        const grid = document.getElementById(row + '-grid');
-        if (grid) {
-            grid.dataset.row = row;
-            rowObserver.observe(grid);
+// --- [Feature] True Stitch Grid Population (v20.0) ---
+async function setupStitchGrids() {
+    // 1. Trending (Asymmetric)
+    const trendingFeatured = document.getElementById('trending-featured');
+    const trendingSidebar = document.getElementById('trending-sidebar-list');
+    
+    if (trendingFeatured) {
+        const kpopSnap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(3).get();
+        if (!kpopSnap.empty) {
+            trendingFeatured.innerHTML = '';
+            trendingSidebar.innerHTML = '';
+            
+            const docs = kpopSnap.docs;
+            // Feature Main
+            const vMain = docs[0].data(); vMain.id = docs[0].id; vMain.category = 'kpop';
+            renderVideos(trendingFeatured, [vMain]);
+            
+            // Sidebar
+            const vSidebar = docs.slice(1).map(d => {
+                const v = d.data(); v.id = d.id; v.category = 'kpop';
+                return v;
+            });
+            renderVideos(trendingSidebar, vSidebar);
         }
-    });
+    }
+
+    // 2. New Releases (Standard Grid)
+    const newGrid = document.getElementById('new-releases-grid');
+    if (newGrid) {
+        const categories = ['kdrama', 'tvlit', 'kclassic'];
+        const allNew = [];
+        for (const cat of categories) {
+            const snap = await db.collection(cat).orderBy(cat === 'tvlit' ? 'sort_idx' : 'timestamp', 'desc').limit(4).get();
+            snap.forEach(doc => {
+                const v = doc.data(); v.id = doc.id; v.category = cat;
+                allNew.push(v);
+            });
+        }
+        newGrid.innerHTML = '';
+        renderVideos(newGrid, allNew.sort(() => Math.random() - 0.5));
+    }
 }
 
 function setupInfiniteScroll(key) {
@@ -422,7 +453,8 @@ async function initApp() {
     }
 
     // (v18.0) Lazy Load Main Page Rows
-    setupRowLazyLoading();
+    // setupRowLazyLoading(); // Replaced by True Stitch setup
+    setupStitchGrids();
 
     // Category Page
     const params = new URLSearchParams(window.location.search);

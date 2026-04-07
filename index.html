@@ -70,126 +70,69 @@
         </div>
     </header>
 
-    <!-- 🎢 Category Roller Hero Slider (v19.19) -->
+    <!-- 🎭 TRUE STITCH Hero (v20.0) -->
     <section class="hero-slider">
-        <!-- Slide 1: K-Pop -->
         <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1619983081563-430f63602796?auto=format&fit=crop&q=80&w=2000');">
             <div class="container hero-content">
-                <span class="hero-tag" data-i18n="hero_slide_1_tag">OFFICIAL K-POP MV</span>
-                <h1 data-i18n="hero_slide_1_title">MUSIC IN YOUR HANDS</h1>
-                <p data-i18n="hero_slide_1_desc">From the latest trending idols to legendary artists, enjoy high-definition MVs provided by official channels.</p>
+                <span class="hero-tag" data-i18n="hero_slide_1_tag">EDITOR'S CHOICE</span>
+                <h1 data-i18n="hero_slide_1_title">MIDNIGHT<br>IN SEOUL</h1>
+                <p data-i18n="hero_slide_1_desc">A cinematic masterpiece exploring the hidden layers of urban longing and the neon-lit shadows of a city that never sleeps. Experience the definitive K-Noir.</p>
                 <div class="hero-actions">
-                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kpop'">Watch Now</button>
+                    <button class="btn btn-primary" onclick="location.href='category.html?c=kpop'">
+                        <span style="font-size: 1.2rem; margin-right: 8px;">▶</span> WATCH NOW
+                    </button>
+                    <button class="btn btn-secondary">+ MY LIST</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Slide 2: K-Drama -->
-        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000');">
-            <div class="container hero-content">
-                <span class="hero-tag" data-i18n="hero_slide_2_tag">K-DRAMA MASTERPIECE</span>
-                <h1 data-i18n="hero_slide_2_title">MEET YOUR LIFE DRAMA</h1>
-                <p data-i18n="hero_slide_2_desc">Relive the emotions of masterpieces like TV Literature Hall that moved the hearts of Korea.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kdrama'">Watch Now</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: K-Movies -->
-        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000');">
-            <div class="container hero-content">
-                <span class="hero-tag" data-i18n="hero_slide_3_tag">K-CLASSIC MOVIE ARCHIVE</span>
-                <h1 data-i18n="hero_slide_3_title">ETERNAL CINEMA</h1>
-                <p data-i18n="hero_slide_3_desc">A special experience to watch 60s-80s classic masterpieces restored by the Korean Movie Archive for free.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kmovie'">Watch Now</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 4: K-Variety -->
-        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=2000');">
-            <div class="container hero-content">
-                <span class="hero-tag" data-i18n="hero_slide_4_tag">K-VARIETY HIGHLIGHTS</span>
-                <h1 data-i18n="hero_slide_4_title">EVERYDAY FUN YOUFLIX</h1>
-                <p data-i18n="hero_slide_4_desc">Enjoy the essence of Korean variety shows like Running Man that captured the world.</p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kvariety'">Watch Now</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination Indicators -->
-        <div class="hero-indicators">
-            <div class="indicator-dot active" data-slide="0"></div>
-            <div class="indicator-dot" data-slide="1"></div>
-            <div class="indicator-dot" data-slide="2"></div>
-            <div class="indicator-dot" data-slide="3"></div>
         </div>
     </section>
 
-    <main class="category-grid-container" style="padding-top: 50px;">
-        <!-- Rows for K-Pop, K-Drama, K-Movies will be injected here via script.js -->
-        <div class="row">
-            <div class="container">
-                <div class="row-header">
-                    <h2 class="row-title" data-i18n="row_kpop_title">K-POP MV: The Official Archive</h2>
-                    <a href="category.html?c=kpop" class="view-all-link" data-i18n="row_view_all">View All</a>
+    <main class="container" style="padding-top: 80px;">
+        <!-- 🧩 Trending Now (Asymmetric Grid) -->
+        <section class="row">
+            <div class="row-header" style="flex-direction: row; justify-content: space-between; align-items: flex-end;">
+                <h2 class="row-title">Trending Now</h2>
+                <a href="#" class="view-all-link" style="background: none; color: var(--primary); padding: 0;">VIEW ALL MASTERPIECES</a>
+            </div>
+            <div class="trending-grid" id="trending-grid">
+                <!-- Trending Main (Featured) -->
+                <div class="trending-main" id="trending-featured">
+                    <div class="loading-msg">Summoning...</div>
                 </div>
-                <div id="kpop-grid" class="video-grid animate-in">
-                    <p class="loading-msg">Summoning the stars...</p>
+                <!-- Trending Sidebar -->
+                <div class="trending-sidebar" id="trending-sidebar-list">
+                    <div class="sidebar-item loading-msg">...</div>
+                    <div class="sidebar-item loading-msg">...</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="row">
-            <div class="container">
-                <div class="row-header">
-                    <h2 class="row-title">K-Drama World: Official Highlights</h2>
-                    <a href="category.html?c=kdrama" class="view-all-link">View All</a>
-                </div>
-                <div id="kdrama-grid" class="video-grid animate-in">
-                    <p class="loading-msg">Preparing the series...</p>
+        <!-- 💎 Promo Section (Legacy of Kings) -->
+        <section class="promo-section">
+            <div class="promo-wide" style="background: url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200') center/cover;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to top, #000 20%, transparent 60%);"></div>
+                <div style="position: absolute; bottom: 40px; left: 40px;">
+                    <span class="badge badge-premium">MUST WATCH</span>
+                    <h2 style="font-size: 3rem; font-weight: 950; letter-spacing: -2px; margin: 10px 0;">LEGACY OF KINGS</h2>
+                    <p style="color: #ccc; max-width: 400px;">The epic historical saga reimagined for the modern screen. Streaming exclusively on YouFlix Premium.</p>
                 </div>
             </div>
-        </div>
+            <div class="promo-box">
+                <span style="font-size: 2rem; margin-bottom: 20px;">🎬</span>
+                <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px;">GOLD TIER ACCESS</h3>
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); line-height: 1.4;">Experience cinema as it was meant to be seen. No ads. 8K Ready.</p>
+            </div>
+        </section>
 
-        <div class="row">
-            <div class="container">
-                <div class="row-header">
-                    <h2 class="row-title">TV Literature Hall: 📽 TV문학관 📽</h2>
-                    <a href="category.html?c=tvlit" class="view-all-link">View All</a>
-                </div>
-                <div id="tvlit-grid" class="video-grid animate-in">
-                    <p class="loading-msg">Deep diving into literature...</p>
-                </div>
+        <!-- 🎞️ New Releases (Standard Grid) -->
+        <section class="row">
+            <div class="row-header">
+                <h2 class="row-title">New Releases</h2>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="container">
-                <div class="row-header">
-                    <h2 class="row-title">Drama Game Archive: 🎭 드라마게임 🎭</h2>
-                    <a href="category.html?c=dramagame" class="view-all-link">View All</a>
-                </div>
-                <div id="dramagame-grid" class="video-grid animate-in">
-                    <p class="loading-msg">Loading classic drama games...</p>
-                </div>
+            <div id="new-releases-grid" class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+                <!-- Content via script.js -->
             </div>
-        </div>
-
-        <div class="row">
-            <div class="container">
-                <div class="row-header">
-                    <h2 class="row-title">Eternal Cinema: 🎥 고전영화 명작 🎥</h2>
-                    <a href="category.html?c=kclassic" class="view-all-link">View All</a>
-                </div>
-                <div id="kclassic-grid" class="video-grid animate-in">
-                    <p class="loading-msg">Fetching timeless masterpieces...</p>
-                </div>
-            </div>
-        </div>
+        </section>
     </main>
 
     <!-- Global Video Modal -->
