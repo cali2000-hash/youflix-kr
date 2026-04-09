@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Archive - YOUFLIX.KR</title>
+    <link rel="stylesheet" href="style.css?v=20.0">
+    
+    <!-- Firebase SDK (v18.4) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="translations.js?v=20.0"></script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="category-page-body">
+    <header id="main-header" class="navbar">
+        <nav id="navbar">
+            <a href="index.html" class="logo-container">
+                <span class="logo-you">You</span><span class="logo-flix">Flix</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" data-i18n="nav_home">Home</a>
+                <a href="category.html?c=kpop" class="nav-link" data-i18n="nav_kpop">K-Pop M/V</a>
+                <a href="category.html?c=kdrama" class="nav-link" data-i18n="nav_drama">K-Drama</a>
+                <a href="category.html?c=kclassic" class="nav-link" data-i18n="nav_classic">Eternal Cinema</a>
+                <a href="category.html?c=kvariety" class="nav-link" data-i18n="nav_variety">Variety</a>
+                <a href="category.html?c=trending" class="nav-link" data-i18n="nav_trending">Trending</a>
+            </div>
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="Search archive...">
+                    <i class="fas fa-search" style="color: grey; font-size: 12px;"></i>
+                </div>
+                <div class="lang-toggle">
+                    <button class="lang-btn" data-lang="ko">KR</button><span style="color: grey;">/</span><button class="lang-btn" data-lang="en">EN</button>
+                </div>
+                <div class="hamburger" id="hamburger-trigger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation Sidebar -->
+    <div class="mobile-menu" id="side-menu">
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="category.html?c=kpop" data-i18n="nav_kpop">K-Pop M/V</a>
+        <a href="category.html?c=kdrama" data-i18n="nav_drama">K-Drama</a>
+        <a href="category.html?c=kclassic" data-i18n="nav_classic">Eternal Cinema</a>
+        <a href="category.html?c=kvariety" data-i18n="nav_variety">Variety</a>
+        <a href="category.html?c=trending" data-i18n="nav_trending">Trending</a>
+    </div>
+
+    <main class="category-page container" style="padding-top: 150px; padding-bottom: 100px;">
+        <header class="category-header" style="margin-bottom: 50px; border-left: 8px solid var(--primary); padding-left: 25px;">
+            <h1 id="category-title" style="font-size: 42px; font-weight: 900; margin: 0; text-transform: uppercase;">Category Archive</h1>
+            <p style="color: #888; margin-top: 10px; font-size: 1.1rem;" data-i18n="modal_curation_msg">Expertly curated collection for our premium members.</p>
+        </header>
+
+        <div id="category-grid" class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; overflow-x: visible;">
+            <!-- Videos will be injected here via script.js -->
+            <p class="loading-msg">Summoning the content library...</p>
+        </div>
+
+        <!-- Infinite Scroll Sentinel -->
+        <div id="scroll-sentinel" style="height: 100px; display: flex; align-items: center; justify-content: center; margin-top: 50px;">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <!-- Global Video Modal (For fallback or integration) -->
+    <div id="video-modal" style="display: none; position: fixed; inset: 0; z-index: 100000; background: rgba(0,0,0,0.95); padding: 50px 4%;">
+        <div class="modal-content" style="max-width: 1000px; margin: 0 auto;">
+            <span class="close-modal" style="color: #fff; font-size: 3rem; cursor: pointer; float: right;">&times;</span>
+            <div id="player" style="aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px;"></div>
+            <h2 id="modal-title" style="font-size: 24px;">Video Title</h2>
+            <p id="modal-desc" style="color: #ccc; line-height: 1.6;"></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links" style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px;">
+            <a href="#" style="color: #666; text-decoration: none;">About</a>
+            <a href="#" style="color: #666; text-decoration: none;">Privacy</a>
+            <a href="#" style="color: #666; text-decoration: none;">Contact</a>
+        </div>
+        <p style="text-align: center; color: #444;">© 2024 YOUFLIX.KR / Premium Archive v20.0</p>
+    </footer>
+
+    <script src="script.js?v=20.0"></script>
+</body>
+</html>
