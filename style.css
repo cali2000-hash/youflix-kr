@@ -442,37 +442,32 @@ footer { padding: 100px var(--gutter) 60px; text-align: center; color: #555; bor
 .lang-toggle {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-right: 25px;
-    background: rgba(255, 255, 255, 0.15); /* More visible background */
-    padding: 6px 16px;
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px; /* Sharper Netflix-like corners */
+    padding: 2px;
+    gap: 0;
+    overflow: hidden;
 }
 
 .lang-btn {
-    background: none;
+    background: transparent;
     border: none;
-    color: #ccc; /* Brighter inactive color */
+    color: #999;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 800;
     cursor: pointer;
-    font-size: 1rem; /* Bigger font */
-    font-weight: 800; /* Bolder font */
-    padding: 4px 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 1px;
+    transition: 0.3s;
+    border-radius: 2px;
 }
 
-.lang-btn:hover {
-    color: #fff;
-    transform: scale(1.1);
-}
+.lang-btn:hover { color: #fff; }
 
 .lang-btn.active {
+    background: var(--primary);
     color: #fff;
-    background: var(--netflix-red);
-    border-radius: 12px;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
 }
 
 .sep {

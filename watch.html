@@ -4,188 +4,210 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watch Video - YOUFLIX</title>
+    <!-- Firebase SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="translations.js"></script> <!-- translations.js 필요 -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #e50914;
-            --bg-dark: #0f0f0f;
+            --bg-dark: #080808;
             --text-main: #ffffff;
             --text-dim: #b3b3b3;
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
-            --nav-bg: rgba(15, 15, 15, 0.95);
+            --nav-bg: rgba(0, 0, 0, 0.95);
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Inter', 'Noto Sans KR', sans-serif;
             overflow-x: hidden;
         }
 
-        /* Enhanced Navigation */
         nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 4%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 4%;
             background: var(--nav-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
+            position: fixed; top: 0; width: 100%; z-index: 1000;
             box-sizing: border-box;
         }
 
         .logo {
-            color: var(--primary);
-            font-size: 24px;
-            font-weight: 900;
-            text-decoration: none;
-            letter-spacing: -1.5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: var(--primary); font-size: 26px; font-weight: 950;
+            text-decoration: none; letter-spacing: -1.5px;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 25px;
+        .back-btn {
+            color: var(--text-main); text-decoration: none;
+            font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px; border-radius: 4px;
+            transition: 0.3s; border: 1px solid var(--border);
+        }
+        .back-btn:hover { background: var(--primary); border-color: var(--primary); }
+
+        .page-container { margin-top: 60px; }
+
+        .video-wrapper {
+            width: 100%; background: #000;
+            aspect-ratio: 16 / 9; max-height: 80vh;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
-        .nav-link {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.3s;
-        }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        .nav-link:hover { color: var(--text-main); }
-
-        /* Video Section */
-        .page-container {
-            margin-top: 60px; /* nav height */
-        }
-
-        .video-container {
-            width: 100%;
-            background: #000;
-            aspect-ratio: 16 / 9;
-            max-height: 75vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Content Info */
-        .content-main {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 6%;
-        }
+        .content-main { max-width: 1000px; margin: 40px auto; padding: 0 5%; }
 
         .category-tag {
-            color: var(--primary);
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            display: block;
+            color: var(--primary); font-size: 14px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 12px; display: block;
         }
 
         .video-title {
-            font-size: 34px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            line-height: 1.2;
+            font-size: 38px; font-weight: 900; margin-bottom: 12px;
+            line-height: 1.2; letter-spacing: -1px;
         }
 
         .meta-info {
-            display: flex;
-            gap: 20px;
-            color: var(--text-dim);
-            font-size: 14px;
-            margin-bottom: 35px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
+            display: flex; gap: 15px; color: var(--text-dim);
+            font-size: 15px; margin-bottom: 30px;
+            border-bottom: 1px solid var(--border); padding-bottom: 20px;
         }
 
         .description-box {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 30px;
-            line-height: 1.8;
-            color: #ccc;
-            backdrop-filter: blur(15px);
-            font-size: 16px;
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 8px; padding: 30px; line-height: 1.8;
+            color: #dcdcdc; font-size: 16px; white-space: pre-wrap;
         }
 
         .description-box strong {
-            color: white;
-            display: block;
-            margin-bottom: 15px;
-            font-size: 18px;
+            color: #fff; display: block; margin-bottom: 15px; font-size: 18px;
         }
 
+        .loading-overlay {
+            position: fixed; inset: 0; background: var(--bg-dark);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; transition: 0.5s;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
         @media (max-width: 768px) {
-            .video-title { font-size: 26px; }
-            .nav-links { display: none; }
+            .video-title { font-size: 24px; }
+            .description-box { padding: 20px; font-size: 15px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="loading-overlay" id="loading">
+        <div style="color: var(--primary); font-size: 40px;"><i class="fas fa-circle-notch fa-spin"></i></div>
+    </div>
+
     <nav>
         <a href="index.html" class="logo">YOUFLIX</a>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">HOME</a>
-            <a href="#" class="nav-link">K-POP</a>
-            <a href="#" class="nav-link">DRAMA</a>
-            <a href="#" class="nav-link">MOVIES</a>
-        </div>
-        <a href="index.html" class="nav-link" style="font-weight: bold; border: 1px solid var(--border); padding: 5px 15px; border-radius: 20px;">
-            <i class="fas fa-list"></i> GALLERY
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-chevron-left"></i> BACK TO HOME
         </a>
     </nav>
 
     <div class="page-container">
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/S2M8R2p5P9Q?autoplay=1&rel=0&showinfo=0&origin=https://www.youflix.kr" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen></iframe>
+        <div class="video-wrapper" id="player-container">
+            <!-- Iframe injected by JS -->
         </div>
 
         <main class="content-main">
-            <span class="category-tag">TV LITERATURE HALL</span>
-            <h1 class="video-title">[TV문학관] 건너야 할 강 (The River of No Return)</h1>
+            <span class="category-tag" id="display-category">Loading...</span>
+            <h1 class="video-title" id="display-title">---</h1>
             
             <div class="meta-info">
-                <span><i class="fas fa-calendar-alt"></i> 1980년대 Classic</span>
-                <span><i class="fas fa-history"></i> High Quality Restoration</span>
+                <span id="display-channel"><i class="fas fa-tv"></i> ---</span>
+                <span id="display-date"><i class="fas fa-calendar-alt"></i> ---</span>
             </div>
 
-            <div class="description-box">
-                <strong>[작품 소개]</strong>
-                이 작품은 한국 문학의 깊은 정서를 TV 드라마로 승화시킨 [TV문학관]의 초기 명작입니다. <br><br>
-                운명과 인연, 그리고 인간의 근원적인 고독을 다룬 이 에피소드는 당시 최고 수준의 연출력과 연기력을 보여주며 많은 시청자들에게 감동을 선사했습니다. 유플릭스에서 복원된 최고 화질의 아카이브로 한국 고전 드라마의 정수를 느껴보세요.
+            <div class="description-box" id="display-desc">
+                <strong>CURATION NOTE</strong>
+                <p>Loading masterpiece details...</p>
             </div>
         </main>
     </div>
-</body>
-</html>
 
+    <script>
+        // Firebase Config (Same as index.html)
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14',
+            authDomain: "gen-lang-client-0874410222.firebaseapp.com",
+            projectId: "gen-lang-client-0874410222",
+            storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
+            messagingSenderId: "970801923265",
+            appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const currentLang = localStorage.getItem('yfx_lang') || 'ko';
+
+        async function initWatch() {
+            const params = new URLSearchParams(window.location.search);
+            const videoId = params.get('v');
+            const category = params.get('c');
+
+            if (!videoId || !category) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const doc = await db.collection(category).doc(videoId).get();
+                if (!doc.exists) throw new Error("Video not found");
+
+                const v = doc.data();
+                
+                // Inject Player
+                const origin = window.location.origin;
+                document.getElementById('player-container').innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${v.id || videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${origin}" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                `;
+
+                // Update Info
+                document.getElementById('display-title').innerText = v.title;
+                document.getElementById('display-category').innerText = category.toUpperCase();
+                document.getElementById('display-channel').innerHTML = `<i class="fas fa-tv"></i> ${v.channel || 'Official'}`;
+                document.getElementById('display-date').innerHTML = `<i class="fas fa-calendar-alt"></i> ${v.date || 'Archives'}`;
+
+                const desc = (currentLang === 'ko') 
+                    ? (v.description_ko || v.description) 
+                    : (v.description_en || v.description);
+                
+                document.getElementById('display-desc').innerHTML = `
+                    <strong>${currentLang === 'ko' ? '[작품 큐레이션]' : '[CURATION NOTE]'}</strong>
+                    ${desc || (currentLang === 'ko' ? '이 작품에 대한 상세 설명이 준비 중입니다.' : 'Detailed description is coming soon.')}
+                `;
+
+                document.title = `${v.title} - YOUFLIX`;
+
+            } catch (error) {
+                console.error(error);
+                alert("영상을 불러올 수 없습니다.");
+                window.location.href = 'index.html';
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initWatch);
+    </script>
 </body>
 </html>

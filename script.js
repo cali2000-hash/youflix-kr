@@ -137,7 +137,7 @@ function trackPV() {
 }
 
 // --- [Core] Data Rendering Engine ---
-function renderVideos(grid, vList) {
+function renderVideos(grid, vList, categoryId) {
     vList.forEach(v => {
         const card = document.createElement('div');
         card.className = 'video-card animate-in';
@@ -148,7 +148,12 @@ function renderVideos(grid, vList) {
             </div>
             <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
         `;
-        card.querySelector('.thumbnail-container').onclick = () => openModal(v);
+        card.querySelector('.thumbnail-container').onclick = () => {
+            window.location.href = `watch.html?v=${v.id}&c=${categoryId}`;
+        };
+        card.querySelector('.video-info').onclick = () => {
+            window.location.href = `watch.html?v=${v.id}&c=${categoryId}`;
+        };
         grid.appendChild(card);
     });
 }
@@ -166,7 +171,7 @@ async function load(key, config = {}, isAppend = false) {
         if (cachedData) {
             console.log(`💎 Cache Hit: ${key}`);
             grid.innerHTML = '';
-            renderVideos(grid, cachedData);
+            renderVideos(grid, cachedData, key);
             return;
         }
     }
@@ -202,7 +207,7 @@ async function load(key, config = {}, isAppend = false) {
                 batchData.push(v);
             });
             
-            renderVideos(grid, batchData);
+            renderVideos(grid, batchData, key);
             
             // 캐시 저장 (첫 페이지만)
             if (!isAppend) setCache(key, batchData);
@@ -364,7 +369,7 @@ async function handleSearch(query) {
                     </div>
                 </div>`;
         } else {
-            renderVideos(grid, allResults);
+            renderVideos(grid, allResults, 'search');
         }
     } catch (e) {
         grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">Search unavailable right now. Please try again later.</p></div>';
@@ -521,11 +526,9 @@ function initHeroSlider() {
         if (slideTitle) slideTitle.innerHTML = slides[idx].title;
         if (slideDesc) slideDesc.innerText = slides[idx].desc;
 
-        // Update Preview Pane
-        if (previewCards.length >= 2) {
-            previewCards[0].style.backgroundImage = `url('${slides[nextIdx].image}')`;
-            previewCards[1].style.backgroundImage = `url('${slides[upNextIdx].image}')`;
-        }
+        // Update Watch Button to link to Trending Category or First Slide
+        const watchBtn = document.getElementById('hero-watch-btn');
+        if (watchBtn) watchBtn.href = `category.html?c=trending`;
     }
 
     setInterval(updateSlide, 6000); // 6초 간격 (조금 더 여유 있게)
