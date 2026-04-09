@@ -83,34 +83,61 @@ nav {
 
 .nav-link:hover { color: white; }
 
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    z-index: 1010;
-}
+.nav-right { display: flex; align-items: center; gap: 30px; }
 
-.search-container {
+/* Custom Search Box (Matches Image) */
+.search-box {
     position: relative;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    border-radius: 20px;
     display: flex;
     align-items: center;
+    background: #0a0a0a;
+    border-radius: 4px;
+    padding: 8px 15px;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.05);
 }
-
-.search-container input {
+.search-box:focus-within {
+    border-color: rgba(255,255,255,0.2);
+    background: #111;
+}
+.search-box input {
     background: transparent;
     border: none;
-    color: white;
-    width: 100px;
+    color: #fff;
     outline: none;
-    font-size: 13px;
-    transition: width 0.3s ease;
+    font-size: 14px;
+    width: 140px;
+    padding-right: 30px;
+}
+.search-box .search-icon {
+    position: absolute;
+    right: 15px;
+    color: #888;
+    font-size: 14px;
 }
 
-.search-container input:focus { width: 180px; }
+/* Simple Red Text Lang Toggle (Matches Image Precisely) */
+.lang-text-toggle {
+    color: var(--netflix-red);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.lang-option {
+    cursor: pointer;
+    transition: 0.2s;
+    color: #666; /* Grey for inactive */
+}
+.lang-option.active {
+    color: var(--netflix-red); /* Red for active */
+    opacity: 1;
+}
+.lang-option:hover { color: #fff; }
 
 /* Hamburger Button */
 .hamburger {

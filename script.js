@@ -63,8 +63,8 @@ function applyTranslations() {
         }
     });
 
-    // 언어 토글 버튼 활성화 상태 표시
-    document.querySelectorAll('.lang-btn').forEach(btn => {
+    // 언어 토글 버튼 활성화 상태 표시 (v20.0 Streamlined Design)
+    document.querySelectorAll('.lang-option').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 }
@@ -409,8 +409,8 @@ async function initApp() {
     applyTranslations();
     try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
-    // (v19.18) 언어 토글 리스너 설치
-    document.querySelectorAll('.lang-btn').forEach(btn => {
+    // (v20.0) Streamlined Language Toggle Listener
+    document.querySelectorAll('.lang-option').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const lang = e.target.dataset.lang;
             console.log("🔄 Switching Language to:", lang);

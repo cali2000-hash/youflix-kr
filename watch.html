@@ -114,11 +114,26 @@
         <div style="color: var(--primary); font-size: 40px;"><i class="fas fa-circle-notch fa-spin"></i></div>
     </div>
 
-    <nav>
-        <a href="index.html" class="logo">YOUFLIX</a>
-        <a href="index.html" class="back-btn">
-            <i class="fas fa-chevron-left"></i> BACK TO HOME
-        </a>
+    <nav id="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="logo">YOUFLIX</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">HOME</a>
+                <a href="category.html?c=kpop" class="nav-link">K-POP</a>
+                <a href="category.html?c=kdrama" class="nav-link">DRAMA</a>
+                <a href="category.html?c=trending" class="nav-link">TRENDING</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search titles...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="lang-text-toggle">
+                <span class="lang-option" data-lang="ko">KR</span> / <span class="lang-option" data-lang="en">EN</span>
+            </div>
+            <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> BACK</a>
+        </div>
     </nav>
 
     <div class="page-container">
