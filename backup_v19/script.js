@@ -444,91 +444,57 @@ async function initApp() {
         load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
     }
     
-    // (v20.0) Initialize Premium UI Components
-    initPremiumUI();
+    // (v19.19) Initialize Hero Slider
+    initHeroSlider();
 
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 }
 
-// 💎 Premium UI Logic Center (v20.0)
-function initPremiumUI() {
-    // 1. Hamburger Menu Toggle
-    const trigger = document.getElementById('hamburger-trigger');
-    const sideMenu = document.getElementById('side-menu');
-    
-    if (trigger && sideMenu) {
-        trigger.addEventListener('click', () => {
-            trigger.classList.toggle('active');
-            sideMenu.classList.toggle('active');
-            document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : 'auto';
-        });
+// 🎢 Hero Slider Engine (v19.19)
+function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.indicator-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
     }
 
-    // 2. Navbar Scroll Effect
-    window.addEventListener('scroll', () => {
-        const nav = document.getElementById('navbar');
-        if (nav) {
-            if (window.scrollY > 50) {
-                nav.style.background = 'rgba(8, 8, 8, 0.98)';
-                nav.style.padding = '10px 4%';
-            } else {
-                nav.style.background = 'transparent';
-                nav.style.padding = '15px 4%';
-            }
-        }
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (slideInterval) clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            startAutoPlay(); // Reset timer on manual click
+        });
     });
 
-    // 3. Premium Carousel Slider
-    initHeroSlider();
-}
+    // Pause on hover
+    slider.addEventListener('mouseenter', stopAutoPlay);
+    slider.addEventListener('mouseleave', startAutoPlay);
 
-// 🎢 Hero Slider Engine (v20.0 - Premium Cycle)
-function initHeroSlider() {
-    const hero = document.getElementById('hero-carousel');
-    if (!hero) return;
-
-    const slides = [
-        {
-            image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_1_title') || 'Midnight<br>in Seoul',
-            desc: t('hero_slide_1_desc') || 'A cinematic masterpiece.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_2_title') || 'Music<br>Revolution',
-            desc: t('hero_slide_2_desc') || 'K-Pop like you have never seen.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_3_title') || 'Eternal<br>Cinema',
-            desc: t('hero_slide_3_desc') || 'Classic masterpieces restored.'
-        }
-    ];
-
-    let idx = 0;
-    const slideTitle = document.querySelector('.hero-title');
-    const slideDesc = document.querySelector('.hero-desc');
-    const heroSection = document.querySelector('.hero-slide');
-    const previewCards = document.querySelectorAll('.preview-card');
-
-    function updateSlide() {
-        idx = (idx + 1) % slides.length;
-        const nextIdx = (idx + 1) % slides.length;
-        const upNextIdx = (idx + 2) % slides.length;
-
-        // Transition Effect (CSS handles basic transition, JS updates content)
-        if (heroSection) heroSection.style.backgroundImage = `url('${slides[idx].image}')`;
-        if (slideTitle) slideTitle.innerHTML = slides[idx].title;
-        if (slideDesc) slideDesc.innerText = slides[idx].desc;
-
-        // Update Preview Pane
-        if (previewCards.length >= 2) {
-            previewCards[0].style.backgroundImage = `url('${slides[nextIdx].image}')`;
-            previewCards[1].style.backgroundImage = `url('${slides[upNextIdx].image}')`;
-        }
-    }
-
-    setInterval(updateSlide, 6000); // 6초 간격 (조금 더 여유 있게)
+    startAutoPlay();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

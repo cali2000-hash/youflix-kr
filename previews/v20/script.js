@@ -70,13 +70,6 @@ function applyTranslations() {
 }
 
 // --- [Utility] Smart Caching Engine ---
-function decodeHTMLEntities(text) {
-    if (!text) return '';
-    const textArea = document.createElement('textarea');
-    textArea.innerHTML = text;
-    return textArea.value;
-}
-
 function getCache(key) {
     const isAdmin = localStorage.getItem('youflix_admin') === 'true';
     if (isAdmin) return null;
@@ -138,15 +131,25 @@ function trackPV() {
 
 // --- [Core] Data Rendering Engine ---
 function renderVideos(grid, vList) {
-    vList.forEach(v => {
+    vList.forEach((v, idx) => {
         const card = document.createElement('div');
         card.className = 'video-card animate-in';
+        
+        // 🏷️ Badge Logic (v20.0)
+        let badgeHTML = '';
+        if (idx % 3 === 0) badgeHTML = '<span class="badge badge-4k">4K HDR</span>';
+        if (v.category === 'tvlit' || v.category === 'kclassic') badgeHTML = '<span class="badge badge-premium">PREMIUM</span>';
+
         card.innerHTML = `
             <div class="thumbnail-container">
                 <img src="${v.thumbnail}" alt="${v.title}">
+                ${badgeHTML}
                 <div class="play-overlay"><span class="play-icon">▶</span></div>
             </div>
-            <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
+            <div class="video-info">
+                <h4>${v.title}</h4>
+                <p class="video-meta">${v.channel} • ${v.date}</p>
+            </div>
         `;
         card.querySelector('.thumbnail-container').onclick = () => openModal(v);
         grid.appendChild(card);
@@ -218,31 +221,47 @@ async function load(key, config = {}, isAppend = false) {
 }
 
 // --- [Feature] Row-Level Lazy Loading (IntersectionObserver) ---
-function setupRowLazyLoading() {
-    const rows = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
-    const rowObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const rowKey = entry.target.dataset.row;
-                const gridId = rowKey + '-grid';
-                if (document.getElementById(gridId)) load(rowKey, { elementId: gridId });
-                rowObserver.unobserve(entry.target); // 한 번 로드 후 감시 종료
-            }
-        });
-    }, { threshold: 0.1 });
-
-    rows.forEach(row => {
-        const grid = document.getElementById(row + '-grid');
-        if (grid) {
-            grid.dataset.row = row;
-            // K-Pop 섹션은 첫 화면이므로 즉시 로드, 나머지는 지연 로드
-            if (row === 'kpop') {
-                load(row, { elementId: row + '-grid' });
-            } else {
-                rowObserver.observe(grid);
-            }
+// --- [Feature] True Stitch Grid Population (v20.0) ---
+async function setupStitchGrids() {
+    // 1. Trending (Asymmetric)
+    const trendingFeatured = document.getElementById('trending-featured');
+    const trendingSidebar = document.getElementById('trending-sidebar-list');
+    
+    if (trendingFeatured) {
+        const kpopSnap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(3).get();
+        if (!kpopSnap.empty) {
+            trendingFeatured.innerHTML = '';
+            trendingSidebar.innerHTML = '';
+            
+            const docs = kpopSnap.docs;
+            // Feature Main
+            const vMain = docs[0].data(); vMain.id = docs[0].id; vMain.category = 'kpop';
+            renderVideos(trendingFeatured, [vMain]);
+            
+            // Sidebar
+            const vSidebar = docs.slice(1).map(d => {
+                const v = d.data(); v.id = d.id; v.category = 'kpop';
+                return v;
+            });
+            renderVideos(trendingSidebar, vSidebar);
         }
-    });
+    }
+
+    // 2. New Releases (Standard Grid)
+    const newGrid = document.getElementById('new-releases-grid');
+    if (newGrid) {
+        const categories = ['kdrama', 'tvlit', 'kclassic'];
+        const allNew = [];
+        for (const cat of categories) {
+            const snap = await db.collection(cat).orderBy(cat === 'tvlit' ? 'sort_idx' : 'timestamp', 'desc').limit(4).get();
+            snap.forEach(doc => {
+                const v = doc.data(); v.id = doc.id; v.category = cat;
+                allNew.push(v);
+            });
+        }
+        newGrid.innerHTML = '';
+        renderVideos(newGrid, allNew.sort(() => Math.random() - 0.5));
+    }
 }
 
 function setupInfiniteScroll(key) {
@@ -267,29 +286,10 @@ function openModal(v) {
         ? (v.description_ko || v.description) 
         : (v.description_en || v.description);
 
-    document.getElementById('modal-title').innerText = decodeHTMLEntities(v.title);
-    document.getElementById('modal-desc').innerText = decodeHTMLEntities(desc) || t('modal_curation_msg');
+    document.getElementById('modal-title').innerText = v.title;
+    document.getElementById('modal-desc').innerText = desc || t('modal_curation_msg');
+    player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
-    // 유튜브 플레이어 파라미터 최적화 (Error 153 완화 및 안정성 향상)
-    const origin = window.location.origin === 'null' ? '*' : window.location.origin;
-    player.innerHTML = `<iframe width="100%" height="100%" 
-        src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&enablejsapi=1&origin=${origin}&widget_referrer=${origin}" 
-        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    
-    // (v19.20) 모달 하단 액션 버튼 추가 (유튜브 바로가기 폴백)
-    let actions = document.querySelector('.modal-actions');
-    if (!actions) {
-        actions = document.createElement('div');
-        actions.className = 'modal-actions';
-        document.querySelector('.modal-content').appendChild(actions);
-    }
-    actions.innerHTML = `
-        <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" class="yt-fallback-btn">
-            <span class="yt-icon">📺</span> ${t('btn_watch_on_yt')}
-        </a>
-        <button class="modal-close-btn" onclick="closeModal()">${t('btn_close_modal')}</button>
-    `;
-
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
 }
 
@@ -299,17 +299,26 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// --- [Feature] Search Engine (v19.1 - Multi-Alias Mapping) ---
+// --- [Feature] Search Engine (v19.2 - Layout Alignment) ---
 async function handleSearch(query) {
     if (!query || query.trim().length < 2) return;
     
+    // Hide Hero Slider for focused search
+    const hero = document.querySelector('.hero-slider');
+    if (hero) hero.style.display = 'none';
+
     const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
     const grid = resultsContainer.querySelector('.video-grid');
-    grid.innerHTML = '<div class="loading-state" style="padding: 40px; text-align: center; width: 100%;"><p style="color: #888;">Searching across all archives...</p></div>';
+    const queryDisplay = document.getElementById('search-query-display');
+    
+    if (queryDisplay) queryDisplay.innerText = t('search_showing_results') + ' "' + query + '"';
+    
+    // Ensure dynamic elements (title, button) are translated
+    applyTranslations();
     resultsContainer.style.display = 'block';
 
     // Hide original rows
-    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    const mainContent = document.querySelector('.category-grid-container');
     if (mainContent) {
         Array.from(mainContent.children).forEach(child => {
             if (child !== resultsContainer) child.style.display = 'none';
@@ -367,27 +376,49 @@ async function handleSearch(query) {
             renderVideos(grid, allResults);
         }
     } catch (e) {
-        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">Search unavailable right now. Please try again later.</p></div>';
+        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">' + t('search_error') + '</p></div>';
         console.error("Search Error: ", e);
     }
 }
 
 function createSearchResultsSection() {
-    const section = document.createElement('div');
+    const section = document.createElement('section');
     section.id = 'search-results-section';
-    section.className = 'row';
+    section.className = 'category-page';
+    section.style.paddingTop = '150px';
     section.innerHTML = `
         <div class="container">
-            <div class="row-header" style="border-left: 6px solid #fff;">
-                <h2 class="row-title">Search Results</h2>
-                <button class="view-all-link" onclick="window.location.reload()" style="cursor:pointer; border: none; background: #333;">Close Search</button>
+            <div class="category-header">
+                <h1 class="row-title" data-i18n="search_results_title">Search Results</h1>
+                <p id="search-query-display" style="color: #888; font-size: 1.1rem;"></p>
             </div>
-            <div class="video-grid" style="flex-wrap: wrap; overflow-x: hidden;"></div>
+            <div class="video-grid animate-in" id="search-grid"></div>
+            <div class="search-footer" style="padding: 60px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 50px;">
+                <button class="btn btn-secondary" onclick="closeSearch()" data-i18n="search_close">Close Search</button>
+            </div>
         </div>
     `;
-    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    const mainContent = document.querySelector('.category-grid-container');
     if (mainContent) mainContent.prepend(section);
     return section;
+}
+
+function closeSearch() {
+    const resultsContainer = document.getElementById('search-results-section');
+    if (resultsContainer) resultsContainer.remove();
+
+    const hero = document.querySelector('.hero-slider');
+    if (hero) hero.style.display = 'block';
+
+    const mainContent = document.querySelector('.category-grid-container');
+    if (mainContent) {
+        Array.from(mainContent.children).forEach(child => {
+            child.style.display = 'block';
+        });
+    }
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
 }
 
 // --- [Init] App Entry Point ---
@@ -422,7 +453,8 @@ async function initApp() {
     }
 
     // (v18.0) Lazy Load Main Page Rows
-    setupRowLazyLoading();
+    // setupRowLazyLoading(); // Replaced by True Stitch setup
+    setupStitchGrids();
 
     // Category Page
     const params = new URLSearchParams(window.location.search);
@@ -444,91 +476,57 @@ async function initApp() {
         load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
     }
     
-    // (v20.0) Initialize Premium UI Components
-    initPremiumUI();
+    // (v19.19) Initialize Hero Slider
+    initHeroSlider();
 
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 }
 
-// 💎 Premium UI Logic Center (v20.0)
-function initPremiumUI() {
-    // 1. Hamburger Menu Toggle
-    const trigger = document.getElementById('hamburger-trigger');
-    const sideMenu = document.getElementById('side-menu');
-    
-    if (trigger && sideMenu) {
-        trigger.addEventListener('click', () => {
-            trigger.classList.toggle('active');
-            sideMenu.classList.toggle('active');
-            document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : 'auto';
-        });
+// 🎢 Hero Slider Engine (v19.19)
+function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.indicator-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
     }
 
-    // 2. Navbar Scroll Effect
-    window.addEventListener('scroll', () => {
-        const nav = document.getElementById('navbar');
-        if (nav) {
-            if (window.scrollY > 50) {
-                nav.style.background = 'rgba(8, 8, 8, 0.98)';
-                nav.style.padding = '10px 4%';
-            } else {
-                nav.style.background = 'transparent';
-                nav.style.padding = '15px 4%';
-            }
-        }
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (slideInterval) clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            startAutoPlay(); // Reset timer on manual click
+        });
     });
 
-    // 3. Premium Carousel Slider
-    initHeroSlider();
-}
+    // Pause on hover
+    slider.addEventListener('mouseenter', stopAutoPlay);
+    slider.addEventListener('mouseleave', startAutoPlay);
 
-// 🎢 Hero Slider Engine (v20.0 - Premium Cycle)
-function initHeroSlider() {
-    const hero = document.getElementById('hero-carousel');
-    if (!hero) return;
-
-    const slides = [
-        {
-            image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_1_title') || 'Midnight<br>in Seoul',
-            desc: t('hero_slide_1_desc') || 'A cinematic masterpiece.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_2_title') || 'Music<br>Revolution',
-            desc: t('hero_slide_2_desc') || 'K-Pop like you have never seen.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_3_title') || 'Eternal<br>Cinema',
-            desc: t('hero_slide_3_desc') || 'Classic masterpieces restored.'
-        }
-    ];
-
-    let idx = 0;
-    const slideTitle = document.querySelector('.hero-title');
-    const slideDesc = document.querySelector('.hero-desc');
-    const heroSection = document.querySelector('.hero-slide');
-    const previewCards = document.querySelectorAll('.preview-card');
-
-    function updateSlide() {
-        idx = (idx + 1) % slides.length;
-        const nextIdx = (idx + 1) % slides.length;
-        const upNextIdx = (idx + 2) % slides.length;
-
-        // Transition Effect (CSS handles basic transition, JS updates content)
-        if (heroSection) heroSection.style.backgroundImage = `url('${slides[idx].image}')`;
-        if (slideTitle) slideTitle.innerHTML = slides[idx].title;
-        if (slideDesc) slideDesc.innerText = slides[idx].desc;
-
-        // Update Preview Pane
-        if (previewCards.length >= 2) {
-            previewCards[0].style.backgroundImage = `url('${slides[nextIdx].image}')`;
-            previewCards[1].style.backgroundImage = `url('${slides[upNextIdx].image}')`;
-        }
-    }
-
-    setInterval(updateSlide, 6000); // 6초 간격 (조금 더 여유 있게)
+    startAutoPlay();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

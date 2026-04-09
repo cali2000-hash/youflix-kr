@@ -70,13 +70,6 @@ function applyTranslations() {
 }
 
 // --- [Utility] Smart Caching Engine ---
-function decodeHTMLEntities(text) {
-    if (!text) return '';
-    const textArea = document.createElement('textarea');
-    textArea.innerHTML = text;
-    return textArea.value;
-}
-
 function getCache(key) {
     const isAdmin = localStorage.getItem('youflix_admin') === 'true';
     if (isAdmin) return null;
@@ -235,12 +228,7 @@ function setupRowLazyLoading() {
         const grid = document.getElementById(row + '-grid');
         if (grid) {
             grid.dataset.row = row;
-            // K-Pop 섹션은 첫 화면이므로 즉시 로드, 나머지는 지연 로드
-            if (row === 'kpop') {
-                load(row, { elementId: row + '-grid' });
-            } else {
-                rowObserver.observe(grid);
-            }
+            rowObserver.observe(grid);
         }
     });
 }
@@ -267,29 +255,10 @@ function openModal(v) {
         ? (v.description_ko || v.description) 
         : (v.description_en || v.description);
 
-    document.getElementById('modal-title').innerText = decodeHTMLEntities(v.title);
-    document.getElementById('modal-desc').innerText = decodeHTMLEntities(desc) || t('modal_curation_msg');
+    document.getElementById('modal-title').innerText = v.title;
+    document.getElementById('modal-desc').innerText = desc || t('modal_curation_msg');
+    player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     
-    // 유튜브 플레이어 파라미터 최적화 (Error 153 완화 및 안정성 향상)
-    const origin = window.location.origin === 'null' ? '*' : window.location.origin;
-    player.innerHTML = `<iframe width="100%" height="100%" 
-        src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&enablejsapi=1&origin=${origin}&widget_referrer=${origin}" 
-        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    
-    // (v19.20) 모달 하단 액션 버튼 추가 (유튜브 바로가기 폴백)
-    let actions = document.querySelector('.modal-actions');
-    if (!actions) {
-        actions = document.createElement('div');
-        actions.className = 'modal-actions';
-        document.querySelector('.modal-content').appendChild(actions);
-    }
-    actions.innerHTML = `
-        <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" class="yt-fallback-btn">
-            <span class="yt-icon">📺</span> ${t('btn_watch_on_yt')}
-        </a>
-        <button class="modal-close-btn" onclick="closeModal()">${t('btn_close_modal')}</button>
-    `;
-
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
 }
 
@@ -444,91 +413,57 @@ async function initApp() {
         load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
     }
     
-    // (v20.0) Initialize Premium UI Components
-    initPremiumUI();
+    // (v19.19) Initialize Hero Slider
+    initHeroSlider();
 
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 }
 
-// 💎 Premium UI Logic Center (v20.0)
-function initPremiumUI() {
-    // 1. Hamburger Menu Toggle
-    const trigger = document.getElementById('hamburger-trigger');
-    const sideMenu = document.getElementById('side-menu');
-    
-    if (trigger && sideMenu) {
-        trigger.addEventListener('click', () => {
-            trigger.classList.toggle('active');
-            sideMenu.classList.toggle('active');
-            document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : 'auto';
-        });
+// 🎢 Hero Slider Engine (v19.19)
+function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.indicator-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
     }
 
-    // 2. Navbar Scroll Effect
-    window.addEventListener('scroll', () => {
-        const nav = document.getElementById('navbar');
-        if (nav) {
-            if (window.scrollY > 50) {
-                nav.style.background = 'rgba(8, 8, 8, 0.98)';
-                nav.style.padding = '10px 4%';
-            } else {
-                nav.style.background = 'transparent';
-                nav.style.padding = '15px 4%';
-            }
-        }
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (slideInterval) clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            startAutoPlay(); // Reset timer on manual click
+        });
     });
 
-    // 3. Premium Carousel Slider
-    initHeroSlider();
-}
+    // Pause on hover
+    slider.addEventListener('mouseenter', stopAutoPlay);
+    slider.addEventListener('mouseleave', startAutoPlay);
 
-// 🎢 Hero Slider Engine (v20.0 - Premium Cycle)
-function initHeroSlider() {
-    const hero = document.getElementById('hero-carousel');
-    if (!hero) return;
-
-    const slides = [
-        {
-            image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_1_title') || 'Midnight<br>in Seoul',
-            desc: t('hero_slide_1_desc') || 'A cinematic masterpiece.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_2_title') || 'Music<br>Revolution',
-            desc: t('hero_slide_2_desc') || 'K-Pop like you have never seen.'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000',
-            title: t('hero_slide_3_title') || 'Eternal<br>Cinema',
-            desc: t('hero_slide_3_desc') || 'Classic masterpieces restored.'
-        }
-    ];
-
-    let idx = 0;
-    const slideTitle = document.querySelector('.hero-title');
-    const slideDesc = document.querySelector('.hero-desc');
-    const heroSection = document.querySelector('.hero-slide');
-    const previewCards = document.querySelectorAll('.preview-card');
-
-    function updateSlide() {
-        idx = (idx + 1) % slides.length;
-        const nextIdx = (idx + 1) % slides.length;
-        const upNextIdx = (idx + 2) % slides.length;
-
-        // Transition Effect (CSS handles basic transition, JS updates content)
-        if (heroSection) heroSection.style.backgroundImage = `url('${slides[idx].image}')`;
-        if (slideTitle) slideTitle.innerHTML = slides[idx].title;
-        if (slideDesc) slideDesc.innerText = slides[idx].desc;
-
-        // Update Preview Pane
-        if (previewCards.length >= 2) {
-            previewCards[0].style.backgroundImage = `url('${slides[nextIdx].image}')`;
-            previewCards[1].style.backgroundImage = `url('${slides[upNextIdx].image}')`;
-        }
-    }
-
-    setInterval(updateSlide, 6000); // 6초 간격 (조금 더 여유 있게)
+    startAutoPlay();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

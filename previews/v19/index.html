@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUFLIX.KR | The Premium YouTube Archive</title>
+    <meta name="description" content="Premium curation of high-quality Korean contents including K-Pop, K-Drama, and variety shows.">
+    <link rel="canonical" href="https://youflix.kr/index.html">
+    
+    <!-- Open Graph for Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://youflix.kr/index.html">
+    <meta property="og:title" content="YOUFLIX.KR | The Premium YouTube Archive">
+    <meta property="og:description" content="Classic Korean Full Movies and Official K-Drama Teasers. Korea’s visual history curated.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1200">
+
+    <link rel="stylesheet" href="style.css?v=19.0">
+    
+    <!-- Firebase SDK (v18.4 Powered) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="translations.js?v=19.18"></script>
+
+    <!-- Google Fonts: Noto Sans KR & Outfit & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VG6LSVY1EW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-VG6LSVY1EW');
+    </script>
+</head>
+<body>
+    <header id="main-header" class="navbar">
+        <div class="container navbar-container">
+            <a href="index.html" class="logo">YOUFLIX.KR</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="category.html?c=kpop" data-i18n="nav_kpop">K-Pop M/V</a></li>
+                    <li class="has-dropdown">
+                        <a href="#" style="color: #ffcc00; font-weight: 900;" data-i18n="nav_drama">Drama ▾</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="category.html?c=kdrama" data-i18n="nav_all_drama">All Dramas</a></li>
+                            <li><a href="category.html?c=tvlit" data-i18n="nav_tvlit">TV Literature Hall</a></li>
+                            <li><a href="category.html?c=dramagame" data-i18n="nav_dramagame">Drama Game</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="category.html?c=kclassic" data-i18n="nav_classic">Eternal Cinema</a></li>
+                    <li><a href="category.html?c=kvariety" data-i18n="nav_variety">Variety</a></li>
+                    <li><a href="category.html?c=trending" data-i18n="nav_trending">Trending</a></li>
+                </ul>
+            </nav>
+            <div class="user-nav">
+                <div class="lang-toggle">
+                    <span style="font-size: 1.2rem; margin-right: 5px; opacity: 0.8;">🌐</span>
+                    <button class="lang-btn" data-lang="ko">KR</button>
+                    <span class="sep">|</span>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="Search archive...">
+                </div>
+                <div class="menu-toggle" id="mobile-menu-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 🎢 Category Roller Hero Slider (v19.19) -->
+    <section class="hero-slider">
+        <!-- Slide 1: K-Pop -->
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1619983081563-430f63602796?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_1_tag">OFFICIAL K-POP MV</span>
+                <h1 data-i18n="hero_slide_1_title">MUSIC IN YOUR HANDS</h1>
+                <p data-i18n="hero_slide_1_desc">From the latest trending idols to legendary artists, enjoy high-definition MVs provided by official channels.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kpop'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: K-Drama -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_2_tag">K-DRAMA MASTERPIECE</span>
+                <h1 data-i18n="hero_slide_2_title">MEET YOUR LIFE DRAMA</h1>
+                <p data-i18n="hero_slide_2_desc">Relive the emotions of masterpieces like TV Literature Hall that moved the hearts of Korea.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kdrama'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: K-Movies -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_3_tag">K-CLASSIC MOVIE ARCHIVE</span>
+                <h1 data-i18n="hero_slide_3_title">ETERNAL CINEMA</h1>
+                <p data-i18n="hero_slide_3_desc">A special experience to watch 60s-80s classic masterpieces restored by the Korean Movie Archive for free.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kmovie'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: K-Variety -->
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=2000');">
+            <div class="container hero-content">
+                <span class="hero-tag" data-i18n="hero_slide_4_tag">K-VARIETY HIGHLIGHTS</span>
+                <h1 data-i18n="hero_slide_4_title">EVERYDAY FUN YOUFLIX</h1>
+                <p data-i18n="hero_slide_4_desc">Enjoy the essence of Korean variety shows like Running Man that captured the world.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" data-i18n="hero_btn_watch" onclick="location.href='category.html?c=kvariety'">Watch Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Indicators -->
+        <div class="hero-indicators">
+            <div class="indicator-dot active" data-slide="0"></div>
+            <div class="indicator-dot" data-slide="1"></div>
+            <div class="indicator-dot" data-slide="2"></div>
+            <div class="indicator-dot" data-slide="3"></div>
+        </div>
+    </section>
+
+    <main class="category-grid-container" style="padding-top: 50px;">
+        <!-- Rows for K-Pop, K-Drama, K-Movies will be injected here via script.js -->
+        <div class="row">
+            <div class="container">
+                <div class="row-header">
+                    <h2 class="row-title" data-i18n="row_kpop_title">K-POP MV: The Official Archive</h2>
+                    <a href="category.html?c=kpop" class="view-all-link" data-i18n="row_view_all">View All</a>
+                </div>
+                <div id="kpop-grid" class="video-grid animate-in">
+                    <p class="loading-msg">Summoning the stars...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container">
+                <div class="row-header">
+                    <h2 class="row-title">K-Drama World: Official Highlights</h2>
+                    <a href="category.html?c=kdrama" class="view-all-link">View All</a>
+                </div>
+                <div id="kdrama-grid" class="video-grid animate-in">
+                    <p class="loading-msg">Preparing the series...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container">
+                <div class="row-header">
+                    <h2 class="row-title">TV Literature Hall: 📽 TV문학관 📽</h2>
+                    <a href="category.html?c=tvlit" class="view-all-link">View All</a>
+                </div>
+                <div id="tvlit-grid" class="video-grid animate-in">
+                    <p class="loading-msg">Deep diving into literature...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container">
+                <div class="row-header">
+                    <h2 class="row-title">Drama Game Archive: 🎭 드라마게임 🎭</h2>
+                    <a href="category.html?c=dramagame" class="view-all-link">View All</a>
+                </div>
+                <div id="dramagame-grid" class="video-grid animate-in">
+                    <p class="loading-msg">Loading classic drama games...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container">
+                <div class="row-header">
+                    <h2 class="row-title">Eternal Cinema: 🎥 고전영화 명작 🎥</h2>
+                    <a href="category.html?c=kclassic" class="view-all-link">View All</a>
+                </div>
+                <div id="kclassic-grid" class="video-grid animate-in">
+                    <p class="loading-msg">Fetching timeless masterpieces...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Video Modal -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="video-container">
+                <div id="player"></div>
+            </div>
+            <div class="modal-info">
+                <div class="modal-controls" id="modal-controls" style="margin-bottom: 20px;"></div>
+                <h2 id="modal-title">Video Title</h2>
+                <p id="modal-desc" style="margin-top: 15px; color: #ccc; font-size: 0.9rem; line-height: 1.6;">
+                    Special curation from Korea's National Movie & Music archive.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="about.html" data-i18n="footer_about">About</a>
+            <a href="privacy.html" data-i18n="footer_privacy">Privacy Policy</a>
+            <a href="contact.html" data-i18n="footer_contact">Contact Us</a>
+            <a href="admin.html" id="admin-link" style="display: none; opacity: 0.5;" data-i18n="footer_admin">Admin</a>
+        </div>
+        <p>© 2024 YOUFLIX.KR / <span style="color:#e50914; font-weight:bold;">v19.18</span> / CONTACT: <a href="mailto:cali20000@gmail.com" style="color:#fff; text-decoration:none;"><b>cali20000@gmail.com</b></a></p>
+    </footer>
+
+    <!-- Fixed script tag with versioning -->
+    <script src="script.js?v=19.1"></script>
+</body>
+</html>

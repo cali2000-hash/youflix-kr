@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YouFlix - Premium OTT UI Final Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e50914;
+            --bg-body: #080808;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
+            --nav-bg: rgba(0, 0, 0, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Style */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 4%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            z-index: 1010;
+        }
+
+        .logo-you { color: var(--primary); font-weight: 900; font-size: 26px; letter-spacing: -1.5px; }
+        .logo-flix { color: white; font-weight: 900; font-size: 26px; letter-spacing: -1.5px; }
+
+        /* Desktop Nav Links */
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            margin-left: 50px;
+            flex-grow: 1;
+        }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .nav-link.active { color: var(--text-main); }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .nav-link:hover { color: var(--text-main); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1010;
+        }
+
+        .search-container {
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .lang-toggle { font-size: 13px; font-weight: bold; color: var(--primary); cursor: pointer; }
+
+        /* Hamburger Button (Crucial for Mobile) */
+        .hamburger {
+            display: none; /* Hidden by default */
+            cursor: pointer;
+            width: 25px;
+            height: 20px;
+            position: relative;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* Mobile Menu Sidebar */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 260px;
+            height: 100vh;
+            background: #0f0f0f;
+            z-index: 1005;
+            padding: 80px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: 0.4s ease;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .mobile-menu.active { right: 0; }
+        .mobile-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Hero Section Responsive */
+        .hero {
+            position: relative;
+            height: 80vh;
+            width: 100%;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%),
+                        linear-gradient(to top, var(--bg-body) 0%, transparent 25%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            padding: 0 4%;
+            max-width: 700px;
+        }
+
+        .hero-title {
+            font-size: 5vw; /* Fluid font size */
+            font-weight: 900;
+            line-height: 1.1;
+            margin: 15px 0;
+            text-transform: uppercase;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+
+        .hero-btns { display: flex; gap: 15px; }
+        .btn { padding: 12px 30px; border-radius: 4px; font-weight: bold; text-decoration: none; transition: 0.3s; }
+        .btn-red { background: var(--primary); color: white; }
+        .btn-grey { background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(5px); }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .nav-links { display: none !important; }
+            .hamburger { display: flex !important; }
+            .hero-title { font-size: 42px; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title { font-size: 32px; }
+            .hero-desc { font-size: 0.95rem; }
+            .btn { padding: 10px 20px; font-size: 14px; }
+            .search-container { display: none; }
+        }
+
+        /* Hamburger Animation */
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="#" class="logo-container">
+            <span class="logo-you">You</span><span class="logo-flix">Flix</span>
+        </a>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">K-Pop M/V</a>
+            <a href="#" class="nav-link">K-Drama</a>
+            <a href="#" class="nav-link">Eternal Cinema</a>
+            <a href="#" class="nav-link">Variety</a>
+        </div>
+        <div class="nav-right">
+            <div class="search-container">
+                <input type="text" placeholder="Search titles...">
+                <i class="fas fa-search" style="color: grey; font-size: 12px;"></i>
+            </div>
+            <div class="lang-toggle">KR</div>
+            <div class="hamburger" id="hamburger-trigger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="side-menu">
+        <a href="#" style="color: var(--primary);">Home</a>
+        <a href="#">K-Pop M/V</a>
+        <a href="#">K-Drama</a>
+        <a href="#">Eternal Cinema</a>
+        <a href="#">Variety</a>
+    </div>
+
+    <section class="hero" id="hero-slider" style="background-image: url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000');">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span style="color: var(--primary); font-weight: 800; letter-spacing: 2px;">EDITOR'S CHOICE</span>
+            <h1 class="hero-title" id="slide-title">Midnight<br>in Seoul</h1>
+            <p class="hero-desc" id="slide-desc">도시의 밤, 네온사인 아래 숨겨진 열망과 고독을 탐구하는 시네마틱 걸작. 진정한 K-Noir의 정수를 경험하세요.</p>
+            <div class="hero-btns">
+                <a href="#" class="btn btn-red"><i class="fas fa-play"></i> WATCH NOW</a>
+                <a href="#" class="btn btn-grey"><i class="fas fa-plus"></i> MY LIST</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Hamburger Toggle
+        const trigger = document.getElementById('hamburger-trigger');
+        const sideMenu = document.getElementById('side-menu');
+
+        trigger.addEventListener('click', () => {
+            trigger.classList.toggle('active');
+            sideMenu.classList.toggle('active');
+            
+            if (sideMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Simple Slide Data Rotation
+        const slides = [
+            {
+                image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=2000',
+                title: 'Midnight<br>in Seoul',
+                desc: '도시의 밤, 네온사인 아래 숨겨진 열망과 고독을 탐구하는 시네마틱 걸작. 진정한 K-Noir의 정수를 경험하세요.'
+            },
+            {
+                image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=2000',
+                title: 'Music<br>Revolution',
+                desc: '글로벌 차트를 점령한 K-팝의 역사와 화려한 퍼포먼스. 음악 그 이상의 예술을 만납니다.'
+            },
+            {
+                image: 'https://images.unsplash.com/photo-1485846234645-a62644ef7467?auto=format&fit=crop&q=80&w=2000',
+                title: 'Eternal<br>Cinema',
+                desc: '시간이 흘러도 변치 않는 명작들. 한국 영화사의 황금기를 수놓은 거장들의 작품을 복원된 화질로 감상하세요.'
+            }
+        ];
+
+        let idx = 0;
+        const hero = document.getElementById('hero-slider');
+        const title = document.getElementById('slide-title');
+        const desc = document.getElementById('slide-desc');
+
+        setInterval(() => {
+            idx = (idx + 1) % slides.length;
+            hero.style.backgroundImage = `url('${slides[idx].image}')`;
+            title.innerHTML = slides[idx].title;
+            desc.innerHTML = slides[idx].desc;
+        }, 5000);
+
+        // Navbar Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(8, 8, 8, 0.98)';
+                nav.style.padding = '10px 4%';
+            } else {
+                nav.style.background = 'transparent';
+                nav.style.padding = '15px 4%';
+            }
+        });
+    </script>
+</body>
+</html>
