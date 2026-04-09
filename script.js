@@ -1,9 +1,8 @@
 /**
- * YOUFLIX.KR Core Engine (v22.1 PURE - Restoration Patch) 🚀
- * Official Stitch 'Editorial Cinematic' Implementation.
+ * YOUFLIX.KR Premium Archive Engine (v18.0 - Quota Optimizer Edition) 🚀
+ * Features: LocalStorage Caching, Row-level Lazy Loading, and Firestore Optimization
  */
 
-// 💎 Firebase Configuration (v22.1 Engine)
 const firebaseConfig = {
     apiKey: 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14',
     authDomain: "gen-lang-client-0874410222.firebaseapp.com",
@@ -13,36 +12,44 @@ const firebaseConfig = {
     appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
 };
 
-let db = null;
-try {
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    console.log("✅ YOUFLIX Engine: Firebase Initialized");
-} catch (e) {
-    console.error("🚨 YOUFLIX Engine: Firebase Initialization Failed", e);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// 🌎 Language Manager
-let currentLang = (function() {
-    try {
-        const saved = localStorage.getItem('yfx_lang');
-        if (saved) return saved;
-    } catch(e) {}
+// 💎 Quota Optimization State (v18.0)
+const lastDocMap = {};
+const loadingMap = {};
+const reachedEndMap = {};
+const CACHE_TTL = 60 * 60 * 1000; // 60분 간 유효
+
+const ARTIST_ALIASES = {
+    "에스파": "aespa", "aespa": "에스파",
+    "뉴진스": "NewJeans", "newjeans": "뉴진스",
+    "아이브": "IVE", "ive": "아이브",
+    "르세라핌": "LE SSERAFIM", "lesserafim": "르세라핌",
+    "방탄소년단": "BTS", "bts": "방탄소년단",
+    "블랙핑크": "BLACKPINK", "blackpink": "블랙핑크",
+    "트와이스": "TWICE", "twice": "트와이스",
+    "스테이씨": "STAYC", "stayc": "스테이씨",
+    "세븐틴": "SEVENTEEN", "seventeen": "세븐틴",
+    "스트레이키즈": "Stray Kids", "straykids": "스트레이키즈"
+};
+
+// 🌎 i18n Language Manager (v19.18)
+const currentLang = (function() {
+    const saved = localStorage.getItem('yfx_lang');
+    if (saved) return saved;
     const browserLang = navigator.language.split('-')[0];
     return (browserLang === 'ko') ? 'ko' : 'en';
 })();
 
 function setLanguage(lang) {
-    try {
-        localStorage.setItem('yfx_lang', lang);
-        window.location.reload();
-    } catch(e) { window.location.reload(); }
+    localStorage.setItem('yfx_lang', lang);
+    window.location.reload();
 }
 
 function t(key) {
-    const registry = window.TRANSLATIONS || (typeof TRANSLATIONS !== 'undefined' ? TRANSLATIONS : null);
-    if (!registry) return key;
-    return registry[currentLang]?.[key] || registry['en']?.[key] || key;
+    if (!window.TRANSLATIONS) return key;
+    return window.TRANSLATIONS[currentLang][key] || window.TRANSLATIONS['en'][key] || key;
 }
 
 function applyTranslations() {
@@ -56,140 +63,438 @@ function applyTranslations() {
         }
     });
 
+    // 언어 토글 버튼 활성화 상태 표시
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 }
 
-// --- [Core] Stitch Rendering Engine ---
-function renderStitchCards(container, vList, mode = 'standard') {
-    if (!container) return;
-    vList.forEach((v) => {
+// --- [Utility] Smart Caching Engine ---
+function decodeHTMLEntities(text) {
+    if (!text) return '';
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+}
+
+function getCache(key) {
+    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
+    if (isAdmin) return null;
+
+    const cached = localStorage.getItem(`yfx_cache_${key}_${currentLang}`);
+    if (!cached) return null;
+    const { timestamp, data } = JSON.parse(cached);
+    if (Date.now() - timestamp > CACHE_TTL) {
+        localStorage.removeItem(`yfx_cache_${key}_${currentLang}`);
+        return null;
+    }
+    return data;
+}
+
+function setCache(key, data) {
+    localStorage.setItem(`yfx_cache_${key}_${currentLang}`, JSON.stringify({
+        timestamp: Date.now(),
+        data: data
+    }));
+}
+
+// --- [Feature] Presence & Access Control ---
+(function() {
+    const sessionId = sessionStorage.getItem('yfx_session') || 
+                     (sessionStorage.setItem('yfx_session', Math.random().toString(36).substr(2, 9)), sessionStorage.getItem('yfx_session'));
+    
+    let userLoc = "Unknown";
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            userLoc = `${data.city}, ${data.country_code}`;
+            updatePresence();
+        })
+        .catch(() => updatePresence());
+
+    async function updatePresence() {
+        if (typeof db === 'undefined') return;
+        try {
+            await db.collection('presence').doc(sessionId).set({
+                last_active: firebase.firestore.FieldValue.serverTimestamp(),
+                page: window.location.pathname,
+                search: window.location.search,
+                location: userLoc,
+                ua: navigator.userAgent
+            }, { merge: true });
+        } catch (e) { console.warn("Presence sync fail."); }
+    }
+    setInterval(updatePresence, 60000); // 주기 연장 (30s -> 60s)
+})();
+
+function trackPV() {
+    const isAdmin = localStorage.getItem('youflix_admin') === 'true';
+    if (isAdmin) return;
+    db.collection('statistics').doc('daily_pv').set({ 
+        count: firebase.firestore.FieldValue.increment(1), 
+        lastUpdate: new Date().toLocaleDateString() 
+    }, { merge: true });
+}
+
+// --- [Core] Data Rendering Engine ---
+function renderVideos(grid, vList) {
+    vList.forEach(v => {
         const card = document.createElement('div');
-        let cardClass = 'card animate-in';
-        if (mode === 'large') cardClass += ' card-large';
-        if (mode === 'square') cardClass += ' card-square';
-        if (mode === 'shelf') cardClass += ' shelf-item';
-        
-        card.className = cardClass;
+        card.className = 'video-card animate-in';
         card.innerHTML = `
-            <img src="${v.thumbnail}" class="card-img" alt="${v.title}" loading="lazy">
-            <div class="card-content">
-                <span style="color:var(--primary); font-weight:900; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase;">
-                    ${(v.category || 'CINEMATIC').toUpperCase()}
-                </span>
-                <h3 class="card-title">${v.title}</h3>
-                <p class="card-subtitle">${v.channel || 'Official Archive'} • ${v.date || 'Restored'}</p>
+            <div class="thumbnail-container">
+                <img src="${v.thumbnail}" alt="${v.title}">
+                <div class="play-overlay"><span class="play-icon">▶</span></div>
             </div>
+            <div class="video-info"><h4>${v.title}</h4><p class="video-meta">${v.channel} • ${v.date}</p></div>
         `;
-        
-        card.onclick = () => openModal(v);
-        container.appendChild(card);
+        card.querySelector('.thumbnail-container').onclick = () => openModal(v);
+        grid.appendChild(card);
     });
 }
 
-// --- [Core] Asymmetric Grid Population ---
-async function setupStitchGrids() {
-    const featuredCon = document.getElementById('trending-featured');
-    const squareCon = document.getElementById('trending-square');
-    const shelfCon = document.getElementById('trending-shelf');
+// --- [Core] Smart Load Engine (Caching & Paging) ---
+async function load(key, config = {}, isAppend = false) {
+    const gridId = config.elementId || 'category-grid';
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    if (loadingMap[key] || reachedEndMap[key]) return;
+    
+    // 💎 캐시 확인 (백업 로드 시 제외)
+    if (!isAppend) {
+        const cachedData = getCache(key);
+        if (cachedData) {
+            console.log(`💎 Cache Hit: ${key}`);
+            grid.innerHTML = '';
+            renderVideos(grid, cachedData);
+            return;
+        }
+    }
 
-    if (!featuredCon || !db) return;
+    loadingMap[key] = true;
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel && isAppend) sentinel.classList.add('loading');
 
     try {
-        // Fetch trending content from 'kpop' or 'trending' collections
-        const kpopSnap = await db.collection('kpop').orderBy('timestamp', 'desc').limit(6).get();
-        if (!kpopSnap.empty) {
-            const docs = kpopSnap.docs;
-            featuredCon.innerHTML = '';
-            if (squareCon) squareCon.innerHTML = '';
-            if (shelfCon) shelfCon.innerHTML = '';
-
-            // 1. Large Feature Card
-            const vL = docs[0].data(); vL.id = docs[0].id; vL.category = 'kpop';
-            renderStitchCards(featuredCon, [vL], 'large');
-
-            // 2. Square Context Card
-            if (squareCon && docs[1]) {
-                const vS = docs[1].data(); vS.id = docs[1].id; vS.category = 'kpop';
-                renderStitchCards(squareCon, [vS], 'square');
-            }
-
-            // 3. Horizontal Shelf Cards
-            if (shelfCon && docs.length > 2) {
-                const shelfList = docs.slice(2).map(d => {
-                    const v = d.data(); v.id = d.id; v.category = 'kpop';
-                    return v;
-                });
-                renderStitchCards(shelfCon, shelfList, 'shelf');
-            }
-        } else {
-            featuredCon.innerHTML = '<div style="padding:40px; opacity:0.5;">No items found.</div>';
+        if (!isAppend) grid.innerHTML = '';
+        
+        let orderField = 'timestamp';
+        let orderDirection = 'desc';
+        if (key === 'tvlit' || key === 'dramagame') {
+            orderField = 'sort_idx';
+            orderDirection = 'asc';
         }
-    } catch (e) {
-        console.error("🚨 YOUFLIX: Grid Sync Error", e);
-        if (featuredCon) featuredCon.innerHTML = '<div style="padding:40px; opacity:0.5;">Sync Deferred.</div>';
+        
+        let query = db.collection(key).orderBy(orderField, orderDirection).limit(20);
+        if (isAppend && lastDocMap[key]) query = query.startAfter(lastDocMap[key]);
+
+        const snap = await query.get();
+        
+        if (snap.empty) {
+            if (!isAppend) grid.innerHTML = `<p class="loading-msg">${t('loading_empty')}</p>`;
+            reachedEndMap[key] = true;
+        } else {
+            lastDocMap[key] = snap.docs[snap.docs.length - 1];
+            const batchData = [];
+            snap.forEach(doc => {
+                const v = doc.data(); v.category = key;
+                v.id = doc.id; // ID 명시적 할당
+                batchData.push(v);
+            });
+            
+            renderVideos(grid, batchData);
+            
+            // 캐시 저장 (첫 페이지만)
+            if (!isAppend) setCache(key, batchData);
+            
+            if (snap.docs.length < 20) reachedEndMap[key] = true;
+        }
+    } catch (e) { 
+        console.error("Load Error: " + key, e); 
+    } finally {
+        loadingMap[key] = false;
+        if (sentinel) sentinel.classList.remove('loading');
     }
 }
 
-// --- [UI] Modal (Cinema Mode) ---
+// --- [Feature] Row-Level Lazy Loading (IntersectionObserver) ---
+function setupRowLazyLoading() {
+    const rows = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+    const rowObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const rowKey = entry.target.dataset.row;
+                const gridId = rowKey + '-grid';
+                if (document.getElementById(gridId)) load(rowKey, { elementId: gridId });
+                rowObserver.unobserve(entry.target); // 한 번 로드 후 감시 종료
+            }
+        });
+    }, { threshold: 0.1 });
+
+    rows.forEach(row => {
+        const grid = document.getElementById(row + '-grid');
+        if (grid) {
+            grid.dataset.row = row;
+            // K-Pop 섹션은 첫 화면이므로 즉시 로드, 나머지는 지연 로드
+            if (row === 'kpop') {
+                load(row, { elementId: row + '-grid' });
+            } else {
+                rowObserver.observe(grid);
+            }
+        }
+    });
+}
+
+function setupInfiniteScroll(key) {
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (!sentinel) return;
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !loadingMap[key] && !reachedEndMap[key]) {
+            load(key, { elementId: 'category-grid' }, true);
+        }
+    }, { threshold: 0.01 });
+    observer.observe(sentinel);
+}
+
+// --- [UI] Modal ---
 function openModal(v) {
     const modal = document.getElementById('video-modal');
     const player = document.getElementById('player');
     if (!modal || !player) return;
     
-    document.getElementById('modal-title').innerText = v.title;
-    document.getElementById('modal-desc').innerText = v.description || 'Premium curation from the YOUFLIX official archive.';
-    player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    // (v19.18) 다국어 해설 선택 루틴
+    const desc = (currentLang === 'ko') 
+        ? (v.description_ko || v.description) 
+        : (v.description_en || v.description);
+
+    document.getElementById('modal-title').innerText = decodeHTMLEntities(v.title);
+    document.getElementById('modal-desc').innerText = decodeHTMLEntities(desc) || t('modal_curation_msg');
     
+    // 유튜브 플레이어 파라미터 최적화 (Error 153 완화 및 안정성 향상)
+    const origin = window.location.origin === 'null' ? '*' : window.location.origin;
+    player.innerHTML = `<iframe width="100%" height="100%" 
+        src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&enablejsapi=1&origin=${origin}&widget_referrer=${origin}" 
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    
+    // (v19.20) 모달 하단 액션 버튼 추가 (유튜브 바로가기 폴백)
+    let actions = document.querySelector('.modal-actions');
+    if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'modal-actions';
+        document.querySelector('.modal-content').appendChild(actions);
+    }
+    actions.innerHTML = `
+        <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" class="yt-fallback-btn">
+            <span class="yt-icon">📺</span> ${t('btn_watch_on_yt')}
+        </a>
+        <button class="modal-close-btn" onclick="closeModal()">${t('btn_close_modal')}</button>
+    `;
+
     modal.style.display = 'block'; document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-    const modal = document.getElementById('video-modal');
-    if (modal) modal.style.display = 'none';
-    const player = document.getElementById('player');
-    if (player) player.innerHTML = '';
+    document.getElementById('video-modal').style.display = 'none';
+    document.getElementById('player').innerHTML = '';
     document.body.style.overflow = 'auto';
 }
 
-// --- [Init] Robust Application Entry ---
-function initApp() {
-    console.log("🚀 YOUFLIX Core: Initializing...");
+// --- [Feature] Search Engine (v19.1 - Multi-Alias Mapping) ---
+async function handleSearch(query) {
+    if (!query || query.trim().length < 2) return;
     
-    // Check if translations are ready
-    const hasTranslations = window.TRANSLATIONS || (typeof TRANSLATIONS !== 'undefined');
-    if (!hasTranslations) {
-        console.warn("⏳ YOUFLIX: Waiting for Translations...");
+    const resultsContainer = document.getElementById('search-results-section') || createSearchResultsSection();
+    const grid = resultsContainer.querySelector('.video-grid');
+    grid.innerHTML = '<div class="loading-state" style="padding: 40px; text-align: center; width: 100%;"><p style="color: #888;">Searching across all archives...</p></div>';
+    resultsContainer.style.display = 'block';
+
+    // Hide original rows
+    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    if (mainContent) {
+        Array.from(mainContent.children).forEach(child => {
+            if (child !== resultsContainer) child.style.display = 'none';
+        });
+    }
+
+    const categories = ['kpop', 'kdrama', 'tvlit', 'dramagame', 'kclassic', 'kmovie', 'kvariety', 'trending'];
+    
+    // Check for alias (e.g. '에스파' -> 'aespa')
+    const queryTrim = query.trim();
+    const alias = ARTIST_ALIASES[queryTrim.toLowerCase()] || ARTIST_ALIASES[queryTrim];
+    const searchTerms = [queryTrim];
+    if (alias) searchTerms.push(alias);
+
+    try {
+        const promises = categories.map(async (cat) => {
+            const termPromises = [];
+            searchTerms.forEach(term => {
+                termPromises.push(db.collection(cat).where('title', '>=', term).where('title', '<=', term + '\uf8ff').limit(15).get());
+                if (cat === 'tvlit') {
+                    termPromises.push(db.collection(cat).where('title', '>=', '[TV문학관] ' + term).where('title', '<=', '[TV문학관] ' + term + '\uf8ff').limit(15).get());
+                }
+            });
+
+            const snaps = await Promise.all(termPromises);
+            const results = [];
+            snaps.forEach(snap => {
+                if (!snap.empty) {
+                    snap.forEach(doc => {
+                        const data = doc.data(); data.category = cat; data.id = doc.id;
+                        if (!results.find(v => v.id === data.id)) results.push(data);
+                    });
+                }
+            });
+            return results;
+        });
+
+        const nestedResults = await Promise.all(promises);
+        const allResults = nestedResults.flat();
+
+        grid.innerHTML = '';
+        if (allResults.length === 0) {
+            grid.innerHTML = `
+                <div class="no-results" style="padding: 60px 20px; text-align: center; color: #888; width: 100%;">
+                    <h3 style="color: #fff; margin-bottom: 10px;">No results found for "${query}"</h3>
+                    <p style="margin-bottom: 25px;">Try different terms or browse our categories:</p>
+                    <div class="suggestion-chips" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <span onclick="document.getElementById('search-input').value='K-Pop M/V'; handleSearch('K-Pop M/V')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#K-Pop M/V</span>
+                        <span onclick="document.getElementById('search-input').value='Drama'; handleSearch('Drama')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Drama</span>
+                        <span onclick="document.getElementById('search-input').value='Eternal Cinema'; handleSearch('Eternal Cinema')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Eternal Cinema</span>
+                        <span onclick="document.getElementById('search-input').value='Movie'; handleSearch('Movie')" style="padding: 8px 16px; background: #333; border-radius: 20px; cursor: pointer; color: #fff;">#Movie</span>
+                    </div>
+                </div>`;
+        } else {
+            renderVideos(grid, allResults);
+        }
+    } catch (e) {
+        grid.innerHTML = '<div style="padding: 40px; text-align: center; width: 100%;"><p class="error-msg" style="color: #ff4d4d;">Search unavailable right now. Please try again later.</p></div>';
+        console.error("Search Error: ", e);
+    }
+}
+
+function createSearchResultsSection() {
+    const section = document.createElement('div');
+    section.id = 'search-results-section';
+    section.className = 'row';
+    section.innerHTML = `
+        <div class="container">
+            <div class="row-header" style="border-left: 6px solid #fff;">
+                <h2 class="row-title">Search Results</h2>
+                <button class="view-all-link" onclick="window.location.reload()" style="cursor:pointer; border: none; background: #333;">Close Search</button>
+            </div>
+            <div class="video-grid" style="flex-wrap: wrap; overflow-x: hidden;"></div>
+        </div>
+    `;
+    const mainContent = document.querySelector('.category-grid-container') || document.querySelector('.category-page');
+    if (mainContent) mainContent.prepend(section);
+    return section;
+}
+
+// --- [Init] App Entry Point ---
+async function initApp() {
+    console.log("🌐 Initializing App Language:", currentLang);
+
+    // translations.js가 로드된 후 실행되도록 보장 (window 객체 명시적 확인)
+    if (!window.TRANSLATIONS) {
+        console.warn("⚠️ Translations not loaded yet. Retrying in 100ms...");
         setTimeout(initApp, 100);
         return;
     }
 
     applyTranslations();
+    try { trackPV(); } catch (e) { console.warn("PV Track deferred."); }
     
-    // Language Toggle
+    // (v19.18) 언어 토글 리스너 설치
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.onclick = (e) => setLanguage(e.target.dataset.lang);
+        btn.addEventListener('click', (e) => {
+            const lang = e.target.dataset.lang;
+            console.log("🔄 Switching Language to:", lang);
+            setLanguage(lang);
+        });
     });
 
-    // Navbar Scroll Effect
-    window.onscroll = () => {
-        const nav = document.getElementById('main-nav');
-        if (nav) {
-            if (window.pageYOffset > 40) nav.classList.add('scrolled');
-            else nav.classList.remove('scrolled');
-        }
-    };
+    // (v19.0) Search Listener
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch(e.target.value);
+        });
+    }
 
-    // Populate Grids
-    setupStitchGrids();
+    // (v18.0) Lazy Load Main Page Rows
+    setupRowLazyLoading();
+
+    // Category Page
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('c');
+    if (cat && document.getElementById('category-grid')) {
+        const titles = { 
+            'kpop': t('row_kpop_title'), 
+            'kdrama': t('row_kdrama_title'), 
+            'tvlit': t('row_tvlit_title'), 
+            'dramagame': t('row_dramagame_title'), 
+            'kclassic': t('row_classic_title'), 
+            'kmovie': t('nav_classic'), 
+            'kvariety': t('nav_variety'), 
+            'trending': t('nav_trending')
+        };
+        const titleEl = document.getElementById('category-title');
+        if (titleEl) titleEl.innerText = titles[cat] || cat;
+        
+        load(cat, { elementId: 'category-grid' }).then(() => setupInfiniteScroll(cat));
+    }
+    
+    // (v19.19) Initialize Hero Slider
+    initHeroSlider();
 
     document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 }
 
-// Wait for DOM to be fully ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
+// 🎢 Hero Slider Engine (v19.19)
+function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.indicator-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+
+    function startAutoPlay() {
+        stopAutoPlay();
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoPlay() {
+        if (slideInterval) clearInterval(slideInterval);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            startAutoPlay(); // Reset timer on manual click
+        });
+    });
+
+    // Pause on hover
+    slider.addEventListener('mouseenter', stopAutoPlay);
+    slider.addEventListener('mouseleave', startAutoPlay);
+
+    startAutoPlay();
 }
+
+document.addEventListener('DOMContentLoaded', initApp);

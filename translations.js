@@ -15,9 +15,9 @@ const TRANSLATIONS = {
         "hero_desc": "대한민국 영상 역사의 깊은 자국을 탐험하세요. 한국영상자료원에서 제공하는 고화질 고전 영화들을 엄격하게 큐레이션합니다.",
         "hero_btn_watch": "영화 감상하기",
         "hero_btn_explore": "KOFA 탐색",
-        "hero_slide_1_tag": "EDITOR'S CHOICE",
-        "hero_slide_1_title": "MIDNIGHT IN SEOUL",
-        "hero_slide_1_desc": "잠들지 않는 도시의 불빛과 그 이면에 숨겨진 도시적 갈망을 탐구하는 시네마틱 걸작. 진정한 K-느와르를 경험하세요.",
+        "hero_slide_1_tag": "K-POP 공식 뮤직비디오",
+        "hero_slide_1_title": "내 손안의 음악 방송",
+        "hero_slide_1_desc": "최신 인기 아이돌부터 전설적인 아티스트까지, 공식 채널에서 제공하는 고화질 MV를 감상하세요.",
         "hero_slide_2_tag": "K-드라마 명작 컬렉션",
         "hero_slide_2_title": "인생 드라마를 만나다",
         "hero_slide_2_desc": "TV문학관, 드라마게임 등 대한민국을 울고 웃게 했던 명작 드라마들의 감동을 다시 한번 느껴보세요.",
@@ -32,6 +32,8 @@ const TRANSLATIONS = {
         "row_tvlit_title": "TV문학관: 📽 역사의 걸작 📽",
         "row_dramagame_title": "드라마게임: 🎭 추억의 단막극 🎭",
         "row_classic_title": "고전영화: 🎥 영화박물관 🎥",
+        "row_variety_title": "K-예능: 🏃‍♂️ 예능 하이라이트 🏃‍♂️",
+        "row_trending_title": "인기 급상승: 🔥 지금 뜨는 영상 🔥",
         "row_view_all": "전체보기",
         "loading_kpop": "스타들을 불러오는 중...",
         "loading_kdrama": "시리즈를 준비하는 중...",
@@ -48,12 +50,9 @@ const TRANSLATIONS = {
         "search_close": "검색 닫기",
         "search_no_results": "결과를 찾을 수 없습니다",
         "search_suggestion": "다른 단어를 입력하거나 카테고리를 확인해보세요:",
-        "search_showing_results": "결과 표시 중: ",
         "search_error": "현재 검색 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요.",
-        "row_trending_title": "인기 급상승 명작",
-        "gold_tier_title": "GOLD TIER ACCESS",
-        "gold_tier_desc": "최고의 화질과 광고 없는 몰입을 경험하세요. 오직 유플릭스에서만.",
-        "view_all": "전체보기"
+        "btn_watch_on_yt": "YouTube에서 직접 보기",
+        "btn_close_modal": "닫기"
     },
     en: {
         "nav_home": "Home",
@@ -71,9 +70,9 @@ const TRANSLATIONS = {
         "hero_desc": "Explore the deep history of South Korea's cinematic gold. We meticulously curate full-length classics provided by the Korean Movie Archive.",
         "hero_btn_watch": "Watch Full Movie",
         "hero_btn_explore": "Explore KOFA",
-        "hero_slide_1_tag": "EDITOR'S CHOICE",
-        "hero_slide_1_title": "MIDNIGHT IN SEOUL",
-        "hero_slide_1_desc": "A cinematic masterpiece exploring the hidden layers of urban longing and the neon-lit shadows of a city that never sleeps. Experience the definitive K-Noir.",
+        "hero_slide_1_tag": "OFFICIAL K-POP MV",
+        "hero_slide_1_title": "MUSIC IN YOUR HANDS",
+        "hero_slide_1_desc": "From the latest trending idols to legendary artists, enjoy high-definition MVs provided by official channels.",
         "hero_slide_2_tag": "K-DRAMA MASTERPIECE",
         "hero_slide_2_title": "MEET YOUR LIFE DRAMA",
         "hero_slide_2_desc": "Relive the emotions of masterpieces like TV Literature Hall that moved the hearts of Korea.",
@@ -88,6 +87,8 @@ const TRANSLATIONS = {
         "row_tvlit_title": "TV Literature Hall: 📽 Masterpieces 📽",
         "row_dramagame_title": "Drama Game Archive: 🎭 Classic Theatre 🎭",
         "row_classic_title": "Eternal Cinema: 🎥 Movie Museum 🎥",
+        "row_variety_title": "K-Variety: 🏃‍♂️ Entertainment Highlights 🏃‍♂️",
+        "row_trending_title": "Trending: 🔥 Top Hot Videos 🔥",
         "row_view_all": "View All",
         "loading_kpop": "Summoning the stars...",
         "loading_kdrama": "Preparing the series...",
@@ -104,12 +105,9 @@ const TRANSLATIONS = {
         "search_close": "Close Search",
         "search_no_results": "No results found",
         "search_suggestion": "Try different terms or browse our categories:",
-        "search_showing_results": "Showing results for: ",
         "search_error": "Search unavailable right now. Please try again later.",
-        "row_trending_title": "Trending Masterpieces",
-        "gold_tier_title": "GOLD TIER ACCESS",
-        "gold_tier_desc": "Experience 8K Ultra with no ads. Only on YOUFLIX.",
-        "view_all": "VIEW ALL"
+        "btn_watch_on_yt": "Watch on YouTube",
+        "btn_close_modal": "Close"
     }
 };
 
