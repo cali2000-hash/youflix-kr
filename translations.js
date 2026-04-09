@@ -49,7 +49,11 @@ const TRANSLATIONS = {
         "search_no_results": "결과를 찾을 수 없습니다",
         "search_suggestion": "다른 단어를 입력하거나 카테고리를 확인해보세요:",
         "search_showing_results": "결과 표시 중: ",
-        "search_error": "현재 검색 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
+        "search_error": "현재 검색 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요.",
+        "row_trending_title": "인기 급상승 명작",
+        "gold_tier_title": "GOLD TIER ACCESS",
+        "gold_tier_desc": "최고의 화질과 광고 없는 몰입을 경험하세요. 오직 유플릭스에서만.",
+        "view_all": "전체보기"
     },
     en: {
         "nav_home": "Home",
@@ -101,7 +105,11 @@ const TRANSLATIONS = {
         "search_no_results": "No results found",
         "search_suggestion": "Try different terms or browse our categories:",
         "search_showing_results": "Showing results for: ",
-        "search_error": "Search unavailable right now. Please try again later."
+        "search_error": "Search unavailable right now. Please try again later.",
+        "row_trending_title": "Trending Masterpieces",
+        "gold_tier_title": "GOLD TIER ACCESS",
+        "gold_tier_desc": "Experience 8K Ultra with no ads. Only on YOUFLIX.",
+        "view_all": "VIEW ALL"
     }
 };
 
