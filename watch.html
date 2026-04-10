@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch Video - YOUFLIX</title>
+    <title>Watch Video - YOUFLIX Premium</title>
     <!-- Firebase SDK (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="translations.js"></script> <!-- translations.js 필요 -->
+    <script src="translations.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #e50914;
-            --bg-dark: #080808;
+            --bg-dark: #000000;
+            --bg-card: #0f0f0f;
             --text-main: #ffffff;
-            --text-dim: #b3b3b3;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-            --nav-bg: rgba(0, 0, 0, 0.95);
+            --text-dim: #999;
+            --border: rgba(255, 255, 255, 0.08);
+            --nav-bg: rgba(0, 0, 0, 0.9);
         }
 
         body {
@@ -30,81 +30,129 @@
             overflow-x: hidden;
         }
 
+        /* Navigation */
         nav {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 4%;
+            padding: 0 4%; height: 68px;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             position: fixed; top: 0; width: 100%; z-index: 1000;
             box-sizing: border-box;
         }
-
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 30px; }
         .logo {
-            color: var(--primary); font-size: 26px; font-weight: 950;
-            text-decoration: none; letter-spacing: -1.5px;
+            color: var(--primary); font-family: 'Anton', sans-serif; font-size: 28px;
+            text-decoration: none; letter-spacing: 1px;
         }
+        .nav-link { 
+            color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 700; 
+            transition: 0.3s;
+        }
+        .nav-link:hover { color: #fff; }
+
+        .search-box {
+            background: #111; border-radius: 4px; padding: 8px 15px;
+            display: flex; align-items: center; border: 1px solid var(--border);
+        }
+        .search-box input {
+            background: transparent; border: none; color: #fff; width: 140px; font-size: 13px; outline: none;
+        }
+        .search-icon { color: #666; font-size: 13px; }
+
+        .lang-text-toggle { color: var(--primary); font-weight: 900; font-size: 14px; cursor: pointer; }
+        .lang-option { opacity: 0.5; transition: 0.3s; }
+        .lang-option.active { opacity: 1; }
 
         .back-btn {
-            color: var(--text-main); text-decoration: none;
-            font-size: 14px; font-weight: 700;
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.1);
-            padding: 8px 16px; border-radius: 4px;
-            transition: 0.3s; border: 1px solid var(--border);
+            color: #fff; text-decoration: none; font-size: 12px; font-weight: 800;
+            border: 1px solid var(--border); padding: 8px 20px; border-radius: 4px;
         }
-        .back-btn:hover { background: var(--primary); border-color: var(--primary); }
 
-        .page-container { margin-top: 60px; }
-
-        .video-wrapper {
+        /* Video Section */
+        .page-container { margin-top: 68px; }
+        .video-hero {
             width: 100%; background: #000;
-            aspect-ratio: 16 / 9; max-height: 80vh;
+            aspect-ratio: 16 / 9; max-height: 75vh;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .video-hero iframe { width: 100%; height: 100%; border: none; }
+
+        /* Detail Layout (Matches Premium Image) */
+        .detail-wrapper {
+            max-width: 1300px; margin: 60px auto; padding: 0 5%;
+            display: grid; grid-template-columns: 1.6fr 1fr; gap: 80px;
         }
 
-        iframe { width: 100%; height: 100%; border: none; }
-
-        .content-main { max-width: 1000px; margin: 40px auto; padding: 0 5%; }
-
-        .category-tag {
-            color: var(--primary); font-size: 14px; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 12px; display: block;
+        /* Left: Synopsis */
+        .synopsis-header {
+            color: var(--primary); font-weight: 900; font-size: 12px;
+            letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase;
         }
-
-        .video-title {
-            font-size: 38px; font-weight: 900; margin-bottom: 12px;
-            line-height: 1.2; letter-spacing: -1px;
+        .synopsis-title {
+            font-size: 34px; font-weight: 900; line-height: 1.3;
+            margin-bottom: 40px; letter-spacing: -1px;
         }
-
-        .meta-info {
-            display: flex; gap: 15px; color: var(--text-dim);
-            font-size: 15px; margin-bottom: 30px;
-            border-bottom: 1px solid var(--border); padding-bottom: 20px;
+        .synopsis-text {
+            font-size: 17px; line-height: 1.9; color: #bbb;
+            white-space: pre-wrap; margin-bottom: 50px;
         }
-
-        .description-box {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 8px; padding: 30px; line-height: 1.8;
-            color: #dcdcdc; font-size: 16px; white-space: pre-wrap;
+        .tags-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
+        .tag-chip {
+            background: #222; color: #fff; padding: 10px 22px; border-radius: 5px;
+            font-size: 13px; font-weight: 800; border: 1px solid rgba(255,255,255,0.05);
         }
+        .tag-chip.active { background: var(--primary); }
 
-        .description-box strong {
-            color: #fff; display: block; margin-bottom: 15px; font-size: 18px;
+        /* Right: Sidebar Identity Card */
+        .info-card {
+            background: var(--bg-card); border-radius: 15px; padding: 45px;
+            position: sticky; top: 110px; border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
         }
+        .info-section-label {
+            color: #ff5e62; font-size: 11px; font-weight: 900;
+            letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase;
+        }
+        .meta-group { margin-bottom: 35px; }
+        .meta-item {
+            display: flex; justify-content: space-between; align-items: baseline;
+            margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding-bottom: 15px;
+        }
+        .meta-label { color: #666; font-size: 12px; font-weight: 800; letter-spacing: 1px; }
+        .meta-value { color: #fff; font-size: 19px; font-weight: 900; text-align: right; }
 
+        .cast-wrapper { margin-top: 45px; }
+        .cast-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px 25px;
+        }
+        .cast-name { font-size: 16px; font-weight: 800; color: #fff; }
+        .cast-additional { font-size: 11px; color: #555; margin-top: 20px; line-height: 1.6; }
+
+        .action-button {
+            width: 100%; padding: 20px; background: var(--primary);
+            color: #fff; border: none; border-radius: 4px;
+            font-weight: 950; font-size: 16px; cursor: pointer;
+            margin-top: 45px; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+        }
+        .action-button:hover { background: #ff0000; transform: translateY(-3px); }
+
+        /* Loading */
         .loading-overlay {
-            position: fixed; inset: 0; background: var(--bg-dark);
+            position: fixed; inset: 0; background: #000;
             display: flex; align-items: center; justify-content: center;
-            z-index: 2000; transition: 0.5s;
+            z-index: 2000;
         }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-overlay.hidden { display: none; }
 
-        @media (max-width: 768px) {
-            .video-title { font-size: 24px; }
-            .description-box { padding: 20px; font-size: 15px; }
+        @media (max-width: 1100px) {
+            .detail-wrapper { grid-template-columns: 1fr; gap: 50px; margin-top: 40px; }
+            .info-card { position: static; padding: 30px; }
+            .synopsis-title { font-size: 26px; }
         }
     </style>
 </head>
@@ -114,14 +162,13 @@
         <div style="color: var(--primary); font-size: 40px;"><i class="fas fa-circle-notch fa-spin"></i></div>
     </div>
 
-    <nav id="navbar">
+    <nav>
         <div class="nav-left">
             <a href="index.html" class="logo">YOUFLIX</a>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">HOME</a>
-                <a href="category.html?c=kpop" class="nav-link">K-POP</a>
-                <a href="category.html?c=kdrama" class="nav-link">DRAMA</a>
-                <a href="category.html?c=trending" class="nav-link">TRENDING</a>
+                <a href="category.html?c=tvlit" class="nav-link">TV문학관</a>
+                <a href="category.html?c=kmovie" class="nav-link">CLASSIC CINEMA</a>
             </div>
         </div>
         <div class="nav-right">
@@ -132,45 +179,100 @@
             <div class="lang-text-toggle">
                 <span class="lang-option" data-lang="ko">KR</span> / <span class="lang-option" data-lang="en">EN</span>
             </div>
-            <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> BACK</a>
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> BACK</a>
         </div>
     </nav>
 
     <div class="page-container">
-        <div class="video-wrapper" id="player-container">
-            <!-- Iframe injected by JS -->
+        <div class="video-hero" id="player-container">
+            <!-- Iframe -->
         </div>
 
-        <main class="content-main">
-            <span class="category-tag" id="display-category">Loading...</span>
-            <h1 class="video-title" id="display-title">---</h1>
-            
-            <div class="meta-info">
-                <span id="display-channel"><i class="fas fa-tv"></i> ---</span>
-                <span id="display-date"><i class="fas fa-calendar-alt"></i> ---</span>
+        <div class="detail-wrapper">
+            <!-- Left: Synopsis -->
+            <div class="synopsis-column">
+                <div class="synopsis-header">Synopsis</div>
+                <h1 class="synopsis-title" id="display-title">---</h1>
+                <div class="synopsis-text" id="display-desc">Loading...</div>
+                
+                <div class="tags-container" id="display-tags">
+                    <!-- Dynamic Tags -->
+                </div>
             </div>
 
-            <div class="description-box" id="display-desc">
-                <strong>CURATION NOTE</strong>
-                <p>Loading masterpiece details...</p>
-            </div>
-        </main>
+            <!-- Right: Sidebar -->
+            <aside class="sidebar-column">
+                <div class="info-card">
+                    <div class="info-section-label">Production Identity</div>
+                    
+                    <div class="meta-group">
+                        <div class="meta-item">
+                            <span class="meta-label">DIRECTOR</span>
+                            <span class="meta-value" id="meta-director">정보없음</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">ORIGINAL WORK</span>
+                            <span class="meta-value" id="meta-original">정보없음</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">SCREENPLAY</span>
+                            <span class="meta-value" id="meta-screenplay">정보없음</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">RELEASE</span>
+                            <span class="meta-value" id="meta-release">정보없음</span>
+                        </div>
+                    </div>
+
+                    <div class="cast-wrapper">
+                        <div class="info-section-label">Cast Ensemble</div>
+                        <div class="cast-grid" id="meta-cast">
+                            <div class="cast-name">정보없음</div>
+                        </div>
+                        <div class="cast-additional" id="meta-cast-more"></div>
+                    </div>
+
+                    <button class="action-button" id="yt-btn">Watch on YouTube</button>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <script>
-        // Firebase Config (Same as index.html)
         const firebaseConfig = {
             apiKey: 'AIzaSyDArPdfLyswcFgLBW724ZTObPC4yQ9Py14',
             authDomain: "gen-lang-client-0874410222.firebaseapp.com",
             projectId: "gen-lang-client-0874410222",
             storageBucket: "gen-lang-client-0874410222.firebasestorage.app",
-            messagingSenderId: "970801923265",
             appId: "1:970801923265:web:e2ee1f82d2c567808d0040"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const currentLang = localStorage.getItem('yfx_lang') || 'ko';
+        function parseVideoMetaData(text) {
+            const meta = {};
+            if(!text) return meta;
+            
+            // Regex patterns for Korean movie archives
+            const patterns = {
+                director: /(?:감독|연출)[:\s]*([^\n|]+)/,
+                original: /(?:원작)[:\s]*([^\n|]+)/,
+                screenplay: /(?:극본|시나리오|각본)[:\s]*([^\n|]+)/,
+                release: /(?:방송일|개봉일|방영일|일시)[:\s]*([^\n|]+)/,
+                cast: /(?:출연|캐스팅)[:\s]*([^\n|]+)/
+            };
+
+            for(const [key, reg] of Object.entries(patterns)) {
+                const match = text.match(reg);
+                if(match) meta[key] = match[1].trim();
+            }
+
+            if(meta.cast) {
+                const names = meta.cast.split(/[,/\s]+/).filter(n => n.length > 1 && n.length < 5).slice(0, 8);
+                meta.castList = names;
+            }
+            return meta;
+        }
 
         async function initWatch() {
             const params = new URLSearchParams(window.location.search);
@@ -187,35 +289,63 @@
                 if (!doc.exists) throw new Error("Video not found");
 
                 const v = doc.data();
+                const descText = v.description || v.description_kr || "";
+                const meta = parseVideoMetaData(v.description || "");
+
+                // 데이터 우선순위: 시트 동기화 데이터 -> 파싱 데이터 -> 기본값
+                const director = v.director || meta.director || "정보없음";
+                const original = v.original_work || meta.original || "정보없음";
+                const screenplay = v.screenplay || meta.screenplay || "정보없음";
+                const releaseDate = v.air_date || v.date || meta.release || "정보없음";
+                const castRaw = v.cast || meta.cast || "";
                 
-                // Inject Player
-                const origin = window.location.origin;
+                let episodeInfo = "";
+                if (v.episode) {
+                    episodeInfo = `<span style="color:var(--primary); font-size: 0.6em; vertical-align: middle; margin-right: 15px; border: 1px solid var(--primary); padding: 2px 8px; border-radius: 4px;">${v.episode}화</span>`;
+                }
+
+                // Populate Fields
+                document.getElementById('display-title').innerHTML = `${episodeInfo}${v.title}`;
+                document.getElementById('display-desc').innerText = v.description_kr || descText;
+                
+                document.getElementById('meta-director').innerText = director;
+                document.getElementById('meta-original').innerText = original;
+                document.getElementById('meta-screenplay').innerText = screenplay;
+                document.getElementById('meta-release').innerText = releaseDate;
+
+                // 출연진 처리
+                const castContainer = document.getElementById('meta-cast');
+                const castMore = document.getElementById('meta-cast-more');
+                
+                if (castRaw) {
+                    const castList = castRaw.split(/[,/\s]+/).filter(n => n.length > 1).slice(0, 8);
+                    castContainer.innerHTML = castList.map(name => `<div class="cast-name">${name.trim()}</div>`).join('');
+                    if (castRaw.length > 30) {
+                        castMore.innerText = `전체 출연: ${castRaw}`;
+                    }
+                } else {
+                    castContainer.innerHTML = `<div class="cast-name">정보없음</div>`;
+                }
+
+                // Tags
+                const tags = [category.toUpperCase(), "MASTERPIECE", "ARCHIVE", "PREMIUM"];
+                document.getElementById('display-tags').innerHTML = tags.map((t, idx) => 
+                    `<div class="tag-chip ${idx===1?'active':''}">${t}</div>`
+                ).join('');
+
+                // Player
                 document.getElementById('player-container').innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${v.id || videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${origin}" 
+                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen></iframe>
                 `;
 
-                // Update Info
-                document.getElementById('display-title').innerText = v.title;
-                document.getElementById('display-category').innerText = category.toUpperCase();
-                document.getElementById('display-channel').innerHTML = `<i class="fas fa-tv"></i> ${v.channel || 'Official'}`;
-                document.getElementById('display-date').innerHTML = `<i class="fas fa-calendar-alt"></i> ${v.date || 'Archives'}`;
+                document.getElementById('yt-btn').onclick = () => window.open(`https://youtu.be/${videoId}`, '_blank');
+                document.title = `${v.title} - YOUFLIX Premium`;
 
-                const desc = (currentLang === 'ko') 
-                    ? (v.description_ko || v.description) 
-                    : (v.description_en || v.description);
-                
-                document.getElementById('display-desc').innerHTML = `
-                    <strong>${currentLang === 'ko' ? '[작품 큐레이션]' : '[CURATION NOTE]'}</strong>
-                    ${desc || (currentLang === 'ko' ? '이 작품에 대한 상세 설명이 준비 중입니다.' : 'Detailed description is coming soon.')}
-                `;
-
-                document.title = `${v.title} - YOUFLIX`;
-
-            } catch (error) {
-                console.error(error);
-                alert("영상을 불러올 수 없습니다.");
+            } catch (err) {
+                console.error(err);
+                alert("정보를 로드할 수 없습니다.");
                 window.location.href = 'index.html';
             } finally {
                 document.getElementById('loading').classList.add('hidden');
