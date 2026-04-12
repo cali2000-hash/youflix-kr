@@ -96,10 +96,10 @@
         .meta-value { color: #fff; font-size: 16px !important; font-weight: 400; text-align: right; }
 
         .cast-wrapper { margin-top: 45px; }
-        .cast-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px 25px;
+        .cast-list {
+            font-size: 16px !important; font-weight: 400; color: #fff;
+            line-height: 1.8;
         }
-        .cast-name { font-size: 16px !important; font-weight: 400; color: #fff; }
         .cast-additional { font-size: 11px; color: #555; margin-top: 20px; line-height: 1.6; }
 
         .action-button {
@@ -216,7 +216,7 @@
 
                     <div class="cast-wrapper">
                         <div class="info-section-label">Cast Ensemble</div>
-                        <div class="cast-grid" id="meta-cast">
+                        <div class="cast-list" id="meta-cast">
                             <div class="cast-name">정보없음</div>
                         </div>
                         <div class="cast-additional" id="meta-cast-more"></div>
@@ -307,9 +307,9 @@
                 
                 if (castRaw) {
                     const castList = castRaw.split(/[,/\s]+/).filter(n => n.length > 1);
-                    castContainer.innerHTML = castList.map(name => `<div class="cast-name">${name.trim()}</div>`).join('');
+                    castContainer.innerText = castList.map(name => name.trim()).join(', ');
                 } else {
-                    castContainer.innerHTML = `<div class="cast-name">정보없음</div>`;
+                    castContainer.innerText = "정보없음";
                 }
 
                 // Tags
