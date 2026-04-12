@@ -11,6 +11,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --primary: #e50914;
@@ -32,37 +33,22 @@
 
         /* Navigation */
         nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 4%; height: 68px;
+            width: 100%;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            box-sizing: border-box;
+            position: fixed; top: 0; z-index: 1000;
         }
-        .nav-left, .nav-right { display: flex; align-items: center; gap: 30px; }
+        .nav-container {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 68px;
+            /* style.css의 .container가 중앙 정렬과 폭을 처리합니다. */
+        }
+        .nav-right { display: flex; align-items: center; gap: 30px; }
         .logo {
             color: var(--primary); font-family: 'Anton', sans-serif; font-size: 28px;
             text-decoration: none; letter-spacing: 1px;
         }
-        .nav-link { 
-            color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 700; 
-            transition: 0.3s;
-        }
-        .nav-link:hover { color: #fff; }
-
-        .search-box {
-            background: #111; border-radius: 4px; padding: 8px 15px;
-            display: flex; align-items: center; border: 1px solid var(--border);
-        }
-        .search-box input {
-            background: transparent; border: none; color: #fff; width: 140px; font-size: 13px; outline: none;
-        }
-        .search-icon { color: #666; font-size: 13px; }
-
-        .lang-text-toggle { color: var(--primary); font-weight: 900; font-size: 14px; cursor: pointer; }
-        .lang-option { opacity: 0.5; transition: 0.3s; }
-        .lang-option.active { opacity: 1; }
 
         .back-btn {
             color: #fff; text-decoration: none; font-size: 12px; font-weight: 800;
@@ -70,19 +56,24 @@
         }
 
         /* Video Section */
-        .page-container { margin-top: 68px; }
+        .page-container { margin-top: 68px; padding-top: 40px; }
         .video-hero {
-            width: 100%; background: #000;
-            aspect-ratio: 16 / 9; max-height: 75vh;
+            width: 100%;
+            max-width: var(--container-width);
+            background: #000;
+            aspect-ratio: 16 / 9;
+            margin: 0 auto;
             display: flex; justify-content: center; align-items: center;
             border-bottom: 3px solid var(--primary);
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 8px; /* Added slight rounding for premium feel */
+            overflow: hidden;
         }
         .video-hero iframe { width: 100%; height: 100%; border: none; }
 
         /* Detail Layout (Matches Premium Image) */
         .detail-wrapper {
-            max-width: 1300px; margin: 60px auto; padding: 0 5%;
+            max-width: var(--container-width); margin: 60px auto; padding: 0 20px;
             display: grid; grid-template-columns: 1.6fr 1fr; gap: 80px;
         }
 
@@ -163,29 +154,30 @@
     </div>
 
     <nav>
-        <div class="nav-left">
-            <a href="index.html" class="logo">YOUFLIX</a>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">HOME</a>
-                <a href="category.html?c=tvlit" class="nav-link">TV문학관</a>
-                <a href="category.html?c=kmovie" class="nav-link">CLASSIC CINEMA</a>
+        <div class="container nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="logo">YOUFLIX</a>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">HOME</a>
+                    <a href="category.html?c=tvlit" class="nav-link">TV문학관</a>
+                    <a href="category.html?c=kmovie" class="nav-link">CLASSIC CINEMA</a>
+                </div>
             </div>
-        </div>
-        <div class="nav-right">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search titles...">
-                <i class="fas fa-search search-icon"></i>
+            <div class="nav-right">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search titles...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> BACK</a>
             </div>
-            <div class="lang-text-toggle">
-                <span class="lang-option" data-lang="ko">KR</span> / <span class="lang-option" data-lang="en">EN</span>
-            </div>
-            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> BACK</a>
         </div>
     </nav>
 
     <div class="page-container">
-        <div class="video-hero" id="player-container">
-            <!-- Iframe -->
+        <div class="container">
+            <div class="video-hero" id="player-container">
+                <!-- Iframe -->
+            </div>
         </div>
 
         <div class="detail-wrapper">
