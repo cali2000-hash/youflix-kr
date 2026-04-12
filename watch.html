@@ -306,14 +306,10 @@
 
                 // 출연진 처리
                 const castContainer = document.getElementById('meta-cast');
-                const castMore = document.getElementById('meta-cast-more');
                 
                 if (castRaw) {
-                    const castList = castRaw.split(/[,/\s]+/).filter(n => n.length > 1).slice(0, 8);
+                    const castList = castRaw.split(/[,/\s]+/).filter(n => n.length > 1);
                     castContainer.innerHTML = castList.map(name => `<div class="cast-name">${name.trim()}</div>`).join('');
-                    if (castRaw.length > 30) {
-                        castMore.innerText = `전체 출연: ${castRaw}`;
-                    }
                 } else {
                     castContainer.innerHTML = `<div class="cast-name">정보없음</div>`;
                 }
