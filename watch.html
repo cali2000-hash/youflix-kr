@@ -224,7 +224,6 @@
                         <div class="cast-additional" id="meta-cast-more"></div>
                     </div>
 
-                    <button class="action-button" id="yt-btn">Watch on YouTube</button>
                 </div>
             </aside>
         </div>
@@ -332,7 +331,6 @@
                             allowfullscreen></iframe>
                 `;
 
-                document.getElementById('yt-btn').onclick = () => window.open(`https://youtu.be/${videoId}`, '_blank');
                 document.title = `${v.title} - YOUFLIX Premium`;
 
             } catch (err) {
